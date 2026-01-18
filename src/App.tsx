@@ -26,7 +26,9 @@ import {
   CalendarBlank,
   Notepad,
   Bell,
-  Camera
+  Camera,
+  ChartLine,
+  CurrencyCircleDollar
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -42,6 +44,8 @@ import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { ReportsView } from '@/components/ReportsView'
+import { CurrencyManagement } from '@/components/CurrencyManagement'
 import type { 
   Timesheet, 
   Invoice, 
@@ -56,7 +60,7 @@ import type {
   ExpenseStatus
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -391,6 +395,19 @@ function App() {
             onClick={() => setCurrentView('compliance')}
             badge={metrics.complianceAlerts}
           />
+          <Separator className="my-2" />
+          <NavItem
+            icon={<ChartLine size={20} />}
+            label="Reports"
+            active={currentView === 'reports'}
+            onClick={() => setCurrentView('reports')}
+          />
+          <NavItem
+            icon={<CurrencyCircleDollar size={20} />}
+            label="Currency"
+            active={currentView === 'currency'}
+            onClick={() => setCurrentView('currency')}
+          />
           <NavItem
             icon={<MapTrifold size={20} />}
             label="Roadmap"
@@ -538,6 +555,17 @@ function App() {
               complianceDocs={complianceDocs}
               onUploadDocument={handleUploadDocument}
             />
+          )}
+
+          {currentView === 'reports' && (
+            <ReportsView
+              invoices={invoices}
+              payrollRuns={payrollRuns}
+            />
+          )}
+
+          {currentView === 'currency' && (
+            <CurrencyManagement />
           )}
 
           {currentView === 'roadmap' && (

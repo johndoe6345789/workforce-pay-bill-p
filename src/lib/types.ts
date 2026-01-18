@@ -98,3 +98,27 @@ export interface Notification {
   actionUrl?: string
   relatedId?: string
 }
+
+export interface MarginAnalysis {
+  period: string
+  revenue: number
+  costs: number
+  margin: number
+  marginPercentage: number
+}
+
+export interface ForecastData {
+  period: string
+  predictedRevenue: number
+  predictedCosts: number
+  predictedMargin: number
+  confidence: number
+}
+
+export interface CurrencyRate {
+  code: string
+  name: string
+  symbol: string
+  rateToGBP: number
+  lastUpdated: string
+}

@@ -48,11 +48,18 @@ This is a multi-module enterprise platform requiring navigation between distinct
 - Success criteria: All documents tracked, alerts sent 30 days before expiry, workers blocked if non-compliant
 
 **Reporting & Analytics**
-- Functionality: Pre-built and custom reports with drill-down capabilities
-- Purpose: Provides visibility into margins, forecasts, and operational metrics
+- Functionality: Pre-built and custom reports with drill-down capabilities, real-time margin analysis, and predictive forecasting
+- Purpose: Provides visibility into margins, forecasts, and operational metrics with AI-powered insights
 - Trigger: User navigates to reports or scheduled report generation
 - Progression: Select report type → Apply filters → Generate → Review visualizations → Drill down → Export data
-- Success criteria: Reports load under 5 seconds, support export to Excel/PDF, reflect real-time data
+- Success criteria: Reports load under 5 seconds, support export to Excel/PDF, reflect real-time data, forecasts show confidence levels
+
+**Multi-Currency Management**
+- Functionality: Comprehensive currency rate management with automatic conversion and tracking
+- Purpose: Enables global operations with support for multiple currencies and real-time exchange rates
+- Trigger: User adds currency or updates exchange rates
+- Progression: Navigate to currency → View rates → Add new currency → Update rates → Apply to invoices
+- Success criteria: Exchange rates update in real-time, conversions are accurate, supports unlimited currencies
 
 **Multi-Tenant Navigation**
 - Functionality: Switch between organizational entities and divisions
