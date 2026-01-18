@@ -63,6 +63,10 @@ import { AuditTrailViewer } from '@/components/AuditTrailViewer'
 import { NotificationRulesManager } from '@/components/NotificationRulesManager'
 import { TimesheetAdjustmentWizard } from '@/components/TimesheetAdjustmentWizard'
 import { BatchImportManager } from '@/components/BatchImportManager'
+import { OneClickPayroll } from '@/components/OneClickPayroll'
+import { RateTemplateManager } from '@/components/RateTemplateManager'
+import { CustomReportBuilder } from '@/components/CustomReportBuilder'
+import { HolidayPayManager } from '@/components/HolidayPayManager'
 import type { 
   Timesheet, 
   Invoice, 
@@ -77,7 +81,7 @@ import type {
   ExpenseStatus
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -470,6 +474,12 @@ function App() {
               onClick={() => setCurrentView('reports')}
             />
             <NavItem
+              icon={<ChartBar size={20} />}
+              label="Custom Reports"
+              active={currentView === 'custom-reports'}
+              onClick={() => setCurrentView('custom-reports')}
+            />
+            <NavItem
               icon={<ClockCounterClockwise size={20} />}
               label="Missing Timesheets"
               active={currentView === 'missing-timesheets'}
@@ -488,6 +498,12 @@ function App() {
               label="Currency"
               active={currentView === 'currency'}
               onClick={() => setCurrentView('currency')}
+            />
+            <NavItem
+              icon={<CurrencyCircleDollar size={20} />}
+              label="Rate Templates"
+              active={currentView === 'rate-templates'}
+              onClick={() => setCurrentView('rate-templates')}
             />
             <NavItem
               icon={<Envelope size={20} />}
@@ -538,6 +554,12 @@ function App() {
               label="Onboarding"
               active={currentView === 'onboarding'}
               onClick={() => setCurrentView('onboarding')}
+            />
+            <NavItem
+              icon={<CalendarBlank size={20} />}
+              label="Holiday Pay"
+              active={currentView === 'holiday-pay'}
+              onClick={() => setCurrentView('holiday-pay')}
             />
             <NavItem
               icon={<ClockCounterClockwise size={20} />}
@@ -677,7 +699,15 @@ function App() {
           )}
 
           {currentView === 'payroll' && (
-            <PayrollView payrollRuns={payrollRuns} />
+            <>
+              <PayrollView payrollRuns={payrollRuns} />
+              <OneClickPayroll 
+                timesheets={timesheets}
+                onPayrollComplete={(run) => {
+                  setPayrollRuns((current) => [...(current || []), run])
+                }}
+              />
+            </>
           )}
 
           {currentView === 'expenses' && (
@@ -760,6 +790,23 @@ function App() {
                 toast.success(`Imported ${data.length} records`)
               }}
             />
+          )}
+
+          {currentView === 'rate-templates' && (
+            <RateTemplateManager />
+          )}
+
+          {currentView === 'custom-reports' && (
+            <CustomReportBuilder
+              timesheets={timesheets}
+              invoices={invoices}
+              payrollRuns={payrollRuns}
+              expenses={expenses}
+            />
+          )}
+
+          {currentView === 'holiday-pay' && (
+            <HolidayPayManager />
           )}
 
           {currentView === 'roadmap' && (
@@ -2364,9 +2411,9 @@ function RoadmapView() {
 ### Basic Payroll
 - ✅ Payroll run tracking
 - ✅ Worker payment calculations
-- 📋 One-click payroll processing
+- ✅ One-click payroll processing
 - 📋 PAYE payroll integration
-- 📋 Holiday pay calculations
+- ✅ Holiday pay calculations
 
 ### Dashboard & Core Reporting
 - ✅ Executive dashboard with key metrics
@@ -2411,7 +2458,7 @@ function RoadmapView() {
 - 📋 Withholding tax handling
 
 ### Contract, Rate & Rule Enforcement
-- 📋 Rate templates by role/client/placement
+- ✅ Rate templates by role/client/placement
 - 📋 Automatic shift premium calculations
 - 📋 Overtime rate automation
 - 📋 Time pattern validation
@@ -2453,7 +2500,7 @@ function RoadmapView() {
 - ✅ Real-time gross margin reporting
 - ✅ Forecasting and predictive analytics
 - ✅ Missing timesheet reports
-- 📋 Custom report builder
+- ✅ Custom report builder
 - 📋 Client-level performance dashboards
 - 📋 Placement-level profitability
 

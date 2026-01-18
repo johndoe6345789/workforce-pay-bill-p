@@ -75,6 +75,34 @@ This is a multi-module enterprise platform requiring navigation between distinct
 - Progression: Navigate to sidebar → Click group header → Group expands/collapses → Access module within group
 - Success criteria: Groups persist state, smooth animations, essential modules always visible
 
+**One-Click Payroll Processing**
+- Functionality: Automated payroll processing from approved timesheets with instant calculation and payment file generation
+- Purpose: Eliminates manual payroll calculations and reduces processing time from hours to seconds
+- Trigger: User clicks "Process Payroll Now" button
+- Progression: View approved timesheets → Review worker payments → Confirm processing → Generate payment files → Mark timesheets as processed → Download payment files
+- Success criteria: Processes 100+ workers in under 5 seconds, calculates all deductions correctly, generates bank-compatible files
+
+**Rate Template Management**
+- Functionality: Pre-configured rate structures for different roles, clients, and shift types (standard, overtime, weekend, night, holiday)
+- Purpose: Ensures consistent rate application and automates shift premium calculations across all timesheets
+- Trigger: User creates new rate template or applies template to timesheet
+- Progression: Define role/client → Set standard rate → Configure premium multipliers → Save template → Apply to timesheets → Automatic rate calculation
+- Success criteria: Unlimited templates supported, automatic application to matching timesheets, version history maintained
+
+**Custom Report Builder**
+- Functionality: Flexible report configuration with custom metrics, grouping, filtering, and date ranges across all data types
+- Purpose: Empowers users to create ad-hoc analysis without requiring technical support or pre-built reports
+- Trigger: User navigates to Custom Reports and configures parameters
+- Progression: Select data type → Choose metrics → Apply filters → Set grouping → Define date range → Generate report → Export to CSV/PDF
+- Success criteria: Supports 10+ data dimensions, generates reports under 3 seconds, exports to multiple formats
+
+**Holiday Pay Management**
+- Functionality: Automatic holiday accrual calculation, request workflows, and balance tracking with statutory compliance
+- Purpose: Automates complex holiday pay calculations and ensures workers receive correct entitlements
+- Trigger: Hours worked recorded in timesheet (automatic accrual) or worker submits holiday request
+- Progression: Hours worked → Accrual calculated at 5.6% → Balance updated → Worker requests holiday → Manager approves → Balance deducted → Holiday pay included in next payroll
+- Success criteria: Automatic accrual from all timesheets, real-time balance visibility, integration with payroll system
+
 ## Edge Case Handling
 
 - **Missing Timesheet Data**: Display clear empty states with guided actions to submit or import timesheets
