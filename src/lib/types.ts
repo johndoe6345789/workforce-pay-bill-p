@@ -2,6 +2,9 @@ export type TimesheetStatus = 'pending' | 'approved' | 'rejected' | 'processing'
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue'
 export type PayrollStatus = 'scheduled' | 'processing' | 'completed' | 'failed'
 export type ComplianceStatus = 'valid' | 'expiring' | 'expired'
+export type ExpenseStatus = 'pending' | 'approved' | 'rejected' | 'paid'
+export type NotificationType = 'timesheet' | 'invoice' | 'compliance' | 'expense' | 'payroll' | 'system'
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent'
 
 export interface Timesheet {
   id: string
@@ -54,6 +57,7 @@ export interface DashboardMetrics {
   monthlyPayroll: number
   grossMargin: number
   activeWorkers: number
+  pendingExpenses: number
 }
 
 export interface ComplianceDocument {
@@ -64,4 +68,33 @@ export interface ComplianceDocument {
   expiryDate: string
   status: ComplianceStatus
   daysUntilExpiry: number
+}
+
+export interface Expense {
+  id: string
+  workerId: string
+  workerName: string
+  clientName: string
+  date: string
+  category: string
+  description: string
+  amount: number
+  currency: string
+  status: ExpenseStatus
+  receiptUrl?: string
+  submittedDate: string
+  approvedDate?: string
+  billable: boolean
+}
+
+export interface Notification {
+  id: string
+  type: NotificationType
+  priority: NotificationPriority
+  title: string
+  message: string
+  timestamp: string
+  read: boolean
+  actionUrl?: string
+  relatedId?: string
 }

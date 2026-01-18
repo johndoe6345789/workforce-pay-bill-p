@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
+import { useNotifications } from '@/hooks/use-notifications'
 import { 
   Clock, 
   Receipt, 
@@ -22,7 +23,10 @@ import {
   FileCsv,
   Envelope,
   X,
-  CalendarBlank
+  CalendarBlank,
+  Notepad,
+  Bell,
+  Camera
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -33,6 +37,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { 
@@ -44,21 +51,25 @@ import type {
   ComplianceDocument,
   TimesheetStatus,
   InvoiceStatus,
-  ComplianceStatus
+  ComplianceStatus,
+  Expense,
+  ExpenseStatus
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'reports' | 'roadmap'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
   const [currentEntity, setCurrentEntity] = useState('Main Agency')
   const [searchQuery, setSearchQuery] = useState('')
+  const { notifications, addNotification, markAsRead, markAllAsRead, deleteNotification, unreadCount } = useNotifications()
   
   const [timesheets = [], setTimesheets] = useKV<Timesheet[]>('timesheets', [])
   const [invoices = [], setInvoices] = useKV<Invoice[]>('invoices', [])
   const [payrollRuns = [], setPayrollRuns] = useKV<PayrollRun[]>('payroll-runs', [])
   const [workers = [], setWorkers] = useKV<Worker[]>('workers', [])
   const [complianceDocs = [], setComplianceDocs] = useKV<ComplianceDocument[]>('compliance-docs', [])
+  const [expenses = [], setExpenses] = useKV<Expense[]>('expenses', [])
 
   const metrics: DashboardMetrics = {
     pendingTimesheets: timesheets.filter(t => t.status === 'pending').length,
@@ -68,7 +79,8 @@ function App() {
     monthlyRevenue: invoices.reduce((sum, inv) => sum + inv.amount, 0),
     monthlyPayroll: payrollRuns.reduce((sum, pr) => sum + pr.totalAmount, 0),
     grossMargin: 0,
-    activeWorkers: workers.filter(w => w.status === 'active').length
+    activeWorkers: workers.filter(w => w.status === 'active').length,
+    pendingExpenses: expenses.filter(e => e.status === 'pending').length
   }
 
   metrics.grossMargin = metrics.monthlyRevenue > 0 
@@ -84,6 +96,16 @@ function App() {
           : t
       )
     })
+    const timesheet = timesheets.find(t => t.id === id)
+    if (timesheet) {
+      addNotification({
+        type: 'timesheet',
+        priority: 'medium',
+        title: 'Timesheet Approved',
+        message: `${timesheet.workerName}'s timesheet for ${new Date(timesheet.weekEnding).toLocaleDateString()} has been approved`,
+        relatedId: id
+      })
+    }
     toast.success('Timesheet approved successfully')
   }
 
@@ -96,6 +118,16 @@ function App() {
           : t
       )
     })
+    const timesheet = timesheets.find(t => t.id === id)
+    if (timesheet) {
+      addNotification({
+        type: 'timesheet',
+        priority: 'medium',
+        title: 'Timesheet Rejected',
+        message: `${timesheet.workerName}'s timesheet for ${new Date(timesheet.weekEnding).toLocaleDateString()} has been rejected`,
+        relatedId: id
+      })
+    }
     toast.error('Timesheet rejected')
   }
 
@@ -221,7 +253,77 @@ function App() {
     }
 
     setComplianceDocs(current => [...(current || []), newDoc])
+    
+    if (status === 'expiring' || status === 'expired') {
+      addNotification({
+        type: 'compliance',
+        priority: status === 'expired' ? 'urgent' : 'high',
+        title: status === 'expired' ? 'Document Expired' : 'Document Expiring Soon',
+        message: `${data.documentType} for ${data.workerName} ${status === 'expired' ? 'has expired' : `expires in ${daysUntilExpiry} days`}`,
+        relatedId: newDoc.id
+      })
+    }
+    
     toast.success('Document uploaded successfully')
+  }
+
+  const handleCreateExpense = (data: {
+    workerName: string
+    clientName: string
+    date: string
+    category: string
+    description: string
+    amount: number
+    billable: boolean
+  }) => {
+    const newExpense: Expense = {
+      id: `EXP-${Date.now()}`,
+      workerId: `W-${Date.now()}`,
+      workerName: data.workerName,
+      clientName: data.clientName,
+      date: data.date,
+      category: data.category,
+      description: data.description,
+      amount: data.amount,
+      currency: 'GBP',
+      status: 'pending',
+      submittedDate: new Date().toISOString(),
+      billable: data.billable
+    }
+
+    setExpenses(current => [...(current || []), newExpense])
+    addNotification({
+      type: 'expense',
+      priority: 'low',
+      title: 'New Expense Submitted',
+      message: `${data.workerName} submitted a £${data.amount.toFixed(2)} expense`,
+      relatedId: newExpense.id
+    })
+    toast.success('Expense created successfully')
+  }
+
+  const handleApproveExpense = (id: string) => {
+    setExpenses(current => {
+      if (!current) return []
+      return current.map(e =>
+        e.id === id
+          ? { ...e, status: 'approved' as ExpenseStatus, approvedDate: new Date().toISOString() }
+          : e
+      )
+    })
+    toast.success('Expense approved')
+  }
+
+  const handleRejectExpense = (id: string) => {
+    setExpenses(current => {
+      if (!current) return []
+      return current.map(e =>
+        e.id === id
+          ? { ...e, status: 'rejected' as ExpenseStatus }
+          : e
+      )
+    })
+    toast.error('Expense rejected')
   }
 
   return (
@@ -276,6 +378,13 @@ function App() {
             onClick={() => setCurrentView('payroll')}
           />
           <NavItem
+            icon={<Notepad size={20} />}
+            label="Expenses"
+            active={currentView === 'expenses'}
+            onClick={() => setCurrentView('expenses')}
+            badge={metrics.pendingExpenses}
+          />
+          <NavItem
             icon={<ShieldCheck size={20} />}
             label="Compliance"
             active={currentView === 'compliance'}
@@ -304,6 +413,84 @@ function App() {
       </aside>
 
       <main className="flex-1 overflow-auto">
+        <div className="border-b border-border bg-card sticky top-0 z-10">
+          <div className="flex items-center justify-between px-6 py-3">
+            <div className="flex-1" />
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="relative">
+                    <Bell size={18} />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-96 p-0" align="end">
+                  <div className="flex items-center justify-between p-4 border-b border-border">
+                    <h3 className="font-semibold">Notifications</h3>
+                    {unreadCount > 0 && (
+                      <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+                        Mark all read
+                      </Button>
+                    )}
+                  </div>
+                  <ScrollArea className="h-96">
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center text-muted-foreground">
+                        <Bell size={32} className="mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No notifications</p>
+                      </div>
+                    ) : (
+                      <div className="p-2">
+                        {notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            className={cn(
+                              'p-3 rounded-lg mb-2 cursor-pointer hover:bg-muted/50 transition-colors',
+                              !notif.read && 'bg-accent/10'
+                            )}
+                            onClick={() => markAsRead(notif.id)}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <p className="font-medium text-sm">{notif.title}</p>
+                                  {!notif.read && (
+                                    <div className="w-2 h-2 rounded-full bg-accent" />
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground mb-1">
+                                  {notif.message}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(notif.timestamp).toLocaleString()}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  deleteNotification(notif.id)
+                                }}
+                              >
+                                <X size={14} />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </div>
+
         <div className="p-6 space-y-6">
           {currentView === 'dashboard' && (
             <DashboardView metrics={metrics} />
@@ -333,6 +520,17 @@ function App() {
 
           {currentView === 'payroll' && (
             <PayrollView payrollRuns={payrollRuns} />
+          )}
+
+          {currentView === 'expenses' && (
+            <ExpensesView
+              expenses={expenses}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              onCreateExpense={handleCreateExpense}
+              onApprove={handleApproveExpense}
+              onReject={handleRejectExpense}
+            />
           )}
 
           {currentView === 'compliance' && (
@@ -404,6 +602,12 @@ function DashboardView({ metrics }: DashboardViewProps) {
           variant="warning"
         />
         <MetricCard
+          title="Pending Expenses"
+          value={metrics.pendingExpenses}
+          icon={<Notepad size={20} className="text-info" />}
+          variant="default"
+        />
+        <MetricCard
           title="Overdue Invoices"
           value={metrics.overdueInvoices}
           icon={<Receipt size={20} className="text-destructive" />}
@@ -415,13 +619,6 @@ function DashboardView({ metrics }: DashboardViewProps) {
           value={metrics.complianceAlerts}
           icon={<Warning size={20} className="text-warning" />}
           variant="warning"
-        />
-        <MetricCard
-          title="Active Workers"
-          value={metrics.activeWorkers}
-          icon={<CheckCircle size={20} className="text-success" />}
-          trend={{ value: 8, direction: 'up' }}
-          variant="success"
         />
       </div>
 
@@ -1470,6 +1667,392 @@ function ComplianceCard({ document }: ComplianceCardProps) {
   )
 }
 
+interface ExpensesViewProps {
+  expenses: Expense[]
+  searchQuery: string
+  setSearchQuery: (query: string) => void
+  onCreateExpense: (data: {
+    workerName: string
+    clientName: string
+    date: string
+    category: string
+    description: string
+    amount: number
+    billable: boolean
+  }) => void
+  onApprove: (id: string) => void
+  onReject: (id: string) => void
+}
+
+function ExpensesView({
+  expenses,
+  searchQuery,
+  setSearchQuery,
+  onCreateExpense,
+  onApprove,
+  onReject
+}: ExpensesViewProps) {
+  const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    workerName: '',
+    clientName: '',
+    date: '',
+    category: '',
+    description: '',
+    amount: '',
+    billable: true
+  })
+
+  const filteredExpenses = expenses.filter(e => {
+    const matchesSearch = e.workerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         e.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         e.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || e.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
+
+  const handleSubmitCreate = () => {
+    if (!formData.workerName || !formData.clientName || !formData.date || !formData.category || !formData.amount) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    onCreateExpense({
+      workerName: formData.workerName,
+      clientName: formData.clientName,
+      date: formData.date,
+      category: formData.category,
+      description: formData.description,
+      amount: parseFloat(formData.amount),
+      billable: formData.billable
+    })
+
+    setFormData({
+      workerName: '',
+      clientName: '',
+      date: '',
+      category: '',
+      description: '',
+      amount: '',
+      billable: true
+    })
+    setIsCreateDialogOpen(false)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">Expense Management</h2>
+          <p className="text-muted-foreground mt-1">Manage worker expenses and reimbursements</p>
+        </div>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus size={18} className="mr-2" />
+              Create Expense
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Create New Expense</DialogTitle>
+              <DialogDescription>
+                Enter expense details for worker reimbursement or client billing
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="exp-worker">Worker Name</Label>
+                <Input
+                  id="exp-worker"
+                  placeholder="Enter worker name"
+                  value={formData.workerName}
+                  onChange={(e) => setFormData({ ...formData, workerName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exp-client">Client Name</Label>
+                <Input
+                  id="exp-client"
+                  placeholder="Enter client name"
+                  value={formData.clientName}
+                  onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exp-date">Expense Date</Label>
+                <Input
+                  id="exp-date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exp-category">Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger id="exp-category">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Travel">Travel</SelectItem>
+                    <SelectItem value="Accommodation">Accommodation</SelectItem>
+                    <SelectItem value="Meals">Meals</SelectItem>
+                    <SelectItem value="Equipment">Equipment</SelectItem>
+                    <SelectItem value="Training">Training</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="exp-description">Description</Label>
+                <Textarea
+                  id="exp-description"
+                  placeholder="Describe the expense"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exp-amount">Amount (£)</Label>
+                <Input
+                  id="exp-amount"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2 flex items-end">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.billable}
+                    onChange={(e) => setFormData({ ...formData, billable: e.target.checked })}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm">Billable to client</span>
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleSubmitCreate}>Create Expense</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <MagnifyingGlass 
+            size={18} 
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
+          />
+          <Input
+            placeholder="Search expenses..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+          <SelectTrigger className="w-40">
+            <div className="flex items-center gap-2">
+              <Funnel size={16} />
+              <SelectValue />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
+            <SelectItem value="paid">Paid</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button variant="outline">
+          <Download size={18} className="mr-2" />
+          Export
+        </Button>
+      </div>
+
+      <Tabs defaultValue="pending" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="pending">
+            Pending ({expenses.filter(e => e.status === 'pending').length})
+          </TabsTrigger>
+          <TabsTrigger value="approved">
+            Approved ({expenses.filter(e => e.status === 'approved').length})
+          </TabsTrigger>
+          <TabsTrigger value="rejected">
+            Rejected ({expenses.filter(e => e.status === 'rejected').length})
+          </TabsTrigger>
+          <TabsTrigger value="paid">
+            Paid ({expenses.filter(e => e.status === 'paid').length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pending" className="space-y-4">
+          {filteredExpenses
+            .filter(e => e.status === 'pending')
+            .map(expense => (
+              <ExpenseCard
+                key={expense.id}
+                expense={expense}
+                onApprove={onApprove}
+                onReject={onReject}
+              />
+            ))}
+          {filteredExpenses.filter(e => e.status === 'pending').length === 0 && (
+            <Card className="p-12 text-center">
+              <CheckCircle size={48} className="mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">All caught up!</h3>
+              <p className="text-muted-foreground">No pending expenses to review</p>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="approved" className="space-y-4">
+          {filteredExpenses
+            .filter(e => e.status === 'approved')
+            .map(expense => (
+              <ExpenseCard key={expense.id} expense={expense} />
+            ))}
+        </TabsContent>
+
+        <TabsContent value="rejected" className="space-y-4">
+          {filteredExpenses
+            .filter(e => e.status === 'rejected')
+            .map(expense => (
+              <ExpenseCard key={expense.id} expense={expense} />
+            ))}
+        </TabsContent>
+
+        <TabsContent value="paid" className="space-y-4">
+          {filteredExpenses
+            .filter(e => e.status === 'paid')
+            .map(expense => (
+              <ExpenseCard key={expense.id} expense={expense} />
+            ))}
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
+interface ExpenseCardProps {
+  expense: Expense
+  onApprove?: (id: string) => void
+  onReject?: (id: string) => void
+}
+
+function ExpenseCard({ expense, onApprove, onReject }: ExpenseCardProps) {
+  const statusConfig = {
+    pending: { icon: ClockCounterClockwise, color: 'text-warning' },
+    approved: { icon: CheckCircle, color: 'text-success' },
+    rejected: { icon: XCircle, color: 'text-destructive' },
+    paid: { icon: CheckCircle, color: 'text-success' }
+  }
+
+  const StatusIcon = statusConfig[expense.status].icon
+
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="space-y-3 flex-1">
+            <div className="flex items-start gap-4">
+              <StatusIcon 
+                size={24} 
+                weight="fill" 
+                className={statusConfig[expense.status].color}
+              />
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="font-semibold text-lg">{expense.workerName}</h3>
+                  <Badge variant={expense.status === 'approved' || expense.status === 'paid' ? 'success' : expense.status === 'rejected' ? 'destructive' : 'warning'}>
+                    {expense.status}
+                  </Badge>
+                  {expense.billable && (
+                    <Badge variant="outline">Billable</Badge>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Client</p>
+                    <p className="font-medium">{expense.clientName}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Category</p>
+                    <p className="font-medium">{expense.category}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Date</p>
+                    <p className="font-medium">{new Date(expense.date).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Amount</p>
+                    <p className="font-semibold font-mono text-lg">£{expense.amount.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Currency</p>
+                    <p className="font-medium font-mono">{expense.currency}</p>
+                  </div>
+                </div>
+                {expense.description && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    {expense.description}
+                  </div>
+                )}
+                <div className="mt-2 text-sm text-muted-foreground">
+                  Submitted {new Date(expense.submittedDate).toLocaleDateString()}
+                  {expense.approvedDate && ` • Approved ${new Date(expense.approvedDate).toLocaleDateString()}`}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex gap-2 ml-4">
+            {expense.status === 'pending' && onApprove && onReject && (
+              <>
+                <Button 
+                  size="sm" 
+                  onClick={() => onApprove(expense.id)}
+                  style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}
+                >
+                  <CheckCircle size={16} className="mr-2" />
+                  Approve
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive" 
+                  onClick={() => onReject(expense.id)}
+                >
+                  <XCircle size={16} className="mr-2" />
+                  Reject
+                </Button>
+              </>
+            )}
+            {expense.receiptUrl && (
+              <Button size="sm" variant="outline">
+                <Camera size={16} className="mr-2" />
+                View Receipt
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 function RoadmapView() {
   const roadmapContent = `# WorkForce Pro - Development Roadmap
 
@@ -1486,8 +2069,8 @@ function RoadmapView() {
 - ✅ Online web portal timesheet entry
 - ✅ Timesheet approval workflows
 - ✅ Status tracking (pending/approved/rejected)
-- 🔄 Agency-initiated timesheet creation
-- 🔄 Bulk entry by administrators
+- ✅ Agency-initiated timesheet creation
+- ✅ Bulk entry by administrators
 - 📋 Mobile timesheet submission
 - 📋 Batch import capabilities
 - 📋 QR-coded paper timesheet scanning
@@ -1496,7 +2079,7 @@ function RoadmapView() {
 - ✅ Invoice generation from timesheets
 - ✅ Invoice status tracking
 - ✅ Multi-currency support (GBP, USD, EUR)
-- 🔄 Electronic invoice delivery
+- ✅ Electronic invoice delivery
 - 📋 Sales invoice templates
 - 📋 Payment terms configuration
 - 📋 Purchase order tracking
@@ -1520,11 +2103,21 @@ function RoadmapView() {
 ## Phase 2: Advanced Operations & Automation (Quarters 3-4) 🔄
 
 ### Expense Management
-- 📋 Worker expense submission (web/mobile)
-- 📋 Mobile expense capture with receipts
-- 📋 Agency-created expense entries
-- 📋 Approval workflows
-- 📋 Integration with billing and payroll
+- ✅ Worker expense submission (web portal)
+- ✅ Agency-created expense entries
+- ✅ Expense approval workflows
+- ✅ Integration with billing and payroll
+- ✅ Reimbursable vs billable expense tracking
+- 📋 Mobile expense capture with receipt photos
+
+### Notifications & Workflow Automation
+- ✅ In-system alert notifications
+- ✅ Real-time notification center
+- ✅ Notification history and tracking
+- ✅ Event-driven processing updates
+- 📋 Email notification templates
+- 📋 Configurable notification rules
+- 📋 Automated follow-up reminders
 
 ### Timesheet Management - Advanced
 - 📋 Multi-step approval routing
@@ -1554,7 +2147,7 @@ function RoadmapView() {
 ### Compliance Management - Enhanced
 - ✅ Document tracking and monitoring
 - ✅ Expiry alerts and notifications
-- 🔄 Document upload and storage
+- ✅ Document upload and storage
 - 📋 Digital onboarding workflows
 - 📋 Automated contract pack generation
 - 📋 Compliance enforcement rules
@@ -1580,8 +2173,8 @@ function RoadmapView() {
 ## Phase 4: Analytics & Integrations (Quarters 7-8) 📋
 
 ### Advanced Reporting & Analytics
-- 🔄 Real-time gross margin reporting
-- 🔄 Forecasting and predictive analytics
+- 📋 Real-time gross margin reporting
+- 📋 Forecasting and predictive analytics
 - 📋 Missing timesheet reports
 - 📋 Custom report builder
 - 📋 Client-level performance dashboards
@@ -1595,7 +2188,7 @@ function RoadmapView() {
 - 📋 Webhook support for real-time updates
 
 ### Global & Multi-Currency - Advanced
-- 🔄 Multi-currency billing (expanded)
+- 📋 Multi-currency billing (expanded)
 - 📋 International sales tax handling
 - 📋 Withholding tax automation
 - 📋 Cross-border margin calculation
@@ -1782,8 +2375,8 @@ function RoadmapView() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">Phase 1</div>
-            <p className="text-sm text-muted-foreground mt-1">Foundation & Core Pay/Bill</p>
+            <div className="text-3xl font-semibold">Phase 1 + 2.1, 2.5</div>
+            <p className="text-sm text-muted-foreground mt-1">Foundation, Expenses & Notifications</p>
           </CardContent>
         </Card>
 
@@ -1796,7 +2389,7 @@ function RoadmapView() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">Phase 2</div>
-            <p className="text-sm text-muted-foreground mt-1">Advanced Operations</p>
+            <p className="text-sm text-muted-foreground mt-1">Advanced Operations & Automation</p>
           </CardContent>
         </Card>
 
