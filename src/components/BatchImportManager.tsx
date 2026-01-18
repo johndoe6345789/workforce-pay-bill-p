@@ -1,272 +1,373 @@
 import { useState } from 'react'
-import { Upload, FileText, CheckCircle, XCircle, Warning, Download } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { FileCsv, FileText, CheckCircle, XCircle, Warning, Download, Upload } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
-interface ImportResult {
-  id: string
-  timestamp: string
-  source: string
-  recordsProcessed: number
-  recordsSuccessful: number
-  recordsFailed: number
-  status: 'success' | 'partial' | 'failed'
-  errors?: string[]
+interface ValidationResult {
+  valid: boolean
+  errors: string[]
+  warnings: string[]
+  rowCount: number
+  preview: Record<string, string>[]
 }
 
 interface BatchImportManagerProps {
-  onImportComplete: (data: any[]) => void
+  onImportComplete?: (data: any[]) => void
 }
 
 export function BatchImportManager({ onImportComplete }: BatchImportManagerProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [importSource, setImportSource] = useState<'csv' | 'json' | 'xml' | 'api'>('csv')
-  const [importData, setImportData] = useState('')
-  const [importHistory, setImportHistory] = useState<ImportResult[]>([])
+  const [csvData, setCsvData] = useState('')
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
+  const [isValidating, setIsValidating] = useState(false)
+
+  const validateCsv = (data: string, type: 'timesheets' | 'expenses' | 'workers') => {
+    setIsValidating(true)
+    
+    setTimeout(() => {
+      const lines = data.trim().split('\n')
+      const errors: string[] = []
+      const warnings: string[] = []
+      const preview: Record<string, string>[] = []
+
+      if (lines.length < 2) {
+        errors.push('CSV must contain at least a header row and one data row')
+        setValidationResult({
+          valid: false,
+          errors,
+          warnings,
+          rowCount: 0,
+          preview: []
+        })
+        setIsValidating(false)
+        return
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim())
+      const requiredFields = type === 'timesheets' 
+        ? ['workerName', 'clientName', 'hours', 'rate', 'weekEnding']
+        : type === 'expenses'
+        ? ['workerName', 'clientName', 'amount', 'category', 'date']
+        : ['name', 'email', 'type']
+
+      const missingFields = requiredFields.filter(field => !headers.includes(field))
+      if (missingFields.length > 0) {
+        errors.push(`Missing required columns: ${missingFields.join(', ')}`)
+      }
+
+      for (let i = 1; i < Math.min(lines.length, 6); i++) {
+        const values = lines[i].split(',').map(v => v.trim())
+        const row: Record<string, string> = {}
+        
+        headers.forEach((header, index) => {
+          row[header] = values[index] || ''
+        })
+
+        if (type === 'timesheets') {
+          const hours = parseFloat(row.hours)
+          const rate = parseFloat(row.rate)
+          
+          if (isNaN(hours) || hours <= 0) {
+            errors.push(`Row ${i}: Invalid hours value`)
+          }
+          if (isNaN(rate) || rate <= 0) {
+            errors.push(`Row ${i}: Invalid rate value`)
+          }
+          if (hours > 80) {
+            warnings.push(`Row ${i}: Hours value ${hours} seems unusually high`)
+          }
+        }
+
+        preview.push(row)
+      }
+
+      const rowCount = lines.length - 1
+
+      if (rowCount > 100) {
+        warnings.push(`Large import: ${rowCount} rows will be processed`)
+      }
+
+      setValidationResult({
+        valid: errors.length === 0,
+        errors,
+        warnings,
+        rowCount,
+        preview
+      })
+      setIsValidating(false)
+    }, 500)
+  }
 
   const handleImport = () => {
-    if (!importData.trim()) {
-      toast.error('Please provide data to import')
+    if (!validationResult?.valid) {
+      toast.error('Cannot import data with validation errors')
       return
     }
 
-    let parsedData: any[] = []
-    let errors: string[] = []
-    let successCount = 0
+    const lines = csvData.trim().split('\n')
+    const headers = lines[0].split(',').map(h => h.trim())
+    const importedData: any[] = []
 
-    try {
-      if (importSource === 'csv') {
-        const lines = importData.trim().split('\n')
-        if (lines.length < 2) {
-          toast.error('CSV must have at least a header and one data row')
-          return
-        }
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim())
+      const row: Record<string, any> = {}
+      
+      headers.forEach((header, index) => {
+        row[header] = values[index]
+      })
 
-        const headers = lines[0].split(',').map(h => h.trim())
-        
-        for (let i = 1; i < lines.length; i++) {
-          try {
-            const values = lines[i].split(',').map(v => v.trim())
-            if (values.length !== headers.length) {
-              errors.push(`Row ${i}: Column count mismatch`)
-              continue
-            }
-
-            const record: any = {}
-            headers.forEach((header, idx) => {
-              record[header] = values[idx]
-            })
-
-            parsedData.push(record)
-            successCount++
-          } catch (err) {
-            errors.push(`Row ${i}: ${err instanceof Error ? err.message : 'Parse error'}`)
-          }
-        }
-      } else if (importSource === 'json') {
-        const parsed = JSON.parse(importData)
-        parsedData = Array.isArray(parsed) ? parsed : [parsed]
-        successCount = parsedData.length
-      } else if (importSource === 'xml') {
-        toast.error('XML import not yet implemented')
-        return
-      } else if (importSource === 'api') {
-        toast.error('API import not yet implemented')
-        return
-      }
-
-      const result: ImportResult = {
-        id: `IMP-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        source: importSource.toUpperCase(),
-        recordsProcessed: parsedData.length + errors.length,
-        recordsSuccessful: successCount,
-        recordsFailed: errors.length,
-        status: errors.length === 0 ? 'success' : successCount > 0 ? 'partial' : 'failed',
-        errors: errors.length > 0 ? errors : undefined
-      }
-
-      setImportHistory(prev => [result, ...prev])
-
-      if (parsedData.length > 0) {
-        onImportComplete(parsedData)
-        toast.success(`Successfully imported ${successCount} records${errors.length > 0 ? ` (${errors.length} failed)` : ''}`)
-      } else {
-        toast.error('No records were successfully imported')
-      }
-
-      setImportData('')
-      if (errors.length === 0) {
-        setIsOpen(false)
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Import failed')
+      importedData.push(row)
     }
+
+    onImportComplete?.(importedData)
+    toast.success(`Successfully imported ${importedData.length} records`)
+    setCsvData('')
+    setValidationResult(null)
   }
 
-  const downloadTemplate = () => {
-    const template = importSource === 'csv' 
-      ? 'workerName,clientName,hours,rate,weekEnding\nJohn Doe,Acme Corp,40,25.50,2025-01-17'
-      : importSource === 'json'
-      ? JSON.stringify([{ workerName: 'John Doe', clientName: 'Acme Corp', hours: 40, rate: 25.50, weekEnding: '2025-01-17' }], null, 2)
-      : ''
-
-    const blob = new Blob([template], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `template.${importSource}`
-    a.click()
-    URL.revokeObjectURL(url)
-    toast.success('Template downloaded')
+  const sampleCsv = {
+    timesheets: `workerName,clientName,hours,rate,weekEnding
+John Smith,Acme Corp,37.5,25.50,2025-01-24
+Jane Doe,Tech Solutions,40,30.00,2025-01-24
+Robert Brown,Global Industries,35,28.75,2025-01-24`,
+    expenses: `workerName,clientName,amount,category,date,description
+John Smith,Acme Corp,45.50,Travel,2025-01-20,Train to client site
+Jane Doe,Tech Solutions,120.00,Accommodation,2025-01-21,Hotel stay`,
+    workers: `name,email,type,phone
+John Smith,john.smith@example.com,contractor,+44 7700 900123
+Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
   }
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline">
-            <Upload size={18} className="mr-2" />
-            Batch Import
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle>Batch Import Manager</DialogTitle>
-            <DialogDescription>
-              Import timesheets, expenses, or workers from external systems
-            </DialogDescription>
-          </DialogHeader>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-semibold tracking-tight">Batch Import Manager</h2>
+        <p className="text-muted-foreground mt-1">Import timesheets, expenses, and workers in bulk via CSV</p>
+      </div>
 
-          <Tabs defaultValue="import" className="mt-4">
-            <TabsList>
-              <TabsTrigger value="import">Import Data</TabsTrigger>
-              <TabsTrigger value="history">Import History ({importHistory.length})</TabsTrigger>
-            </TabsList>
+      <Tabs defaultValue="timesheets" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="timesheets">Timesheets</TabsTrigger>
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
+          <TabsTrigger value="workers">Workers</TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="import" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="import-source">Import Source</Label>
-                <Select value={importSource} onValueChange={(v: any) => setImportSource(v)}>
-                  <SelectTrigger id="import-source">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="csv">CSV File</SelectItem>
-                    <SelectItem value="json">JSON Data</SelectItem>
-                    <SelectItem value="xml">XML (Coming Soon)</SelectItem>
-                    <SelectItem value="api">API Connection (Coming Soon)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        {(['timesheets', 'expenses', 'workers'] as const).map((type) => (
+          <TabsContent key={type} value={type} className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Upload size={20} />
+                    Import Data
+                  </CardTitle>
+                  <CardDescription>
+                    Paste CSV data or drag and drop a file
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>CSV Data</Label>
+                    <Textarea
+                      placeholder={`Paste CSV data here...\n\n${sampleCsv[type]}`}
+                      value={csvData}
+                      onChange={(e) => setCsvData(e.target.value)}
+                      rows={12}
+                      className="font-mono text-xs"
+                    />
+                  </div>
 
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
-                  Paste your {importSource.toUpperCase()} data below or download a template to get started
-                </p>
-                <Button variant="outline" size="sm" onClick={downloadTemplate}>
-                  <Download size={16} className="mr-2" />
-                  Download Template
-                </Button>
-              </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => validateCsv(csvData, type)}
+                      disabled={!csvData.trim() || isValidating}
+                      className="flex-1"
+                    >
+                      <CheckCircle size={18} className="mr-2" />
+                      {isValidating ? 'Validating...' : 'Validate'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setCsvData(sampleCsv[type])
+                        toast.info('Sample data loaded')
+                      }}
+                    >
+                      <FileText size={18} className="mr-2" />
+                      Load Sample
+                    </Button>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="import-data">Import Data</Label>
-                <Textarea
-                  id="import-data"
-                  value={importData}
-                  onChange={(e) => setImportData(e.target.value)}
-                  placeholder={importSource === 'csv' 
-                    ? 'workerName,clientName,hours,rate,weekEnding\nJohn Doe,Acme Corp,40,25.50,2025-01-17'
-                    : importSource === 'json'
-                    ? '[{"workerName": "John Doe", "clientName": "Acme Corp", "hours": 40, "rate": 25.50, "weekEnding": "2025-01-17"}]'
-                    : 'Paste your data here...'}
-                  rows={12}
-                  className="font-mono text-xs"
-                />
-              </div>
+                  {validationResult && (
+                    <div className="space-y-3 p-4 border rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          {validationResult.valid ? (
+                            <>
+                              <CheckCircle size={18} className="text-success" weight="fill" />
+                              Validation Passed
+                            </>
+                          ) : (
+                            <>
+                              <XCircle size={18} className="text-destructive" weight="fill" />
+                              Validation Failed
+                            </>
+                          )}
+                        </h4>
+                        <Badge variant={validationResult.valid ? 'success' : 'destructive'}>
+                          {validationResult.rowCount} rows
+                        </Badge>
+                      </div>
 
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-                <Button onClick={handleImport}>Import Records</Button>
-              </div>
-            </TabsContent>
+                      {validationResult.errors.length > 0 && (
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-destructive">Errors:</p>
+                          <ul className="text-sm space-y-1">
+                            {validationResult.errors.map((error, i) => (
+                              <li key={i} className="flex items-start gap-2 text-destructive">
+                                <XCircle size={14} className="mt-0.5 flex-shrink-0" />
+                                <span>{error}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-            <TabsContent value="history" className="space-y-3">
-              {importHistory.length === 0 ? (
-                <Card className="p-12 text-center">
-                  <FileText size={48} className="mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No import history yet</p>
-                </Card>
-              ) : (
-                importHistory.map((result) => (
-                  <Card key={result.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2 flex-1">
-                          <div className="flex items-center gap-3">
-                            {result.status === 'success' && <CheckCircle size={20} className="text-success" weight="fill" />}
-                            {result.status === 'partial' && <Warning size={20} className="text-warning" weight="fill" />}
-                            {result.status === 'failed' && <XCircle size={20} className="text-destructive" weight="fill" />}
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium">{result.id}</p>
-                                <Badge variant={result.status === 'success' ? 'success' : result.status === 'partial' ? 'warning' : 'destructive'}>
-                                  {result.status}
-                                </Badge>
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(result.timestamp).toLocaleString()} • {result.source}
-                              </p>
+                      {validationResult.warnings.length > 0 && (
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-warning">Warnings:</p>
+                          <ul className="text-sm space-y-1">
+                            {validationResult.warnings.map((warning, i) => (
+                              <li key={i} className="flex items-start gap-2 text-warning">
+                                <Warning size={14} className="mt-0.5 flex-shrink-0" />
+                                <span>{warning}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {validationResult.valid && (
+                        <Button
+                          onClick={handleImport}
+                          className="w-full"
+                          style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}
+                        >
+                          <Upload size={18} className="mr-2" />
+                          Import {validationResult.rowCount} Records
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText size={20} />
+                    Preview & Guidelines
+                  </CardTitle>
+                  <CardDescription>
+                    Preview of first 5 rows
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {validationResult && validationResult.preview.length > 0 ? (
+                    <ScrollArea className="h-64">
+                      <div className="space-y-3">
+                        {validationResult.preview.map((row, i) => (
+                          <div key={i} className="p-3 border rounded-lg bg-muted/30">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Row {i + 1}</p>
+                            <div className="space-y-1">
+                              {Object.entries(row).map(([key, value]) => (
+                                <div key={key} className="flex justify-between text-sm">
+                                  <span className="font-medium">{key}:</span>
+                                  <span className="text-muted-foreground font-mono">{value || '(empty)'}</span>
+                                </div>
+                              ))}
                             </div>
                           </div>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="text-muted-foreground">Processed</p>
-                              <p className="font-medium font-mono">{result.recordsProcessed}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Successful</p>
-                              <p className="font-medium font-mono text-success">{result.recordsSuccessful}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Failed</p>
-                              <p className="font-medium font-mono text-destructive">{result.recordsFailed}</p>
-                            </div>
-                          </div>
-                          {result.errors && result.errors.length > 0 && (
-                            <details className="text-xs">
-                              <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                                View {result.errors.length} error(s)
-                              </summary>
-                              <ul className="mt-2 space-y-1 pl-4">
-                                {result.errors.slice(0, 5).map((error, idx) => (
-                                  <li key={idx} className="text-destructive">{error}</li>
-                                ))}
-                                {result.errors.length > 5 && (
-                                  <li className="text-muted-foreground">...and {result.errors.length - 5} more</li>
-                                )}
-                              </ul>
-                            </details>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="p-4 bg-muted/50 rounded-lg">
+                        <h4 className="font-semibold mb-2 flex items-center gap-2">
+                          <FileCsv size={18} />
+                          Required Format
+                        </h4>
+                        <ul className="text-sm space-y-1 text-muted-foreground">
+                          <li>• First row must be column headers</li>
+                          <li>• Comma-separated values (CSV)</li>
+                          <li>• No special characters in headers</li>
+                          <li>• Date format: YYYY-MM-DD</li>
+                          <li>• Numbers without currency symbols</li>
+                        </ul>
+                      </div>
+
+                      <div className="p-4 bg-muted/50 rounded-lg">
+                        <h4 className="font-semibold mb-2">Required Columns</h4>
+                        <div className="text-sm space-y-1">
+                          {type === 'timesheets' && (
+                            <>
+                              <Badge variant="outline" className="mr-2">workerName</Badge>
+                              <Badge variant="outline" className="mr-2">clientName</Badge>
+                              <Badge variant="outline" className="mr-2">hours</Badge>
+                              <Badge variant="outline" className="mr-2">rate</Badge>
+                              <Badge variant="outline">weekEnding</Badge>
+                            </>
+                          )}
+                          {type === 'expenses' && (
+                            <>
+                              <Badge variant="outline" className="mr-2">workerName</Badge>
+                              <Badge variant="outline" className="mr-2">clientName</Badge>
+                              <Badge variant="outline" className="mr-2">amount</Badge>
+                              <Badge variant="outline" className="mr-2">category</Badge>
+                              <Badge variant="outline">date</Badge>
+                            </>
+                          )}
+                          {type === 'workers' && (
+                            <>
+                              <Badge variant="outline" className="mr-2">name</Badge>
+                              <Badge variant="outline" className="mr-2">email</Badge>
+                              <Badge variant="outline">type</Badge>
+                            </>
                           )}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
-    </>
+
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          const blob = new Blob([sampleCsv[type]], { type: 'text/csv' })
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = `sample-${type}.csv`
+                          a.click()
+                          URL.revokeObjectURL(url)
+                          toast.success('Sample template downloaded')
+                        }}
+                      >
+                        <Download size={18} className="mr-2" />
+                        Download Template
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
   )
 }

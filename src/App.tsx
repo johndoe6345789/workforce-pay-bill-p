@@ -59,6 +59,8 @@ import { PurchaseOrderManager } from '@/components/PurchaseOrderManager'
 import { OnboardingWorkflowManager } from '@/components/OnboardingWorkflowManager'
 import { AuditTrailViewer } from '@/components/AuditTrailViewer'
 import { NotificationRulesManager } from '@/components/NotificationRulesManager'
+import { TimesheetAdjustmentWizard } from '@/components/TimesheetAdjustmentWizard'
+import { BatchImportManager } from '@/components/BatchImportManager'
 import type { 
   Timesheet, 
   Invoice, 
@@ -73,7 +75,7 @@ import type {
   ExpenseStatus
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -496,6 +498,13 @@ function App() {
           />
           <Separator className="my-2" />
           <NavItem
+            icon={<UploadSimple size={20} />}
+            label="Batch Import"
+            active={currentView === 'batch-import'}
+            onClick={() => setCurrentView('batch-import')}
+          />
+          <Separator className="my-2" />
+          <NavItem
             icon={<MapTrifold size={20} />}
             label="Roadmap"
             active={currentView === 'roadmap'}
@@ -610,6 +619,7 @@ function App() {
               onCreateInvoice={handleCreateInvoice}
               onCreateTimesheet={handleCreateTimesheet}
               onBulkImport={handleBulkImport}
+              onAdjust={handleAdjustTimesheet}
             />
           )}
 
@@ -698,6 +708,14 @@ function App() {
 
           {currentView === 'notification-rules' && (
             <NotificationRulesManager />
+          )}
+
+          {currentView === 'batch-import' && (
+            <BatchImportManager
+              onImportComplete={(data) => {
+                toast.success(`Imported ${data.length} records`)
+              }}
+            />
           )}
 
           {currentView === 'roadmap' && (
@@ -976,6 +994,7 @@ interface TimesheetsViewProps {
     weekEnding: string
   }) => void
   onBulkImport: (csvData: string) => void
+  onAdjust: (timesheetId: string, adjustment: any) => void
 }
 
 function TimesheetsView({ 
@@ -986,11 +1005,13 @@ function TimesheetsView({
   onReject,
   onCreateInvoice,
   onCreateTimesheet,
-  onBulkImport
+  onBulkImport,
+  onAdjust
 }: TimesheetsViewProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | TimesheetStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
+  const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null)
   const [formData, setFormData] = useState({
     workerName: '',
     clientName: '',
@@ -1211,6 +1232,7 @@ function TimesheetsView({
                 onApprove={onApprove}
                 onReject={onReject}
                 onCreateInvoice={onCreateInvoice}
+                onAdjust={setSelectedTimesheet}
               />
             ))}
           {filteredTimesheets.filter(t => t.status === 'pending').length === 0 && (
@@ -1232,6 +1254,7 @@ function TimesheetsView({
                 onApprove={onApprove}
                 onReject={onReject}
                 onCreateInvoice={onCreateInvoice}
+                onAdjust={setSelectedTimesheet}
               />
             ))}
         </TabsContent>
@@ -1246,10 +1269,22 @@ function TimesheetsView({
                 onApprove={onApprove}
                 onReject={onReject}
                 onCreateInvoice={onCreateInvoice}
+                onAdjust={setSelectedTimesheet}
               />
             ))}
         </TabsContent>
       </Tabs>
+
+      {selectedTimesheet && (
+        <TimesheetAdjustmentWizard
+          timesheet={selectedTimesheet}
+          open={selectedTimesheet !== null}
+          onOpenChange={(open) => {
+            if (!open) setSelectedTimesheet(null)
+          }}
+          onAdjust={onAdjust}
+        />
+      )}
     </div>
   )
 }
@@ -1259,9 +1294,10 @@ interface TimesheetCardProps {
   onApprove: (id: string) => void
   onReject: (id: string) => void
   onCreateInvoice: (id: string) => void
+  onAdjust?: (timesheet: Timesheet) => void
 }
 
-function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice }: TimesheetCardProps) {
+function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdjust }: TimesheetCardProps) {
   const statusConfig = {
     pending: { icon: ClockCounterClockwise, color: 'text-warning' },
     approved: { icon: CheckCircle, color: 'text-success' },
@@ -1335,6 +1371,16 @@ function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice }: Time
                   Reject
                 </Button>
               </>
+            )}
+            {(timesheet.status === 'approved' || timesheet.status === 'pending') && onAdjust && (
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => onAdjust(timesheet)}
+              >
+                <ClockCounterClockwise size={16} className="mr-2" />
+                Adjust
+              </Button>
             )}
             {timesheet.status === 'approved' && (
               <Button 
