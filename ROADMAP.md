@@ -21,7 +21,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Agency-initiated timesheet creation
 - ✅ Bulk entry by administrators
 - ✅ Mobile timesheet submission
-- 📋 Batch import from third-party systems
+- ✅ Batch import from third-party systems
 - ✅ QR-coded paper timesheet scanning
 - 📋 Email-based automated ingestion
 
@@ -32,7 +32,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Electronic invoice delivery
 - ✅ Sales invoice templates
 - ✅ Payment terms configuration
-- 📋 Purchase order tracking
+- ✅ Purchase order tracking
 - 📋 Credit control visibility
 
 ### 1.4 Basic Payroll
@@ -66,10 +66,10 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 
 ### 2.2 Timesheet Management - Advanced
 - ✅ Multi-step approval routing
-- 📋 Time and rate adjustment wizard
+- ✅ Time and rate adjustment wizard
 - 📋 Automated credit generation
 - 📋 Re-invoicing workflows
-- 📋 Full audit trail of all changes
+- ✅ Full audit trail of all changes
 - 📋 Email-based approval workflows
 - 📋 Configurable validation rules
 
@@ -97,7 +97,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Notification history and tracking
 - ✅ Event-driven processing updates
 - ✅ Email notification templates
-- 📋 Configurable notification rules
+- ✅ Configurable notification rules
 - 📋 Automated follow-up reminders
 
 ---
@@ -108,7 +108,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Document tracking and monitoring
 - ✅ Expiry alerts and notifications
 - ✅ Document upload and storage
-- 📋 Digital onboarding workflows
+- ✅ Digital onboarding workflows
 - 📋 Automated contract pack generation
 - 📋 Compliance enforcement rules
 - 📋 Statutory reporting support

@@ -30,7 +30,10 @@ import {
   ChartLine,
   CurrencyCircleDollar,
   QrCode,
-  Palette
+  Palette,
+  UserPlus,
+  Gear,
+  FileText
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -52,6 +55,10 @@ import { EmailTemplateManager } from '@/components/EmailTemplateManager'
 import { InvoiceTemplateManager } from '@/components/InvoiceTemplateManager'
 import { QRTimesheetScanner } from '@/components/QRTimesheetScanner'
 import { MissingTimesheetsReport } from '@/components/MissingTimesheetsReport'
+import { PurchaseOrderManager } from '@/components/PurchaseOrderManager'
+import { OnboardingWorkflowManager } from '@/components/OnboardingWorkflowManager'
+import { AuditTrailViewer } from '@/components/AuditTrailViewer'
+import { NotificationRulesManager } from '@/components/NotificationRulesManager'
 import type { 
   Timesheet, 
   Invoice, 
@@ -66,7 +73,7 @@ import type {
   ExpenseStatus
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -139,6 +146,29 @@ function App() {
       })
     }
     toast.error('Timesheet rejected')
+  }
+
+  const handleAdjustTimesheet = (timesheetId: string, adjustment: any) => {
+    setTimesheets(current => {
+      if (!current) return []
+      return current.map(t => {
+        if (t.id !== timesheetId) return t
+        
+        const newAdjustment = {
+          id: `ADJ-${Date.now()}`,
+          adjustmentDate: new Date().toISOString(),
+          ...adjustment
+        }
+        
+        return {
+          ...t,
+          hours: adjustment.newHours,
+          rate: adjustment.newRate,
+          amount: adjustment.newHours * adjustment.newRate,
+          adjustments: [...(t.adjustments || []), newAdjustment]
+        }
+      })
+    })
   }
 
   const handleCreateInvoice = (timesheetId: string) => {
@@ -422,6 +452,31 @@ function App() {
           />
           <Separator className="my-2" />
           <NavItem
+            icon={<FileText size={20} />}
+            label="Purchase Orders"
+            active={currentView === 'purchase-orders'}
+            onClick={() => setCurrentView('purchase-orders')}
+          />
+          <NavItem
+            icon={<UserPlus size={20} />}
+            label="Onboarding"
+            active={currentView === 'onboarding'}
+            onClick={() => setCurrentView('onboarding')}
+          />
+          <NavItem
+            icon={<ClockCounterClockwise size={20} />}
+            label="Audit Trail"
+            active={currentView === 'audit-trail'}
+            onClick={() => setCurrentView('audit-trail')}
+          />
+          <NavItem
+            icon={<Gear size={20} />}
+            label="Notification Rules"
+            active={currentView === 'notification-rules'}
+            onClick={() => setCurrentView('notification-rules')}
+          />
+          <Separator className="my-2" />
+          <NavItem
             icon={<QrCode size={20} />}
             label="QR Scanner"
             active={currentView === 'qr-scanner'}
@@ -627,6 +682,22 @@ function App() {
 
           {currentView === 'invoice-templates' && (
             <InvoiceTemplateManager />
+          )}
+
+          {currentView === 'purchase-orders' && (
+            <PurchaseOrderManager />
+          )}
+
+          {currentView === 'onboarding' && (
+            <OnboardingWorkflowManager />
+          )}
+
+          {currentView === 'audit-trail' && (
+            <AuditTrailViewer />
+          )}
+
+          {currentView === 'notification-rules' && (
+            <NotificationRulesManager />
           )}
 
           {currentView === 'roadmap' && (
