@@ -68,6 +68,13 @@ This is a multi-module enterprise platform requiring navigation between distinct
 - Progression: Click entity selector → Choose entity → Context switches → Data filters to selected entity
 - Success criteria: Clear indication of active entity, data properly segregated, no cross-contamination
 
+**Collapsible Navigation Groups**
+- Functionality: Organized, collapsible navigation menu with grouped module sections
+- Purpose: Manages growing menu complexity by organizing related modules into expandable/collapsible groups
+- Trigger: User clicks group header to expand/collapse
+- Progression: Navigate to sidebar → Click group header → Group expands/collapses → Access module within group
+- Success criteria: Groups persist state, smooth animations, essential modules always visible
+
 ## Edge Case Handling
 
 - **Missing Timesheet Data**: Display clear empty states with guided actions to submit or import timesheets
