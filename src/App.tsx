@@ -67,6 +67,10 @@ import { OneClickPayroll } from '@/components/OneClickPayroll'
 import { RateTemplateManager } from '@/components/RateTemplateManager'
 import { CustomReportBuilder } from '@/components/CustomReportBuilder'
 import { HolidayPayManager } from '@/components/HolidayPayManager'
+import { PermanentPlacementInvoice } from '@/components/PermanentPlacementInvoice'
+import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
+import { ShiftPremiumCalculator } from '@/components/ShiftPremiumCalculator'
+import { ContractValidator } from '@/components/ContractValidator'
 import type { 
   Timesheet, 
   Invoice, 
@@ -78,10 +82,11 @@ import type {
   InvoiceStatus,
   ComplianceStatus,
   Expense,
-  ExpenseStatus
+  ExpenseStatus,
+  RateCard
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -108,6 +113,7 @@ function App() {
   const [workers = [], setWorkers] = useKV<Worker[]>('workers', [])
   const [complianceDocs = [], setComplianceDocs] = useKV<ComplianceDocument[]>('compliance-docs', [])
   const [expenses = [], setExpenses] = useKV<Expense[]>('expenses', [])
+  const [rateCards = [], setRateCards] = useKV<RateCard[]>('rate-cards', [])
 
   const metrics: DashboardMetrics = {
     pendingTimesheets: timesheets.filter(t => t.status === 'pending').length,
@@ -387,6 +393,14 @@ function App() {
     toast.error('Expense rejected')
   }
 
+  const handleCreatePlacementInvoice = (invoice: Invoice) => {
+    setInvoices(current => [...(current || []), invoice])
+  }
+
+  const handleCreateCreditNote = (creditNote: any, creditInvoice: Invoice) => {
+    setInvoices(current => [...(current || []), creditInvoice])
+  }
+
   return (
     <div className="flex h-screen bg-background">
       <aside className="w-64 border-r border-border bg-card flex flex-col">
@@ -522,6 +536,12 @@ function App() {
               label="Notification Rules"
               active={currentView === 'notification-rules'}
               onClick={() => setCurrentView('notification-rules')}
+            />
+            <NavItem
+              icon={<ShieldCheck size={20} />}
+              label="Contract Validation"
+              active={currentView === 'contract-validation'}
+              onClick={() => setCurrentView('contract-validation')}
             />
           </NavGroup>
 
@@ -695,6 +715,9 @@ function App() {
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               onSendInvoice={handleSendInvoice}
+              onCreatePlacementInvoice={handleCreatePlacementInvoice}
+              onCreateCreditNote={handleCreateCreditNote}
+              rateCards={rateCards}
             />
           )}
 
@@ -807,6 +830,13 @@ function App() {
 
           {currentView === 'holiday-pay' && (
             <HolidayPayManager />
+          )}
+
+          {currentView === 'contract-validation' && (
+            <ContractValidator
+              timesheets={timesheets}
+              rateCards={rateCards}
+            />
           )}
 
           {currentView === 'roadmap' && (
@@ -1522,9 +1552,12 @@ interface BillingViewProps {
   searchQuery: string
   setSearchQuery: (query: string) => void
   onSendInvoice: (invoiceId: string) => void
+  onCreatePlacementInvoice: (invoice: Invoice) => void
+  onCreateCreditNote: (creditNote: any, creditInvoice: Invoice) => void
+  rateCards: RateCard[]
 }
 
-function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice }: BillingViewProps) {
+function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onCreatePlacementInvoice, onCreateCreditNote, rateCards }: BillingViewProps) {
   const filteredInvoices = invoices.filter(i =>
     i.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     i.clientName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -1537,10 +1570,14 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice }: B
           <h2 className="text-3xl font-semibold tracking-tight">Billing & Invoicing</h2>
           <p className="text-muted-foreground mt-1">Manage invoices and track payments</p>
         </div>
-        <Button>
-          <Plus size={18} className="mr-2" />
-          Create Invoice
-        </Button>
+        <div className="flex gap-2">
+          <PermanentPlacementInvoice onCreateInvoice={onCreatePlacementInvoice} />
+          <CreditNoteGenerator invoices={invoices} onCreateCreditNote={onCreateCreditNote} />
+          <Button>
+            <Plus size={18} className="mr-2" />
+            Create Invoice
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">

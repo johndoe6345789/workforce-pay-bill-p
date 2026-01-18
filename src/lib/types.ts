@@ -1,5 +1,7 @@
 export type TimesheetStatus = 'pending' | 'approved' | 'rejected' | 'processing' | 'awaiting-client' | 'awaiting-manager'
-export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue'
+export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'credit' | 'cancelled'
+export type InvoiceType = 'timesheet' | 'permanent-placement' | 'credit-note' | 'adhoc'
+export type ShiftType = 'standard' | 'overtime' | 'weekend' | 'night' | 'holiday'
 export type PayrollStatus = 'scheduled' | 'processing' | 'completed' | 'failed'
 export type ComplianceStatus = 'valid' | 'expiring' | 'expired'
 export type ExpenseStatus = 'pending' | 'approved' | 'rejected' | 'paid'
@@ -24,6 +26,18 @@ export interface Timesheet {
   currentApprovalStep?: ApprovalStep
   rate?: number
   adjustments?: TimesheetAdjustment[]
+  shifts?: ShiftEntry[]
+  rateCardId?: string
+  validationErrors?: string[]
+}
+
+export interface ShiftEntry {
+  id: string
+  date: string
+  shiftType: ShiftType
+  hours: number
+  rate: number
+  amount: number
 }
 
 export interface ApprovalHistoryEntry {
@@ -59,6 +73,18 @@ export interface Invoice {
   lineItems?: InvoiceLineItem[]
   notes?: string
   paymentTerms?: string
+  type?: InvoiceType
+  relatedInvoiceId?: string
+  placementDetails?: PlacementDetails
+}
+
+export interface PlacementDetails {
+  candidateName: string
+  position: string
+  startDate: string
+  salary: number
+  feePercentage: number
+  guaranteePeriod: number
 }
 
 export interface InvoiceLineItem {
@@ -199,4 +225,52 @@ export interface QRTimesheetData {
   hours: number
   rate: number
   signature?: string
+}
+
+export interface RateCard {
+  id: string
+  name: string
+  clientName?: string
+  role?: string
+  standardRate: number
+  overtimeMultiplier: number
+  weekendMultiplier: number
+  nightMultiplier: number
+  holidayMultiplier: number
+  effectiveFrom: string
+  effectiveTo?: string
+  validationRules?: ValidationRule[]
+}
+
+export interface ValidationRule {
+  id: string
+  type: 'max-hours-per-day' | 'max-hours-per-week' | 'min-break' | 'max-consecutive-days'
+  value: number
+  severity: 'warning' | 'error'
+  message: string
+}
+
+export interface CreditNote {
+  id: string
+  creditNoteNumber: string
+  originalInvoiceId: string
+  originalInvoiceNumber: string
+  clientName: string
+  issueDate: string
+  amount: number
+  reason: string
+  status: 'draft' | 'issued' | 'applied'
+  currency: string
+}
+
+export interface AuditLogEntry {
+  id: string
+  timestamp: string
+  userId: string
+  userName: string
+  action: string
+  entityType: 'timesheet' | 'invoice' | 'payroll' | 'worker' | 'expense' | 'rate-card'
+  entityId: string
+  changes: Record<string, { from: any; to: any }>
+  ipAddress?: string
 }
