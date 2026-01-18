@@ -20,9 +20,9 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Pending/approved/rejected status tracking
 - ✅ Agency-initiated timesheet creation
 - ✅ Bulk entry by administrators
-- 📋 Mobile timesheet submission
+- ✅ Mobile timesheet submission
 - 📋 Batch import from third-party systems
-- 📋 QR-coded paper timesheet scanning
+- ✅ QR-coded paper timesheet scanning
 - 📋 Email-based automated ingestion
 
 ### 1.3 Basic Billing & Invoicing
@@ -30,8 +30,8 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Invoice tracking (draft, sent, paid, overdue)
 - ✅ Multi-currency support (GBP, USD, EUR)
 - ✅ Electronic invoice delivery
-- 📋 Sales invoice templates
-- 📋 Payment terms configuration
+- ✅ Sales invoice templates
+- ✅ Payment terms configuration
 - 📋 Purchase order tracking
 - 📋 Credit control visibility
 
@@ -65,7 +65,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - 📋 Mobile expense capture with receipt photos
 
 ### 2.2 Timesheet Management - Advanced
-- 📋 Multi-step approval routing
+- ✅ Multi-step approval routing
 - 📋 Time and rate adjustment wizard
 - 📋 Automated credit generation
 - 📋 Re-invoicing workflows
@@ -96,7 +96,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Real-time notification center
 - ✅ Notification history and tracking
 - ✅ Event-driven processing updates
-- 📋 Email notification templates
+- ✅ Email notification templates
 - 📋 Configurable notification rules
 - 📋 Automated follow-up reminders
 
@@ -139,7 +139,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 ### 4.1 Advanced Reporting & Analytics
 - ✅ Real-time gross margin reporting
 - ✅ Forecasting and predictive analytics
-- 📋 Missing timesheet reports
+- ✅ Missing timesheet reports
 - 📋 User and audit activity reports
 - 📋 Client-level performance dashboards
 - 📋 Placement-level profitability
@@ -182,7 +182,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 ### 5.2 Configuration & Customisation
 - 📋 Custom system labels
 - 📋 Agency-defined security roles
-- 📋 Editable email templates
+- ✅ Editable email templates
 - 📋 Advanced system configuration
 - 📋 White-label capabilities
 - 📋 Custom workflow builders

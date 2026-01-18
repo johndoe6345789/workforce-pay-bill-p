@@ -1,10 +1,12 @@
-export type TimesheetStatus = 'pending' | 'approved' | 'rejected' | 'processing'
+export type TimesheetStatus = 'pending' | 'approved' | 'rejected' | 'processing' | 'awaiting-client' | 'awaiting-manager'
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue'
 export type PayrollStatus = 'scheduled' | 'processing' | 'completed' | 'failed'
 export type ComplianceStatus = 'valid' | 'expiring' | 'expired'
 export type ExpenseStatus = 'pending' | 'approved' | 'rejected' | 'paid'
 export type NotificationType = 'timesheet' | 'invoice' | 'compliance' | 'expense' | 'payroll' | 'system'
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent'
+export type SubmissionMethod = 'web' | 'mobile' | 'qr-scan' | 'email' | 'bulk-import'
+export type ApprovalStep = 'manager' | 'client' | 'finance' | 'final'
 
 export interface Timesheet {
   id: string
@@ -17,6 +19,31 @@ export interface Timesheet {
   submittedDate: string
   approvedDate?: string
   amount: number
+  submissionMethod?: SubmissionMethod
+  approvalHistory?: ApprovalHistoryEntry[]
+  currentApprovalStep?: ApprovalStep
+  rate?: number
+  adjustments?: TimesheetAdjustment[]
+}
+
+export interface ApprovalHistoryEntry {
+  step: ApprovalStep
+  approverName: string
+  approverEmail: string
+  status: 'pending' | 'approved' | 'rejected'
+  timestamp: string
+  notes?: string
+}
+
+export interface TimesheetAdjustment {
+  id: string
+  adjustmentDate: string
+  adjustedBy: string
+  previousHours: number
+  newHours: number
+  previousRate?: number
+  newRate?: number
+  reason: string
 }
 
 export interface Invoice {
@@ -28,6 +55,29 @@ export interface Invoice {
   amount: number
   status: InvoiceStatus
   currency: string
+  template?: string
+  lineItems?: InvoiceLineItem[]
+  notes?: string
+  paymentTerms?: string
+}
+
+export interface InvoiceLineItem {
+  id: string
+  description: string
+  quantity: number
+  rate: number
+  amount: number
+  timesheetId?: string
+}
+
+export interface InvoiceTemplate {
+  id: string
+  name: string
+  headerText: string
+  footerText: string
+  defaultPaymentTerms: string
+  logoUrl?: string
+  accentColor: string
 }
 
 export interface PayrollRun {
@@ -121,4 +171,32 @@ export interface CurrencyRate {
   symbol: string
   rateToGBP: number
   lastUpdated: string
+}
+
+export interface MissingTimesheetReport {
+  workerId: string
+  workerName: string
+  clientName: string
+  expectedWeekEnding: string
+  daysOverdue: number
+  lastSubmissionDate?: string
+}
+
+export interface EmailTemplate {
+  id: string
+  name: string
+  subject: string
+  body: string
+  type: NotificationType
+  variables: string[]
+}
+
+export interface QRTimesheetData {
+  workerId: string
+  workerName: string
+  clientName: string
+  weekEnding: string
+  hours: number
+  rate: number
+  signature?: string
 }

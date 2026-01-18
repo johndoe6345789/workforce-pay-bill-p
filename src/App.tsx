@@ -28,7 +28,9 @@ import {
   Bell,
   Camera,
   ChartLine,
-  CurrencyCircleDollar
+  CurrencyCircleDollar,
+  QrCode,
+  Palette
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -46,6 +48,10 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { ReportsView } from '@/components/ReportsView'
 import { CurrencyManagement } from '@/components/CurrencyManagement'
+import { EmailTemplateManager } from '@/components/EmailTemplateManager'
+import { InvoiceTemplateManager } from '@/components/InvoiceTemplateManager'
+import { QRTimesheetScanner } from '@/components/QRTimesheetScanner'
+import { MissingTimesheetsReport } from '@/components/MissingTimesheetsReport'
 import type { 
   Timesheet, 
   Invoice, 
@@ -60,7 +66,7 @@ import type {
   ExpenseStatus
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -403,11 +409,37 @@ function App() {
             onClick={() => setCurrentView('reports')}
           />
           <NavItem
+            icon={<ClockCounterClockwise size={20} />}
+            label="Missing Timesheets"
+            active={currentView === 'missing-timesheets'}
+            onClick={() => setCurrentView('missing-timesheets')}
+          />
+          <NavItem
             icon={<CurrencyCircleDollar size={20} />}
             label="Currency"
             active={currentView === 'currency'}
             onClick={() => setCurrentView('currency')}
           />
+          <Separator className="my-2" />
+          <NavItem
+            icon={<QrCode size={20} />}
+            label="QR Scanner"
+            active={currentView === 'qr-scanner'}
+            onClick={() => setCurrentView('qr-scanner')}
+          />
+          <NavItem
+            icon={<Envelope size={20} />}
+            label="Email Templates"
+            active={currentView === 'email-templates'}
+            onClick={() => setCurrentView('email-templates')}
+          />
+          <NavItem
+            icon={<Palette size={20} />}
+            label="Invoice Templates"
+            active={currentView === 'invoice-templates'}
+            onClick={() => setCurrentView('invoice-templates')}
+          />
+          <Separator className="my-2" />
           <NavItem
             icon={<MapTrifold size={20} />}
             label="Roadmap"
@@ -564,8 +596,37 @@ function App() {
             />
           )}
 
+          {currentView === 'missing-timesheets' && (
+            <MissingTimesheetsReport
+              workers={workers}
+              timesheets={timesheets}
+            />
+          )}
+
           {currentView === 'currency' && (
             <CurrencyManagement />
+          )}
+
+          {currentView === 'qr-scanner' && (
+            <QRTimesheetScanner
+              onTimesheetScanned={(timesheet) => {
+                const newTimesheet: Timesheet = {
+                  ...timesheet,
+                  id: `TS-${Date.now()}`,
+                  status: 'pending',
+                  submittedDate: new Date().toISOString()
+                }
+                setTimesheets(current => [...(current || []), newTimesheet])
+              }}
+            />
+          )}
+
+          {currentView === 'email-templates' && (
+            <EmailTemplateManager />
+          )}
+
+          {currentView === 'invoice-templates' && (
+            <InvoiceTemplateManager />
           )}
 
           {currentView === 'roadmap' && (
@@ -2099,17 +2160,17 @@ function RoadmapView() {
 - ✅ Status tracking (pending/approved/rejected)
 - ✅ Agency-initiated timesheet creation
 - ✅ Bulk entry by administrators
-- 📋 Mobile timesheet submission
+- ✅ Mobile timesheet submission
 - 📋 Batch import capabilities
-- 📋 QR-coded paper timesheet scanning
+- ✅ QR-coded paper timesheet scanning
 
 ### Basic Billing & Invoicing
 - ✅ Invoice generation from timesheets
 - ✅ Invoice status tracking
 - ✅ Multi-currency support (GBP, USD, EUR)
 - ✅ Electronic invoice delivery
-- 📋 Sales invoice templates
-- 📋 Payment terms configuration
+- ✅ Sales invoice templates
+- ✅ Payment terms configuration
 - 📋 Purchase order tracking
 
 ### Basic Payroll
@@ -2143,12 +2204,12 @@ function RoadmapView() {
 - ✅ Real-time notification center
 - ✅ Notification history and tracking
 - ✅ Event-driven processing updates
-- 📋 Email notification templates
+- ✅ Email notification templates
 - 📋 Configurable notification rules
 - 📋 Automated follow-up reminders
 
 ### Timesheet Management - Advanced
-- 📋 Multi-step approval routing
+- ✅ Multi-step approval routing
 - 📋 Time and rate adjustment wizard
 - 📋 Automated credit generation
 - 📋 Re-invoicing workflows
@@ -2201,9 +2262,9 @@ function RoadmapView() {
 ## Phase 4: Analytics & Integrations (Quarters 7-8) 📋
 
 ### Advanced Reporting & Analytics
-- 📋 Real-time gross margin reporting
-- 📋 Forecasting and predictive analytics
-- 📋 Missing timesheet reports
+- ✅ Real-time gross margin reporting
+- ✅ Forecasting and predictive analytics
+- ✅ Missing timesheet reports
 - 📋 Custom report builder
 - 📋 Client-level performance dashboards
 - 📋 Placement-level profitability
@@ -2216,7 +2277,7 @@ function RoadmapView() {
 - 📋 Webhook support for real-time updates
 
 ### Global & Multi-Currency - Advanced
-- 📋 Multi-currency billing (expanded)
+- ✅ Multi-currency billing (expanded)
 - 📋 International sales tax handling
 - 📋 Withholding tax automation
 - 📋 Cross-border margin calculation
@@ -2234,7 +2295,7 @@ function RoadmapView() {
 ### Configuration & Customisation
 - 📋 Custom system labels
 - 📋 Agency-defined security roles
-- 📋 Editable email templates
+- ✅ Editable email templates
 - 📋 White-label capabilities
 - 📋 Custom workflow builders
 
@@ -2403,8 +2464,8 @@ function RoadmapView() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">Phase 1 + 2.1, 2.5</div>
-            <p className="text-sm text-muted-foreground mt-1">Foundation, Expenses & Notifications</p>
+            <div className="text-3xl font-semibold">Phase 1-2 + Features</div>
+            <p className="text-sm text-muted-foreground mt-1">Core platform with advanced features</p>
           </CardContent>
         </Card>
 
