@@ -17,7 +17,12 @@ import {
   ArrowUp,
   ArrowDown,
   Warning,
-  MapTrifold
+  MapTrifold,
+  UploadSimple,
+  FileCsv,
+  Envelope,
+  X,
+  CalendarBlank
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -38,7 +43,8 @@ import type {
   DashboardMetrics,
   ComplianceDocument,
   TimesheetStatus,
-  InvoiceStatus
+  InvoiceStatus,
+  ComplianceStatus
 } from '@/lib/types'
 
 type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'reports' | 'roadmap'
@@ -110,6 +116,112 @@ function App() {
 
     setInvoices(current => [...(current || []), newInvoice])
     toast.success(`Invoice ${newInvoice.invoiceNumber} created`)
+  }
+
+  const handleCreateTimesheet = (data: {
+    workerName: string
+    clientName: string
+    hours: number
+    rate: number
+    weekEnding: string
+  }) => {
+    const newTimesheet: Timesheet = {
+      id: `TS-${Date.now()}`,
+      workerId: `W-${Date.now()}`,
+      workerName: data.workerName,
+      clientName: data.clientName,
+      weekEnding: data.weekEnding,
+      hours: data.hours,
+      status: 'pending',
+      submittedDate: new Date().toISOString(),
+      amount: data.hours * data.rate
+    }
+
+    setTimesheets(current => [...(current || []), newTimesheet])
+    toast.success('Timesheet created successfully')
+  }
+
+  const handleBulkImport = (csvData: string) => {
+    const lines = csvData.trim().split('\n')
+    if (lines.length < 2) {
+      toast.error('Invalid CSV format')
+      return
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim())
+    const newTimesheets: Timesheet[] = []
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim())
+      if (values.length !== headers.length) continue
+
+      const workerName = values[headers.indexOf('workerName')] || values[0]
+      const clientName = values[headers.indexOf('clientName')] || values[1]
+      const hours = parseFloat(values[headers.indexOf('hours')] || values[2] || '0')
+      const rate = parseFloat(values[headers.indexOf('rate')] || values[3] || '0')
+      const weekEnding = values[headers.indexOf('weekEnding')] || values[4]
+
+      if (workerName && clientName && hours > 0 && rate > 0) {
+        newTimesheets.push({
+          id: `TS-${Date.now()}-${i}`,
+          workerId: `W-${Date.now()}-${i}`,
+          workerName,
+          clientName,
+          weekEnding,
+          hours,
+          status: 'pending',
+          submittedDate: new Date().toISOString(),
+          amount: hours * rate
+        })
+      }
+    }
+
+    if (newTimesheets.length > 0) {
+      setTimesheets(current => [...(current || []), ...newTimesheets])
+      toast.success(`Imported ${newTimesheets.length} timesheets`)
+    } else {
+      toast.error('No valid timesheets found in CSV')
+    }
+  }
+
+  const handleSendInvoice = (invoiceId: string) => {
+    setInvoices(current => {
+      if (!current) return []
+      return current.map(inv =>
+        inv.id === invoiceId
+          ? { ...inv, status: 'sent' as InvoiceStatus }
+          : inv
+      )
+    })
+    toast.success('Invoice sent to client via email')
+  }
+
+  const handleUploadDocument = (data: {
+    workerId: string
+    workerName: string
+    documentType: string
+    expiryDate: string
+  }) => {
+    const expiryDateObj = new Date(data.expiryDate)
+    const now = new Date()
+    const daysUntilExpiry = Math.floor((expiryDateObj.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+    let status: ComplianceStatus = 'valid'
+    if (daysUntilExpiry < 0) status = 'expired'
+    else if (daysUntilExpiry < 30) status = 'expiring'
+
+    const newDoc: ComplianceDocument = {
+      id: `DOC-${Date.now()}`,
+      workerId: data.workerId,
+      workerName: data.workerName,
+      documentType: data.documentType,
+      expiryDate: data.expiryDate,
+      status,
+      daysUntilExpiry
+    }
+
+    setComplianceDocs(current => [...(current || []), newDoc])
+    toast.success('Document uploaded successfully')
   }
 
   return (
@@ -205,6 +317,8 @@ function App() {
               onApprove={handleApproveTimesheet}
               onReject={handleRejectTimesheet}
               onCreateInvoice={handleCreateInvoice}
+              onCreateTimesheet={handleCreateTimesheet}
+              onBulkImport={handleBulkImport}
             />
           )}
 
@@ -213,6 +327,7 @@ function App() {
               invoices={invoices}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              onSendInvoice={handleSendInvoice}
             />
           )}
 
@@ -221,7 +336,10 @@ function App() {
           )}
 
           {currentView === 'compliance' && (
-            <ComplianceView complianceDocs={complianceDocs} />
+            <ComplianceView
+              complianceDocs={complianceDocs}
+              onUploadDocument={handleUploadDocument}
+            />
           )}
 
           {currentView === 'roadmap' && (
@@ -493,6 +611,14 @@ interface TimesheetsViewProps {
   onApprove: (id: string) => void
   onReject: (id: string) => void
   onCreateInvoice: (id: string) => void
+  onCreateTimesheet: (data: {
+    workerName: string
+    clientName: string
+    hours: number
+    rate: number
+    weekEnding: string
+  }) => void
+  onBulkImport: (csvData: string) => void
 }
 
 function TimesheetsView({ 
@@ -501,9 +627,21 @@ function TimesheetsView({
   setSearchQuery, 
   onApprove, 
   onReject,
-  onCreateInvoice 
+  onCreateInvoice,
+  onCreateTimesheet,
+  onBulkImport
 }: TimesheetsViewProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | TimesheetStatus>('all')
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    workerName: '',
+    clientName: '',
+    hours: '',
+    rate: '',
+    weekEnding: ''
+  })
+  const [csvData, setCsvData] = useState('')
 
   const filteredTimesheets = timesheets.filter(t => {
     const matchesSearch = t.workerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -512,6 +650,41 @@ function TimesheetsView({
     return matchesSearch && matchesStatus
   })
 
+  const handleSubmitCreate = () => {
+    if (!formData.workerName || !formData.clientName || !formData.hours || !formData.rate || !formData.weekEnding) {
+      toast.error('Please fill in all fields')
+      return
+    }
+
+    onCreateTimesheet({
+      workerName: formData.workerName,
+      clientName: formData.clientName,
+      hours: parseFloat(formData.hours),
+      rate: parseFloat(formData.rate),
+      weekEnding: formData.weekEnding
+    })
+
+    setFormData({
+      workerName: '',
+      clientName: '',
+      hours: '',
+      rate: '',
+      weekEnding: ''
+    })
+    setIsCreateDialogOpen(false)
+  }
+
+  const handleSubmitBulkImport = () => {
+    if (!csvData.trim()) {
+      toast.error('Please paste CSV data')
+      return
+    }
+
+    onBulkImport(csvData)
+    setCsvData('')
+    setIsBulkImportOpen(false)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -519,46 +692,110 @@ function TimesheetsView({
           <h2 className="text-3xl font-semibold tracking-tight">Timesheets</h2>
           <p className="text-muted-foreground mt-1">Manage and approve worker timesheets</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus size={18} className="mr-2" />
-              Create Timesheet
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Timesheet</DialogTitle>
-              <DialogDescription>
-                Enter timesheet details manually or import from external system
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="worker">Worker</Label>
-                <Input id="worker" placeholder="Select worker..." />
+        <div className="flex gap-2">
+          <Dialog open={isBulkImportOpen} onOpenChange={setIsBulkImportOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <FileCsv size={18} className="mr-2" />
+                Bulk Import
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Bulk Import Timesheets</DialogTitle>
+                <DialogDescription>
+                  Paste CSV data with columns: workerName, clientName, hours, rate, weekEnding
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <Textarea
+                  placeholder="workerName,clientName,hours,rate,weekEnding&#10;John Smith,Acme Corp,40,25.50,2025-01-17&#10;Jane Doe,Tech Ltd,37.5,30.00,2025-01-17"
+                  value={csvData}
+                  onChange={(e) => setCsvData(e.target.value)}
+                  rows={10}
+                  className="font-mono text-sm"
+                />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="client">Client</Label>
-                <Input id="client" placeholder="Select client..." />
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsBulkImportOpen(false)}>Cancel</Button>
+                <Button onClick={handleSubmitBulkImport}>Import Timesheets</Button>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+            </DialogContent>
+          </Dialog>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus size={18} className="mr-2" />
+                Create Timesheet
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Timesheet</DialogTitle>
+                <DialogDescription>
+                  Enter timesheet details manually
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="hours">Hours</Label>
-                  <Input id="hours" type="number" placeholder="37.5" />
+                  <Label htmlFor="worker">Worker Name</Label>
+                  <Input
+                    id="worker"
+                    placeholder="Enter worker name"
+                    value={formData.workerName}
+                    onChange={(e) => setFormData({ ...formData, workerName: e.target.value })}
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="rate">Rate (£/hr)</Label>
-                  <Input id="rate" type="number" placeholder="25.00" />
+                  <Label htmlFor="client">Client Name</Label>
+                  <Input
+                    id="client"
+                    placeholder="Enter client name"
+                    value={formData.clientName}
+                    onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="weekEnding">Week Ending</Label>
+                  <Input
+                    id="weekEnding"
+                    type="date"
+                    value={formData.weekEnding}
+                    onChange={(e) => setFormData({ ...formData, weekEnding: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="hours">Hours</Label>
+                    <Input
+                      id="hours"
+                      type="number"
+                      step="0.5"
+                      placeholder="37.5"
+                      value={formData.hours}
+                      onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rate">Rate (£/hr)</Label>
+                    <Input
+                      id="rate"
+                      type="number"
+                      step="0.01"
+                      placeholder="25.00"
+                      value={formData.rate}
+                      onChange={(e) => setFormData({ ...formData, rate: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">Cancel</Button>
-              <Button>Create Timesheet</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleSubmitCreate}>Create Timesheet</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
@@ -763,9 +1000,10 @@ interface BillingViewProps {
   invoices: Invoice[]
   searchQuery: string
   setSearchQuery: (query: string) => void
+  onSendInvoice: (invoiceId: string) => void
 }
 
-function BillingView({ invoices, searchQuery, setSearchQuery }: BillingViewProps) {
+function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice }: BillingViewProps) {
   const filteredInvoices = invoices.filter(i =>
     i.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     i.clientName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -842,6 +1080,15 @@ function BillingView({ invoices, searchQuery, setSearchQuery }: BillingViewProps
                   </div>
                 </div>
                 <div className="flex gap-2 ml-4">
+                  {invoice.status === 'draft' && (
+                    <Button
+                      size="sm"
+                      onClick={() => onSendInvoice(invoice.id)}
+                    >
+                      <Envelope size={16} className="mr-2" />
+                      Send
+                    </Button>
+                  )}
                   <Button size="sm" variant="outline">View</Button>
                   <Button size="sm" variant="outline">
                     <Download size={16} className="mr-2" />
@@ -977,11 +1224,46 @@ function PayrollView({ payrollRuns }: PayrollViewProps) {
 
 interface ComplianceViewProps {
   complianceDocs: ComplianceDocument[]
+  onUploadDocument: (data: {
+    workerId: string
+    workerName: string
+    documentType: string
+    expiryDate: string
+  }) => void
 }
 
-function ComplianceView({ complianceDocs }: ComplianceViewProps) {
+function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProps) {
   const expiringDocs = complianceDocs.filter(d => d.status === 'expiring')
   const expiredDocs = complianceDocs.filter(d => d.status === 'expired')
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [uploadFormData, setUploadFormData] = useState({
+    workerId: '',
+    workerName: '',
+    documentType: '',
+    expiryDate: ''
+  })
+
+  const handleSubmitUpload = () => {
+    if (!uploadFormData.workerName || !uploadFormData.documentType || !uploadFormData.expiryDate) {
+      toast.error('Please fill in all fields')
+      return
+    }
+
+    onUploadDocument({
+      workerId: uploadFormData.workerId || `W-${Date.now()}`,
+      workerName: uploadFormData.workerName,
+      documentType: uploadFormData.documentType,
+      expiryDate: uploadFormData.expiryDate
+    })
+
+    setUploadFormData({
+      workerId: '',
+      workerName: '',
+      documentType: '',
+      expiryDate: ''
+    })
+    setIsUploadOpen(false)
+  }
 
   return (
     <div className="space-y-6">
@@ -990,10 +1272,70 @@ function ComplianceView({ complianceDocs }: ComplianceViewProps) {
           <h2 className="text-3xl font-semibold tracking-tight">Compliance Monitoring</h2>
           <p className="text-muted-foreground mt-1">Track worker documentation and certifications</p>
         </div>
-        <Button>
-          <Plus size={18} className="mr-2" />
-          Add Document
-        </Button>
+        <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <UploadSimple size={18} className="mr-2" />
+              Upload Document
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload Compliance Document</DialogTitle>
+              <DialogDescription>
+                Add a new document for a worker
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="workerName">Worker Name</Label>
+                <Input
+                  id="workerName"
+                  placeholder="Enter worker name"
+                  value={uploadFormData.workerName}
+                  onChange={(e) => setUploadFormData({ ...uploadFormData, workerName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="documentType">Document Type</Label>
+                <Select
+                  value={uploadFormData.documentType}
+                  onValueChange={(value) => setUploadFormData({ ...uploadFormData, documentType: value })}
+                >
+                  <SelectTrigger id="documentType">
+                    <SelectValue placeholder="Select document type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DBS Check">DBS Check</SelectItem>
+                    <SelectItem value="Right to Work">Right to Work</SelectItem>
+                    <SelectItem value="Professional License">Professional License</SelectItem>
+                    <SelectItem value="First Aid Certificate">First Aid Certificate</SelectItem>
+                    <SelectItem value="Driving License">Driving License</SelectItem>
+                    <SelectItem value="Passport">Passport</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="expiryDate">Expiry Date</Label>
+                <Input
+                  id="expiryDate"
+                  type="date"
+                  value={uploadFormData.expiryDate}
+                  onChange={(e) => setUploadFormData({ ...uploadFormData, expiryDate: e.target.value })}
+                />
+              </div>
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                <UploadSimple size={32} className="mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">Click to upload or drag and drop</p>
+                <p className="text-xs text-muted-foreground">PDF, JPG, PNG up to 10MB</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsUploadOpen(false)}>Cancel</Button>
+              <Button onClick={handleSubmitUpload}>Upload Document</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
