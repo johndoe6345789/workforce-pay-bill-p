@@ -9,25 +9,9 @@ import {
   ShieldCheck, 
   ChartBar,
   Buildings,
-  CheckCircle,
-  XCircle,
-  ClockCounterClockwise,
-  Plus,
-  MagnifyingGlass,
-  Funnel,
-  Download,
-  ArrowUp,
-  ArrowDown,
-  Warning,
   MapTrifold,
-  UploadSimple,
-  FileCsv,
-  Envelope,
-  X,
-  CalendarBlank,
   Notepad,
   Bell,
-  Camera,
   ChartLine,
   CurrencyCircleDollar,
   QrCode,
@@ -35,24 +19,23 @@ import {
   UserPlus,
   Gear,
   FileText,
-  CaretDown,
-  CaretRight,
-  Question
+  Question,
+  UploadSimple,
+  ClockCounterClockwise,
+  CalendarBlank,
+  Envelope,
+  X
 } from '@phosphor-icons/react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { NavItem, NavGroup } from '@/components/navigation'
+import { DashboardView } from '@/components/dashboard-view'
+import { RoadmapView } from '@/components/roadmap-view'
 import { ReportsView } from '@/components/ReportsView'
 import { CurrencyManagement } from '@/components/CurrencyManagement'
 import { EmailTemplateManager } from '@/components/EmailTemplateManager'
@@ -71,7 +54,6 @@ import { CustomReportBuilder } from '@/components/CustomReportBuilder'
 import { HolidayPayManager } from '@/components/HolidayPayManager'
 import { PermanentPlacementInvoice } from '@/components/PermanentPlacementInvoice'
 import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
-import { ShiftPremiumCalculator } from '@/components/ShiftPremiumCalculator'
 import { ContractValidator } from '@/components/ContractValidator'
 import { DetailedTimesheetEntry } from '@/components/DetailedTimesheetEntry'
 import { ShiftPatternManager } from '@/components/ShiftPatternManager'
@@ -81,6 +63,7 @@ import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { ComplianceDetailDialog } from '@/components/ComplianceDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { QueryLanguageGuide } from '@/components/QueryLanguageGuide'
+import { TimesheetsView, BillingView, PayrollView, ExpensesView, ComplianceView } from '@/components/views'
 import type { 
   Timesheet, 
   Invoice, 
@@ -909,13 +892,7 @@ function App() {
   )
 }
 
-interface NavItemProps {
-  icon: React.ReactNode
-  label: string
-  active?: boolean
-  onClick?: () => void
-  badge?: number
-}
+export default App
 
 function NavItem({ icon, label, active, onClick, badge }: NavItemProps) {
   return (
@@ -3083,4 +3060,3 @@ function RoadmapView() {
   )
 }
 
-export default App
