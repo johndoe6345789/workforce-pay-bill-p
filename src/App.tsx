@@ -2494,7 +2494,7 @@ function ExpenseCard({ expense, onApprove, onReject }: ExpenseCardProps) {
                 )}
                 <div className="mt-2 text-sm text-muted-foreground">
                   Submitted {new Date(expense.submittedDate).toLocaleDateString()}
-                  {expense.approvedDate && ` • Approved ${new Date(expense.approvedDate).toLocaleDateString()}`}
+                  size="sm" 
                 </div>
               </div>
             </div>
@@ -2801,9 +2801,8 @@ function RoadmapView() {
         listItems.push(
           <li key={i} className="flex items-start gap-2 text-sm">
             <span className="mt-0.5">
-              {isCompleted && <span className="text-success">✅</span>}
               {isInProgress && <span className="text-warning">🔄</span>}
-              {isPlanned && <span className="text-muted-foreground">📋</span>}
+            </span>
               {!isCompleted && !isInProgress && !isPlanned && <span className="text-muted-foreground">•</span>}
             </span>
             <span className={cn(
