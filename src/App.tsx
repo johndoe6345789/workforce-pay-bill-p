@@ -73,6 +73,10 @@ import { ShiftPremiumCalculator } from '@/components/ShiftPremiumCalculator'
 import { ContractValidator } from '@/components/ContractValidator'
 import { DetailedTimesheetEntry } from '@/components/DetailedTimesheetEntry'
 import { ShiftPatternManager } from '@/components/ShiftPatternManager'
+import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
+import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
+import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
+import { ComplianceDetailDialog } from '@/components/ComplianceDetailDialog'
 import type { 
   Timesheet, 
   Invoice, 
@@ -1211,6 +1215,7 @@ function TimesheetsView({
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null)
+  const [viewingTimesheet, setViewingTimesheet] = useState<Timesheet | null>(null)
   const [formData, setFormData] = useState({
     workerName: '',
     clientName: '',
@@ -1433,6 +1438,7 @@ function TimesheetsView({
                 onReject={onReject}
                 onCreateInvoice={onCreateInvoice}
                 onAdjust={setSelectedTimesheet}
+                onViewDetails={setViewingTimesheet}
               />
             ))}
           {filteredTimesheets.filter(t => t.status === 'pending').length === 0 && (
@@ -1455,6 +1461,7 @@ function TimesheetsView({
                 onReject={onReject}
                 onCreateInvoice={onCreateInvoice}
                 onAdjust={setSelectedTimesheet}
+                onViewDetails={setViewingTimesheet}
               />
             ))}
         </TabsContent>
@@ -1470,10 +1477,19 @@ function TimesheetsView({
                 onReject={onReject}
                 onCreateInvoice={onCreateInvoice}
                 onAdjust={setSelectedTimesheet}
+                onViewDetails={setViewingTimesheet}
               />
             ))}
         </TabsContent>
       </Tabs>
+
+      <TimesheetDetailDialog
+        timesheet={viewingTimesheet}
+        open={viewingTimesheet !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingTimesheet(null)
+        }}
+      />
 
       {selectedTimesheet && (
         <TimesheetAdjustmentWizard
@@ -1495,9 +1511,10 @@ interface TimesheetCardProps {
   onReject: (id: string) => void
   onCreateInvoice: (id: string) => void
   onAdjust?: (timesheet: Timesheet) => void
+  onViewDetails?: (timesheet: Timesheet) => void
 }
 
-function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdjust }: TimesheetCardProps) {
+function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdjust, onViewDetails }: TimesheetCardProps) {
   const [showShifts, setShowShifts] = useState(false)
   
   const statusConfig = {
@@ -1524,7 +1541,7 @@ function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdju
   const hasShifts = timesheet.shifts && timesheet.shifts.length > 0
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => onViewDetails?.(timesheet)}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="space-y-3 flex-1">
@@ -1574,7 +1591,10 @@ function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdju
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      onClick={() => setShowShifts(!showShifts)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowShifts(!showShifts)
+                      }}
                       className="h-8 px-2 text-xs"
                     >
                       {showShifts ? 'Hide' : 'Show'} Shift Details
@@ -1619,7 +1639,7 @@ function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdju
             </div>
           </div>
           
-          <div className="flex gap-2 ml-4">
+          <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
             {timesheet.status === 'pending' && (
               <>
                 <Button 
@@ -1678,6 +1698,8 @@ interface BillingViewProps {
 }
 
 function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onCreatePlacementInvoice, onCreateCreditNote, rateCards }: BillingViewProps) {
+  const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
+  
   const filteredInvoices = invoices.filter(i =>
     i.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     i.clientName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -1721,7 +1743,7 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
 
       <div className="space-y-3">
         {filteredInvoices.map(invoice => (
-          <Card key={invoice.id} className="hover:shadow-md transition-shadow">
+          <Card key={invoice.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setViewingInvoice(invoice)}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2 flex-1">
@@ -1757,7 +1779,7 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 ml-4">
+                <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
                   {invoice.status === 'draft' && (
                     <Button
                       size="sm"
@@ -1786,6 +1808,15 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
           </Card>
         )}
       </div>
+
+      <InvoiceDetailDialog
+        invoice={viewingInvoice}
+        open={viewingInvoice !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingInvoice(null)
+        }}
+        onSendInvoice={onSendInvoice}
+      />
     </div>
   )
 }
@@ -1914,6 +1945,7 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
   const expiringDocs = complianceDocs.filter(d => d.status === 'expiring')
   const expiredDocs = complianceDocs.filter(d => d.status === 'expired')
   const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
   const [uploadFormData, setUploadFormData] = useState({
     workerId: '',
     workerName: '',
@@ -2059,7 +2091,7 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
 
         <TabsContent value="expiring" className="space-y-3">
           {expiringDocs.map(doc => (
-            <ComplianceCard key={doc.id} document={doc} />
+            <ComplianceCard key={doc.id} document={doc} onViewDetails={setViewingDocument} />
           ))}
           {expiringDocs.length === 0 && (
             <Card className="p-12 text-center">
@@ -2072,25 +2104,34 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
 
         <TabsContent value="expired" className="space-y-3">
           {expiredDocs.map(doc => (
-            <ComplianceCard key={doc.id} document={doc} />
+            <ComplianceCard key={doc.id} document={doc} onViewDetails={setViewingDocument} />
           ))}
         </TabsContent>
 
         <TabsContent value="valid" className="space-y-3">
           {complianceDocs.filter(d => d.status === 'valid').map(doc => (
-            <ComplianceCard key={doc.id} document={doc} />
+            <ComplianceCard key={doc.id} document={doc} onViewDetails={setViewingDocument} />
           ))}
         </TabsContent>
       </Tabs>
+
+      <ComplianceDetailDialog
+        document={viewingDocument}
+        open={viewingDocument !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingDocument(null)
+        }}
+      />
     </div>
   )
 }
 
 interface ComplianceCardProps {
   document: ComplianceDocument
+  onViewDetails?: (document: ComplianceDocument) => void
 }
 
-function ComplianceCard({ document }: ComplianceCardProps) {
+function ComplianceCard({ document, onViewDetails }: ComplianceCardProps) {
   const statusConfig = {
     valid: { icon: CheckCircle, color: 'text-success', bgColor: 'bg-success/10' },
     expiring: { icon: Warning, color: 'text-warning', bgColor: 'bg-warning/10' },
@@ -2100,7 +2141,7 @@ function ComplianceCard({ document }: ComplianceCardProps) {
   const StatusIcon = statusConfig[document.status].icon
 
   return (
-    <Card>
+    <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => onViewDetails?.(document)}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="space-y-3 flex-1">
@@ -2138,7 +2179,7 @@ function ComplianceCard({ document }: ComplianceCardProps) {
               </div>
             </div>
           </div>
-          <div className="flex gap-2 ml-4">
+          <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
             <Button size="sm" variant="outline">View</Button>
             <Button size="sm">Upload New</Button>
           </div>
@@ -2175,6 +2216,7 @@ function ExpensesView({
 }: ExpensesViewProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [viewingExpense, setViewingExpense] = useState<Expense | null>(null)
   const [formData, setFormData] = useState({
     workerName: '',
     clientName: '',
@@ -2389,6 +2431,7 @@ function ExpensesView({
                 expense={expense}
                 onApprove={onApprove}
                 onReject={onReject}
+                onViewDetails={setViewingExpense}
               />
             ))}
           {filteredExpenses.filter(e => e.status === 'pending').length === 0 && (
@@ -2404,7 +2447,7 @@ function ExpensesView({
           {filteredExpenses
             .filter(e => e.status === 'approved')
             .map(expense => (
-              <ExpenseCard key={expense.id} expense={expense} />
+              <ExpenseCard key={expense.id} expense={expense} onViewDetails={setViewingExpense} />
             ))}
         </TabsContent>
 
@@ -2412,7 +2455,7 @@ function ExpensesView({
           {filteredExpenses
             .filter(e => e.status === 'rejected')
             .map(expense => (
-              <ExpenseCard key={expense.id} expense={expense} />
+              <ExpenseCard key={expense.id} expense={expense} onViewDetails={setViewingExpense} />
             ))}
         </TabsContent>
 
@@ -2420,10 +2463,20 @@ function ExpensesView({
           {filteredExpenses
             .filter(e => e.status === 'paid')
             .map(expense => (
-              <ExpenseCard key={expense.id} expense={expense} />
+              <ExpenseCard key={expense.id} expense={expense} onViewDetails={setViewingExpense} />
             ))}
         </TabsContent>
       </Tabs>
+
+      <ExpenseDetailDialog
+        expense={viewingExpense}
+        open={viewingExpense !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingExpense(null)
+        }}
+        onApprove={onApprove}
+        onReject={onReject}
+      />
     </div>
   )
 }
@@ -2432,9 +2485,10 @@ interface ExpenseCardProps {
   expense: Expense
   onApprove?: (id: string) => void
   onReject?: (id: string) => void
+  onViewDetails?: (expense: Expense) => void
 }
 
-function ExpenseCard({ expense, onApprove, onReject }: ExpenseCardProps) {
+function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCardProps) {
   const statusConfig = {
     pending: { icon: ClockCounterClockwise, color: 'text-warning' },
     approved: { icon: CheckCircle, color: 'text-success' },
@@ -2445,7 +2499,7 @@ function ExpenseCard({ expense, onApprove, onReject }: ExpenseCardProps) {
   const StatusIcon = statusConfig[expense.status].icon
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => onViewDetails?.(expense)}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="space-y-3 flex-1">
@@ -2500,7 +2554,7 @@ function ExpenseCard({ expense, onApprove, onReject }: ExpenseCardProps) {
             </div>
           </div>
           
-          <div className="flex gap-2 ml-4">
+          <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
             {expense.status === 'pending' && onApprove && onReject && (
               <>
                 <Button 
