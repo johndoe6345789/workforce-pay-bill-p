@@ -563,7 +563,7 @@ export function ComponentShowcase() {
   )
 
   return (
-    <div className="flex h-[calc(100vh-12rem)] lg:h-[calc(100vh-10rem)] bg-background rounded-lg border border-border overflow-hidden">
+    <div className="flex h-full bg-background rounded-lg border border-border overflow-hidden">
       {!isMobile && (
         <aside className="w-64 border-r border-border bg-card flex flex-col">
           <CategorySidebar />
