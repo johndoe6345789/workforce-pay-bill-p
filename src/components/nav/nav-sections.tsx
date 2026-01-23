@@ -44,6 +44,7 @@ export function CoreOperationsNav({ currentView, setCurrentView, metrics, expand
         active={currentView === 'timesheets'}
         onClick={() => setCurrentView('timesheets')}
         badge={metrics.pendingTimesheets}
+        view="timesheets"
       />
       <NavItem
         icon={<Receipt size={20} />}
@@ -51,12 +52,14 @@ export function CoreOperationsNav({ currentView, setCurrentView, metrics, expand
         active={currentView === 'billing'}
         onClick={() => setCurrentView('billing')}
         badge={metrics.overdueInvoices}
+        view="billing"
       />
       <NavItem
         icon={<CurrencyDollar size={20} />}
         label="Payroll"
         active={currentView === 'payroll'}
         onClick={() => setCurrentView('payroll')}
+        view="payroll"
       />
       <NavItem
         icon={<Notepad size={20} />}
@@ -64,6 +67,7 @@ export function CoreOperationsNav({ currentView, setCurrentView, metrics, expand
         active={currentView === 'expenses'}
         onClick={() => setCurrentView('expenses')}
         badge={metrics.pendingExpenses}
+        view="expenses"
       />
       <NavItem
         icon={<ShieldCheck size={20} />}
@@ -71,6 +75,7 @@ export function CoreOperationsNav({ currentView, setCurrentView, metrics, expand
         active={currentView === 'compliance'}
         onClick={() => setCurrentView('compliance')}
         badge={metrics.complianceAlerts}
+        view="compliance"
       />
     </NavGroup>
   )
@@ -89,18 +94,21 @@ export function ReportsNav({ currentView, setCurrentView, expandedGroups, toggle
         label="Reports"
         active={currentView === 'reports'}
         onClick={() => setCurrentView('reports')}
+        view="reports"
       />
       <NavItem
         icon={<ChartBar size={20} />}
         label="Custom Reports"
         active={currentView === 'custom-reports'}
         onClick={() => setCurrentView('custom-reports')}
+        view="custom-reports"
       />
       <NavItem
         icon={<ClockCounterClockwise size={20} />}
         label="Missing Timesheets"
         active={currentView === 'missing-timesheets'}
         onClick={() => setCurrentView('missing-timesheets')}
+        view="missing-timesheets"
       />
     </NavGroup>
   )
@@ -119,42 +127,49 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         label="Currency"
         active={currentView === 'currency'}
         onClick={() => setCurrentView('currency')}
+        view="currency"
       />
       <NavItem
         icon={<CurrencyCircleDollar size={20} />}
         label="Rate Templates"
         active={currentView === 'rate-templates'}
         onClick={() => setCurrentView('rate-templates')}
+        view="rate-templates"
       />
       <NavItem
         icon={<Clock size={20} />}
         label="Shift Patterns"
         active={currentView === 'shift-patterns'}
         onClick={() => setCurrentView('shift-patterns')}
+        view="shift-patterns"
       />
       <NavItem
         icon={<Envelope size={20} />}
         label="Email Templates"
         active={currentView === 'email-templates'}
         onClick={() => setCurrentView('email-templates')}
+        view="email-templates"
       />
       <NavItem
         icon={<Palette size={20} />}
         label="Invoice Templates"
         active={currentView === 'invoice-templates'}
         onClick={() => setCurrentView('invoice-templates')}
+        view="invoice-templates"
       />
       <NavItem
         icon={<Gear size={20} />}
         label="Notification Rules"
         active={currentView === 'notification-rules'}
         onClick={() => setCurrentView('notification-rules')}
+        view="notification-rules"
       />
       <NavItem
         icon={<ShieldCheck size={20} />}
         label="Contract Validation"
         active={currentView === 'contract-validation'}
         onClick={() => setCurrentView('contract-validation')}
+        view="contract-validation"
       />
     </NavGroup>
   )
@@ -173,36 +188,42 @@ export function ToolsNav({ currentView, setCurrentView, expandedGroups, toggleGr
         label="QR Scanner"
         active={currentView === 'qr-scanner'}
         onClick={() => setCurrentView('qr-scanner')}
+        view="qr-scanner"
       />
       <NavItem
         icon={<UploadSimple size={20} />}
         label="Batch Import"
         active={currentView === 'batch-import'}
         onClick={() => setCurrentView('batch-import')}
+        view="batch-import"
       />
       <NavItem
         icon={<FileText size={20} />}
         label="Purchase Orders"
         active={currentView === 'purchase-orders'}
         onClick={() => setCurrentView('purchase-orders')}
+        view="purchase-orders"
       />
       <NavItem
         icon={<UserPlus size={20} />}
         label="Onboarding"
         active={currentView === 'onboarding'}
         onClick={() => setCurrentView('onboarding')}
+        view="onboarding"
       />
       <NavItem
         icon={<CalendarBlank size={20} />}
         label="Holiday Pay"
         active={currentView === 'holiday-pay'}
         onClick={() => setCurrentView('holiday-pay')}
+        view="holiday-pay"
       />
       <NavItem
         icon={<ClockCounterClockwise size={20} />}
         label="Audit Trail"
         active={currentView === 'audit-trail'}
         onClick={() => setCurrentView('audit-trail')}
+        view="audit-trail"
       />
     </NavGroup>
   )

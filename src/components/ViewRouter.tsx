@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import type { View } from '@/App'
 import type { 
   Timesheet, 
@@ -9,35 +10,35 @@ import type {
   RateCard,
   DashboardMetrics
 } from '@/lib/types'
-import { 
-  DashboardView,
-  TimesheetsView,
-  BillingView,
-  PayrollView,
-  ComplianceView,
-  ExpensesView
-} from '@/components/views'
-import { ReportsView } from '@/components/ReportsView'
-import { CurrencyManagement } from '@/components/CurrencyManagement'
-import { EmailTemplateManager } from '@/components/EmailTemplateManager'
-import { InvoiceTemplateManager } from '@/components/InvoiceTemplateManager'
-import { QRTimesheetScanner } from '@/components/QRTimesheetScanner'
-import { MissingTimesheetsReport } from '@/components/MissingTimesheetsReport'
-import { PurchaseOrderManager } from '@/components/PurchaseOrderManager'
-import { OnboardingWorkflowManager } from '@/components/OnboardingWorkflowManager'
-import { AuditTrailViewer } from '@/components/AuditTrailViewer'
-import { NotificationRulesManager } from '@/components/NotificationRulesManager'
-import { BatchImportManager } from '@/components/BatchImportManager'
-import { RateTemplateManager } from '@/components/RateTemplateManager'
-import { CustomReportBuilder } from '@/components/CustomReportBuilder'
-import { HolidayPayManager } from '@/components/HolidayPayManager'
-import { ContractValidator } from '@/components/ContractValidator'
-import { ShiftPatternManager } from '@/components/ShiftPatternManager'
-import { QueryLanguageGuide } from '@/components/QueryLanguageGuide'
-import { RoadmapView } from '@/components/roadmap-view'
-import { ComponentShowcase } from '@/components/ComponentShowcase'
-import { BusinessLogicDemo } from '@/components/BusinessLogicDemo'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { toast } from 'sonner'
+
+const DashboardView = lazy(() => import('@/components/views').then(m => ({ default: m.DashboardView })))
+const TimesheetsView = lazy(() => import('@/components/views').then(m => ({ default: m.TimesheetsView })))
+const BillingView = lazy(() => import('@/components/views').then(m => ({ default: m.BillingView })))
+const PayrollView = lazy(() => import('@/components/views').then(m => ({ default: m.PayrollView })))
+const ComplianceView = lazy(() => import('@/components/views').then(m => ({ default: m.ComplianceView })))
+const ExpensesView = lazy(() => import('@/components/views').then(m => ({ default: m.ExpensesView })))
+const ReportsView = lazy(() => import('@/components/ReportsView').then(m => ({ default: m.ReportsView })))
+const CurrencyManagement = lazy(() => import('@/components/CurrencyManagement').then(m => ({ default: m.CurrencyManagement })))
+const EmailTemplateManager = lazy(() => import('@/components/EmailTemplateManager').then(m => ({ default: m.EmailTemplateManager })))
+const InvoiceTemplateManager = lazy(() => import('@/components/InvoiceTemplateManager').then(m => ({ default: m.InvoiceTemplateManager })))
+const QRTimesheetScanner = lazy(() => import('@/components/QRTimesheetScanner').then(m => ({ default: m.QRTimesheetScanner })))
+const MissingTimesheetsReport = lazy(() => import('@/components/MissingTimesheetsReport').then(m => ({ default: m.MissingTimesheetsReport })))
+const PurchaseOrderManager = lazy(() => import('@/components/PurchaseOrderManager').then(m => ({ default: m.PurchaseOrderManager })))
+const OnboardingWorkflowManager = lazy(() => import('@/components/OnboardingWorkflowManager').then(m => ({ default: m.OnboardingWorkflowManager })))
+const AuditTrailViewer = lazy(() => import('@/components/AuditTrailViewer').then(m => ({ default: m.AuditTrailViewer })))
+const NotificationRulesManager = lazy(() => import('@/components/NotificationRulesManager').then(m => ({ default: m.NotificationRulesManager })))
+const BatchImportManager = lazy(() => import('@/components/BatchImportManager').then(m => ({ default: m.BatchImportManager })))
+const RateTemplateManager = lazy(() => import('@/components/RateTemplateManager').then(m => ({ default: m.RateTemplateManager })))
+const CustomReportBuilder = lazy(() => import('@/components/CustomReportBuilder').then(m => ({ default: m.CustomReportBuilder })))
+const HolidayPayManager = lazy(() => import('@/components/HolidayPayManager').then(m => ({ default: m.HolidayPayManager })))
+const ContractValidator = lazy(() => import('@/components/ContractValidator').then(m => ({ default: m.ContractValidator })))
+const ShiftPatternManager = lazy(() => import('@/components/ShiftPatternManager').then(m => ({ default: m.ShiftPatternManager })))
+const QueryLanguageGuide = lazy(() => import('@/components/QueryLanguageGuide').then(m => ({ default: m.QueryLanguageGuide })))
+const RoadmapView = lazy(() => import('@/components/roadmap-view').then(m => ({ default: m.RoadmapView })))
+const ComponentShowcase = lazy(() => import('@/components/ComponentShowcase').then(m => ({ default: m.ComponentShowcase })))
+const BusinessLogicDemo = lazy(() => import('@/components/BusinessLogicDemo').then(m => ({ default: m.BusinessLogicDemo })))
 
 interface ViewRouterProps {
   currentView: View
@@ -56,6 +57,14 @@ interface ViewRouterProps {
   actions: any
 }
 
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[400px]">
+      <LoadingSpinner size="lg" />
+    </div>
+  )
+}
+
 export function ViewRouter({
   currentView,
   searchQuery,
@@ -72,9 +81,10 @@ export function ViewRouter({
   setPayrollRuns,
   actions
 }: ViewRouterProps) {
-  switch (currentView) {
-    case 'dashboard':
-      return <DashboardView metrics={metrics} />
+  const renderView = () => {
+    switch (currentView) {
+      case 'dashboard':
+        return <DashboardView metrics={metrics} />
 
     case 'timesheets':
       return (
@@ -238,5 +248,12 @@ export function ViewRouter({
 
     default:
       return <DashboardView metrics={metrics} />
+    }
   }
+
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      {renderView()}
+    </Suspense>
+  )
 }

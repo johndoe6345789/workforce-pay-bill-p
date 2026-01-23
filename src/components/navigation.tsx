@@ -66,6 +66,7 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           label="Dashboard"
           active={currentView === 'dashboard'}
           onClick={() => setCurrentView('dashboard')}
+          view="dashboard"
         />
         
         <CoreOperationsNav
@@ -103,24 +104,28 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           label="Component Library"
           active={currentView === 'component-showcase'}
           onClick={() => setCurrentView('component-showcase')}
+          view="component-showcase"
         />
         <NavItem
           icon={<Code size={20} />}
           label="Business Logic Hooks"
           active={currentView === 'business-logic-demo'}
           onClick={() => setCurrentView('business-logic-demo')}
+          view="business-logic-demo"
         />
         <NavItem
           icon={<Question size={20} />}
           label="Query Guide"
           active={currentView === 'query-guide'}
           onClick={() => setCurrentView('query-guide')}
+          view="query-guide"
         />
         <NavItem
           icon={<MapTrifold size={20} />}
           label="Roadmap"
           active={currentView === 'roadmap'}
           onClick={() => setCurrentView('roadmap')}
+          view="roadmap"
         />
       </nav>
 

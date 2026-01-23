@@ -3,6 +3,7 @@ import { useSampleData } from '@/hooks/use-sample-data'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useAppData } from '@/hooks/use-app-data'
 import { useAppActions } from '@/hooks/use-app-actions'
+import { useViewPreload } from '@/hooks/use-view-preload'
 import { Sidebar } from '@/components/navigation'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { ViewRouter } from '@/components/ViewRouter'
@@ -11,6 +12,7 @@ export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'complia
 
 function App() {
   useSampleData()
+  useViewPreload()
   
   const [currentView, setCurrentView] = useState<View>('dashboard')
   const [currentEntity, setCurrentEntity] = useState('Main Agency')

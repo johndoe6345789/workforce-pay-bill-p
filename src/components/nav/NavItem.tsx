@@ -1,5 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import type { View } from '@/App'
+import { preloadView } from '@/lib/view-preloader'
 
 interface NavItemProps {
   icon: React.ReactNode
@@ -7,12 +9,20 @@ interface NavItemProps {
   active?: boolean
   onClick?: () => void
   badge?: number
+  view?: View
 }
 
-export function NavItem({ icon, label, active, onClick, badge }: NavItemProps) {
+export function NavItem({ icon, label, active, onClick, badge, view }: NavItemProps) {
+  const handleMouseEnter = () => {
+    if (view) {
+      preloadView(view)
+    }
+  }
+
   return (
     <button
       onClick={onClick}
+      onMouseEnter={handleMouseEnter}
       className={cn(
         'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
         active 
