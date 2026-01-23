@@ -4,12 +4,19 @@ import {
   CurrencyDollar,
   Download,
   ChartBar,
-  Calculator
+  Calculator,
+  Users,
+  CalendarBlank,
+  ClockCounterClockwise
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { PageHeader } from '@/components/ui/page-header'
+import { Grid } from '@/components/ui/grid'
+import { Stack } from '@/components/ui/stack'
+import { MetricCard } from '@/components/ui/metric-card'
 import { PayrollDetailDialog } from '@/components/PayrollDetailDialog'
 import { OneClickPayroll } from '@/components/OneClickPayroll'
 import { usePayrollCalculations } from '@/hooks/use-payroll-calculations'
@@ -67,98 +74,98 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
   }
   
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Payroll Processing</h2>
-          <p className="text-muted-foreground mt-1">Manage payroll runs and worker payments</p>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowAnalytics(!showAnalytics)}
-          >
-            <ChartBar size={18} className="mr-2" />
-            {showAnalytics ? 'Hide' : 'Show'} Analytics
-          </Button>
-          <Dialog open={showCalculator} onOpenChange={setShowCalculator}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Calculator size={18} className="mr-2" />
-                Tax Calculator
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Payroll Tax Calculator</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Gross Pay (Monthly)</label>
-                  <input
-                    type="number"
-                    value={calculatorGrossPay}
-                    onChange={(e) => setCalculatorGrossPay(e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border border-input rounded-md"
-                    placeholder="1000"
-                  />
-                </div>
-                <Button onClick={handleCalculate}>Calculate</Button>
-                
-                {calculatorResult && (
-                  <div className="space-y-3 border-t pt-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <Card>
-                        <CardContent className="pt-4">
-                          <div className="text-sm text-muted-foreground">Gross Pay</div>
-                          <div className="text-xl font-semibold font-mono">
-                            £{calculatorResult.grossPay.toFixed(2)}
-                          </div>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardContent className="pt-4">
-                          <div className="text-sm text-muted-foreground">Net Pay</div>
-                          <div className="text-xl font-semibold font-mono text-success">
-                            £{calculatorResult.netPay.toFixed(2)}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-sm">Breakdown</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {calculatorResult.breakdown.map((item: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <span>{item.description}</span>
-                            <span className={`font-mono ${item.amount < 0 ? 'text-destructive' : ''}`}>
-                              £{Math.abs(item.amount).toFixed(2)}
-                            </span>
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-muted/50">
-                      <CardContent className="pt-4">
-                        <div className="text-xs text-muted-foreground mb-1">Tax Year: {payrollConfig.taxYear}</div>
-                        <div className="text-xs text-muted-foreground">Personal Allowance: £{payrollConfig.personalAllowance.toLocaleString()}</div>
-                      </CardContent>
-                    </Card>
+    <Stack spacing={6}>
+      <PageHeader
+        title="Payroll Processing"
+        description="Manage payroll runs and worker payments"
+        actions={
+          <Stack direction="horizontal" spacing={2}>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
+              <ChartBar size={18} className="mr-2" />
+              {showAnalytics ? 'Hide' : 'Show'} Analytics
+            </Button>
+            <Dialog open={showCalculator} onOpenChange={setShowCalculator}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Calculator size={18} className="mr-2" />
+                  Tax Calculator
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Payroll Tax Calculator</DialogTitle>
+                </DialogHeader>
+                <Stack spacing={4}>
+                  <div>
+                    <label className="text-sm font-medium">Gross Pay (Monthly)</label>
+                    <input
+                      type="number"
+                      value={calculatorGrossPay}
+                      onChange={(e) => setCalculatorGrossPay(e.target.value)}
+                      className="w-full mt-1 px-3 py-2 border border-input rounded-md"
+                      placeholder="1000"
+                    />
                   </div>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
-          <Button>
-            <Plus size={18} className="mr-2" />
-            Run Payroll
-          </Button>
-        </div>
-      </div>
+                  <Button onClick={handleCalculate}>Calculate</Button>
+                  
+                  {calculatorResult && (
+                    <Stack spacing={3} className="border-t pt-4">
+                      <Grid cols={2} gap={3}>
+                        <Card>
+                          <CardContent className="pt-4">
+                            <div className="text-sm text-muted-foreground">Gross Pay</div>
+                            <div className="text-xl font-semibold font-mono">
+                              £{calculatorResult.grossPay.toFixed(2)}
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card>
+                          <CardContent className="pt-4">
+                            <div className="text-sm text-muted-foreground">Net Pay</div>
+                            <div className="text-xl font-semibold font-mono text-success">
+                              £{calculatorResult.netPay.toFixed(2)}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-sm">Breakdown</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          {calculatorResult.breakdown.map((item: any, idx: number) => (
+                            <div key={idx} className="flex justify-between text-sm">
+                              <span>{item.description}</span>
+                              <span className={`font-mono ${item.amount < 0 ? 'text-destructive' : ''}`}>
+                                £{Math.abs(item.amount).toFixed(2)}
+                              </span>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-muted/50">
+                        <CardContent className="pt-4">
+                          <div className="text-xs text-muted-foreground mb-1">Tax Year: {payrollConfig.taxYear}</div>
+                          <div className="text-xs text-muted-foreground">Personal Allowance: £{payrollConfig.personalAllowance.toLocaleString()}</div>
+                        </CardContent>
+                      </Card>
+                    </Stack>
+                  )}
+                </Stack>
+              </DialogContent>
+            </Dialog>
+            <Button>
+              <Plus size={18} className="mr-2" />
+              Run Payroll
+            </Button>
+          </Stack>
+        }
+      />
 
       <OneClickPayroll 
         timesheets={timesheets}
@@ -166,88 +173,55 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
       />
 
       {showAnalytics && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Approved Timesheets</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold">{approvedTimesheets.length}</div>
-              <p className="text-sm text-muted-foreground mt-1">Ready for payroll</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Pending Approval</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold">{pendingTimesheets.length}</div>
-              <p className="text-sm text-muted-foreground mt-1">
-                £{totalPendingValue.toLocaleString()} value
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Total Payroll Runs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold">{payrollRuns.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Last Run Total</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold font-mono">
-                £{lastRun ? lastRun.totalAmount.toLocaleString() : '0'}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <Grid cols={4} gap={4}>
+          <MetricCard
+            label="Approved Timesheets"
+            value={approvedTimesheets.length}
+            description="Ready for payroll"
+            icon={<Users size={24} />}
+          />
+          <MetricCard
+            label="Pending Approval"
+            value={pendingTimesheets.length}
+            description={`£${totalPendingValue.toLocaleString()} value`}
+            icon={<ClockCounterClockwise size={24} />}
+          />
+          <MetricCard
+            label="Total Payroll Runs"
+            value={payrollRuns.length}
+            icon={<CurrencyDollar size={24} />}
+          />
+          <MetricCard
+            label="Last Run Total"
+            value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
+            description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
+            icon={<Download size={24} />}
+          />
+        </Grid>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Next Pay Date</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold">22 Jan 2025</div>
-            <p className="text-sm text-muted-foreground mt-1">Weekly run in 3 days</p>
-          </CardContent>
-        </Card>
+      <Grid cols={3} gap={4}>
+        <MetricCard
+          label="Next Pay Date"
+          value="22 Jan 2025"
+          description="Weekly run in 3 days"
+          icon={<CalendarBlank size={24} />}
+        />
+        <MetricCard
+          label="Pending Approval"
+          value={`${pendingTimesheets.length} timesheets`}
+          description="Must be approved for payroll"
+          icon={<ClockCounterClockwise size={24} />}
+        />
+        <MetricCard
+          label="Last Run Total"
+          value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
+          description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
+          icon={<CurrencyDollar size={24} />}
+        />
+      </Grid>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Pending Approval</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold">{pendingTimesheets.length} timesheets</div>
-            <p className="text-sm text-muted-foreground mt-1">Must be approved for payroll</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Last Run Total</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold font-mono">
-              £{lastRun ? lastRun.totalAmount.toLocaleString() : '0'}
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="space-y-3">
+      <Stack spacing={3}>
         {payrollRuns.map(run => (
           <Card 
             key={run.id}
@@ -256,15 +230,15 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
           >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-3">
+                <Stack spacing={2} className="flex-1">
+                  <Stack direction="horizontal" spacing={3} align="center">
                     <CurrencyDollar size={20} weight="fill" className="text-primary" />
                     <h3 className="font-semibold text-lg">Payroll Run</h3>
                     <Badge variant={run.status === 'completed' ? 'success' : run.status === 'failed' ? 'destructive' : 'warning'}>
                       {run.status}
                     </Badge>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  </Stack>
+                  <Grid cols={4} gap={4} className="text-sm">
                     <div>
                       <p className="text-muted-foreground">Period Ending</p>
                       <p className="font-medium">{new Date(run.periodEnding).toLocaleDateString()}</p>
@@ -283,9 +257,9 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
                         {run.processedDate ? new Date(run.processedDate).toLocaleDateString() : 'Not yet'}
                       </p>
                     </div>
-                  </div>
-                </div>
-                <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
+                  </Grid>
+                </Stack>
+                <Stack direction="horizontal" spacing={2} className="ml-4" onClick={(e) => e.stopPropagation()}>
                   <Button size="sm" variant="outline" onClick={() => setViewingPayroll(run)}>
                     View Details
                   </Button>
@@ -295,7 +269,7 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
                       Export
                     </Button>
                   )}
-                </div>
+                </Stack>
               </div>
             </CardContent>
           </Card>
@@ -308,7 +282,7 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
             <p className="text-muted-foreground">Create your first payroll run to get started</p>
           </Card>
         )}
-      </div>
+      </Stack>
 
       <PayrollDetailDialog
         payrollRun={viewingPayroll}
@@ -317,6 +291,6 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
           if (!open) setViewingPayroll(null)
         }}
       />
-    </div>
+    </Stack>
   )
 }
