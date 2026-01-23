@@ -1,1 +1,6 @@
-
+export { DashboardView } from './DashboardView'
+export { TimesheetsView } from './TimesheetsView'
+export { BillingView } from './BillingView'
+export { PayrollView } from './PayrollView'
+export { ComplianceView } from './ComplianceView'
+export { ExpensesView } from './ExpensesView'
