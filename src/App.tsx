@@ -1232,7 +1232,7 @@ function TimesheetsView({
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null)
   const [viewingTimesheet, setViewingTimesheet] = useState<Timesheet | null>(null)
-  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>(timesheets)
+  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>([])
   
   const handleResultsChange = useCallback((results: Timesheet[]) => {
     setFilteredTimesheets(results)
@@ -1728,7 +1728,7 @@ interface BillingViewProps {
 
 function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onCreatePlacementInvoice, onCreateCreditNote, rateCards }: BillingViewProps) {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(invoices)
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   
   const handleResultsChange = useCallback((results: Invoice[]) => {
     setFilteredInvoices(results)
@@ -1985,15 +1985,16 @@ interface ComplianceViewProps {
 }
 
 function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProps) {
-  const expiringDocs = complianceDocs.filter(d => d.status === 'expiring')
-  const expiredDocs = complianceDocs.filter(d => d.status === 'expired')
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
-  const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>(complianceDocs)
+  const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>([])
   
   const handleResultsChange = useCallback((results: ComplianceDocument[]) => {
     setFilteredDocs(results)
   }, [])
+  
+  const expiringDocs = filteredDocs.filter(d => d.status === 'expiring')
+  const expiredDocs = filteredDocs.filter(d => d.status === 'expired')
   const [uploadFormData, setUploadFormData] = useState({
     workerId: '',
     workerName: '',
@@ -2300,7 +2301,7 @@ function ExpensesView({
   const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [viewingExpense, setViewingExpense] = useState<Expense | null>(null)
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>(expenses)
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
   
   const handleResultsChange = useCallback((results: Expense[]) => {
     setFilteredExpenses(results)
