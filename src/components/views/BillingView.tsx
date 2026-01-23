@@ -10,6 +10,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageHeader } from '@/components/ui/page-header'
+import { MetricCard } from '@/components/ui/metric-card'
+import { Grid } from '@/components/ui/grid'
+import { Stack } from '@/components/ui/stack'
 import { PermanentPlacementInvoice } from '@/components/PermanentPlacementInvoice'
 import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
 import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
@@ -81,77 +85,50 @@ export function BillingView({
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Billing & Invoicing</h2>
-          <p className="text-muted-foreground mt-1">Manage invoices and track payments</p>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowAnalytics(!showAnalytics)}
-          >
-            <ChartLine size={18} className="mr-2" />
-            {showAnalytics ? 'Hide' : 'Show'} Analytics
-          </Button>
-          <PermanentPlacementInvoice onCreateInvoice={onCreatePlacementInvoice} />
-          <CreditNoteGenerator invoices={invoices} onCreateCreditNote={onCreateCreditNote} />
-          <Button>
-            <Plus size={18} className="mr-2" />
-            Create Invoice
-          </Button>
-        </div>
-      </div>
+    <Stack spacing={6}>
+      <PageHeader
+        title="Billing & Invoicing"
+        description="Manage invoices and track payments"
+        actions={
+          <Stack direction="horizontal" spacing={2}>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
+              <ChartLine size={18} className="mr-2" />
+              {showAnalytics ? 'Hide' : 'Show'} Analytics
+            </Button>
+            <PermanentPlacementInvoice onCreateInvoice={onCreatePlacementInvoice} />
+            <CreditNoteGenerator invoices={invoices} onCreateCreditNote={onCreateCreditNote} />
+            <Button>
+              <Plus size={18} className="mr-2" />
+              Create Invoice
+            </Button>
+          </Stack>
+        }
+      />
 
       {showAnalytics && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-muted-foreground">Total Revenue</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold font-mono">
-                  £{totalRevenue.toLocaleString()}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-muted-foreground">Draft Invoices</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold">{draftInvoices.length}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-muted-foreground">Overdue</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <div className="text-2xl font-semibold">{overdueInvoices.length}</div>
-                  {overdueInvoices.length > 0 && (
-                    <Badge variant="destructive" className="text-xs">
-                      <Warning size={12} className="mr-1" />
-                      Action needed
-                    </Badge>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-muted-foreground">Outstanding</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold font-mono">
-                  £{(agingData.current + agingData.days30 + agingData.days60 + agingData.days90 + agingData.over90).toLocaleString()}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        <Stack spacing={4}>
+          <Grid cols={4} gap={4} responsive>
+            <MetricCard
+              label="Total Revenue"
+              value={`£${totalRevenue.toLocaleString()}`}
+            />
+            <MetricCard
+              label="Draft Invoices"
+              value={draftInvoices.length}
+            />
+            <MetricCard
+              label="Overdue"
+              value={overdueInvoices.length}
+              description={overdueInvoices.length > 0 ? 'Action needed' : 'All current'}
+            />
+            <MetricCard
+              label="Outstanding"
+              value={`£${(agingData.current + agingData.days30 + agingData.days60 + agingData.days90 + agingData.over90).toLocaleString()}`}
+            />
+          </Grid>
 
           <Card>
             <CardHeader>
@@ -182,7 +159,7 @@ export function BillingView({
               </div>
             </CardContent>
           </Card>
-        </div>
+        </Stack>
       )}
 
       <AdvancedSearch
@@ -192,14 +169,14 @@ export function BillingView({
         placeholder="Search invoices or use query language (e.g., status = overdue amount > 1000)"
       />
 
-      <div className="flex items-center gap-4">
+      <Stack direction="horizontal" spacing={4}>
         <Button variant="outline">
           <Download size={18} className="mr-2" />
           Export
         </Button>
-      </div>
+      </Stack>
 
-      <div className="space-y-3">
+      <Stack spacing={3}>
         {filteredInvoices.map(invoice => (
           <Card key={invoice.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setViewingInvoice(invoice)}>
             <CardContent className="p-6">
@@ -265,7 +242,7 @@ export function BillingView({
             <p className="text-muted-foreground">Create your first invoice or adjust your search</p>
           </Card>
         )}
-      </div>
+      </Stack>
 
       <InvoiceDetailDialog
         invoice={viewingInvoice}
@@ -275,6 +252,6 @@ export function BillingView({
         }}
         onSendInvoice={onSendInvoice}
       />
-    </div>
+    </Stack>
   )
 }

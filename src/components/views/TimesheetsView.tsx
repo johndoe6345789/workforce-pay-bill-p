@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/ui/page-header'
+import { MetricCard } from '@/components/ui/metric-card'
+import { Grid } from '@/components/ui/grid'
+import { Stack } from '@/components/ui/stack'
+import { EmptyState } from '@/components/ui/empty-state'
 import { TimesheetAdjustmentWizard } from '@/components/TimesheetAdjustmentWizard'
 import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
@@ -126,93 +131,66 @@ export function TimesheetsView({
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Timesheets</h2>
-          <p className="text-muted-foreground mt-1">Manage and approve worker timesheets</p>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowAnalytics(!showAnalytics)}
-          >
-            <ChartBar size={18} className="mr-2" />
-            {showAnalytics ? 'Hide' : 'Show'} Analytics
-          </Button>
-          <TimesheetCreateDialogs
-            isCreateDialogOpen={isCreateDialogOpen}
-            setIsCreateDialogOpen={setIsCreateDialogOpen}
-            isBulkImportOpen={isBulkImportOpen}
-            setIsBulkImportOpen={setIsBulkImportOpen}
-            formData={formData}
-            setFormData={setFormData}
-            csvData={csvData}
-            setCsvData={setCsvData}
-            onCreateTimesheet={onCreateTimesheet}
-            onCreateDetailedTimesheet={onCreateDetailedTimesheet}
-            onBulkImport={onBulkImport}
-          />
-        </div>
-      </div>
+    <Stack spacing={6}>
+      <PageHeader
+        title="Timesheets"
+        description="Manage and approve worker timesheets"
+        actions={
+          <Stack direction="horizontal" spacing={2}>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
+              <ChartBar size={18} className="mr-2" />
+              {showAnalytics ? 'Hide' : 'Show'} Analytics
+            </Button>
+            <TimesheetCreateDialogs
+              isCreateDialogOpen={isCreateDialogOpen}
+              setIsCreateDialogOpen={setIsCreateDialogOpen}
+              isBulkImportOpen={isBulkImportOpen}
+              setIsBulkImportOpen={setIsBulkImportOpen}
+              formData={formData}
+              setFormData={setFormData}
+              csvData={csvData}
+              setCsvData={setCsvData}
+              onCreateTimesheet={onCreateTimesheet}
+              onCreateDetailedTimesheet={onCreateDetailedTimesheet}
+              onBulkImport={onBulkImport}
+            />
+          </Stack>
+        }
+      />
 
       {showAnalytics && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Total Timesheets</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold">{filteredTimesheets.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Total Hours</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold">
-                {filteredTimesheets.reduce((sum, ts) => sum + ts.hours, 0).toFixed(1)}h
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Validation Issues</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className="text-2xl font-semibold">{validationStats.invalid}</div>
-                {validationStats.invalid > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    <Warning size={12} className="mr-1" />
-                    Errors
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Total Value</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-semibold font-mono">
-                £{filteredTimesheets.reduce((sum, ts) => sum + ts.amount, 0).toLocaleString()}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Grid cols={4} gap={4} responsive>
+          <MetricCard
+            label="Total Timesheets"
+            value={filteredTimesheets.length}
+          />
+          <MetricCard
+            label="Total Hours"
+            value={`${filteredTimesheets.reduce((sum, ts) => sum + ts.hours, 0).toFixed(1)}h`}
+          />
+          <MetricCard
+            label="Validation Issues"
+            value={validationStats.invalid}
+            description={validationStats.invalid > 0 ? 'Errors found' : 'All valid'}
+          />
+          <MetricCard
+            label="Total Value"
+            value={`£${filteredTimesheets.reduce((sum, ts) => sum + ts.amount, 0).toLocaleString()}`}
+          />
+        </Grid>
       )}
 
       <AdvancedSearch
         items={timesheetsToFilter}
         fields={timesheetFields}
         onResultsChange={handleResultsChange}
-        placeholder="Search timesheets or use query language (e.g., status = pending hours > 40)"
+        placeholder="Search timesheets..."
       />
 
-      <div className="flex items-center gap-4">
+      <Stack direction="horizontal" spacing={4}>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
           <SelectTrigger className="w-40">
             <div className="flex items-center gap-2">
@@ -231,7 +209,7 @@ export function TimesheetsView({
           <Download size={18} className="mr-2" />
           Export
         </Button>
-      </div>
+      </Stack>
 
       <TimesheetTabs
         filteredTimesheets={timesheetsWithValidation}
@@ -260,6 +238,6 @@ export function TimesheetsView({
           onAdjust={onAdjust}
         />
       )}
-    </div>
+    </Stack>
   )
 }
