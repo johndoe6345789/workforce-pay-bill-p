@@ -103,6 +103,18 @@ This is a multi-module enterprise platform requiring navigation between distinct
 - Progression: Hours worked → Accrual calculated at 5.6% → Balance updated → Worker requests holiday → Manager approves → Balance deducted → Holiday pay included in next payroll
 - Success criteria: Automatic accrual from all timesheets, real-time balance visibility, integration with payroll system
 
+**Advanced Search & Query Language**
+- Functionality: Powerful query language parser with filter builder UI for all list views (timesheets, invoices, expenses, compliance)
+- Purpose: Enables power users to rapidly filter and sort large datasets using natural query syntax while providing visual builder for less technical users
+- Trigger: User types in search bar or opens filter builder
+- Progression: Enter query (e.g., "status = pending hours > 40") → Parse and validate → Apply filters → Display results count → Show active filter badges → Clear/modify filters
+- Success criteria: Supports text (contains/equals/starts/ends), numeric (>/</=/>=/<=/), list (in), and sorting operators; sub-second query parsing; persistent filter state; guided help documentation; exports include active filters
+- Query Examples:
+  - Timesheets: `status = pending workerName : Smith hours > 40 sort amount desc`
+  - Invoices: `amount > 5000 currency = GBP status in sent,overdue`
+  - Expenses: `category = Travel billable = true status = pending`
+  - Compliance: `status = expiring daysUntilExpiry < 30 documentType : DBS`
+
 ## Edge Case Handling
 
 - **Missing Timesheet Data**: Display clear empty states with guided actions to submit or import timesheets

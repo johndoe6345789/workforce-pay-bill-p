@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { useNotifications } from '@/hooks/use-notifications'
+import { useSampleData } from '@/hooks/use-sample-data'
 import { 
   Clock, 
   Receipt, 
@@ -35,7 +36,8 @@ import {
   Gear,
   FileText,
   CaretDown,
-  CaretRight
+  CaretRight,
+  Question
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -77,6 +79,8 @@ import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
 import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
 import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { ComplianceDetailDialog } from '@/components/ComplianceDetailDialog'
+import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
+import { QueryLanguageGuide } from '@/components/QueryLanguageGuide'
 import type { 
   Timesheet, 
   Invoice, 
@@ -93,9 +97,11 @@ import type {
   ShiftEntry
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide'
 
 function App() {
+  useSampleData()
+  
   const [currentView, setCurrentView] = useState<View>('dashboard')
   const [currentEntity, setCurrentEntity] = useState('Main Agency')
   const [searchQuery, setSearchQuery] = useState('')
@@ -631,6 +637,12 @@ function App() {
 
           <Separator className="my-2" />
           <NavItem
+            icon={<Question size={20} />}
+            label="Query Guide"
+            active={currentView === 'query-guide'}
+            onClick={() => setCurrentView('query-guide')}
+          />
+          <NavItem
             icon={<MapTrifold size={20} />}
             label="Roadmap"
             active={currentView === 'roadmap'}
@@ -882,6 +894,10 @@ function App() {
 
           {currentView === 'shift-patterns' && (
             <ShiftPatternManager />
+          )}
+
+          {currentView === 'query-guide' && (
+            <QueryLanguageGuide />
           )}
 
           {currentView === 'roadmap' && (
@@ -1216,6 +1232,7 @@ function TimesheetsView({
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null)
   const [viewingTimesheet, setViewingTimesheet] = useState<Timesheet | null>(null)
+  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>(timesheets)
   const [formData, setFormData] = useState({
     workerName: '',
     clientName: '',
@@ -1225,11 +1242,24 @@ function TimesheetsView({
   })
   const [csvData, setCsvData] = useState('')
 
-  const filteredTimesheets = timesheets.filter(t => {
-    const matchesSearch = t.workerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         t.clientName.toLowerCase().includes(searchQuery.toLowerCase())
+  const timesheetFields: FilterField[] = [
+    { name: 'workerName', label: 'Worker Name', type: 'text' },
+    { name: 'clientName', label: 'Client Name', type: 'text' },
+    { name: 'status', label: 'Status', type: 'select', options: [
+      { value: 'pending', label: 'Pending' },
+      { value: 'approved', label: 'Approved' },
+      { value: 'rejected', label: 'Rejected' },
+      { value: 'processing', label: 'Processing' }
+    ]},
+    { name: 'hours', label: 'Hours', type: 'number' },
+    { name: 'amount', label: 'Amount', type: 'number' },
+    { name: 'weekEnding', label: 'Week Ending', type: 'date' },
+    { name: 'submittedDate', label: 'Submitted Date', type: 'date' }
+  ]
+
+  const timesheetsToFilter = timesheets.filter(t => {
     const matchesStatus = statusFilter === 'all' || t.status === statusFilter
-    return matchesSearch && matchesStatus
+    return matchesStatus
   })
 
   const handleSubmitCreate = () => {
@@ -1381,19 +1411,14 @@ function TimesheetsView({
         </div>
       </div>
 
+      <AdvancedSearch
+        items={timesheetsToFilter}
+        fields={timesheetFields}
+        onResultsChange={setFilteredTimesheets}
+        placeholder="Search timesheets or use query language (e.g., status = pending hours > 40)"
+      />
+
       <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <MagnifyingGlass 
-            size={18} 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
-          />
-          <Input
-            placeholder="Search by worker or client..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
           <SelectTrigger className="w-40">
             <div className="flex items-center gap-2">
@@ -1699,11 +1724,26 @@ interface BillingViewProps {
 
 function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onCreatePlacementInvoice, onCreateCreditNote, rateCards }: BillingViewProps) {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(invoices)
   
-  const filteredInvoices = invoices.filter(i =>
-    i.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    i.clientName.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const invoiceFields: FilterField[] = [
+    { name: 'invoiceNumber', label: 'Invoice Number', type: 'text' },
+    { name: 'clientName', label: 'Client Name', type: 'text' },
+    { name: 'status', label: 'Status', type: 'select', options: [
+      { value: 'draft', label: 'Draft' },
+      { value: 'sent', label: 'Sent' },
+      { value: 'paid', label: 'Paid' },
+      { value: 'overdue', label: 'Overdue' }
+    ]},
+    { name: 'amount', label: 'Amount', type: 'number' },
+    { name: 'currency', label: 'Currency', type: 'select', options: [
+      { value: 'GBP', label: 'GBP' },
+      { value: 'USD', label: 'USD' },
+      { value: 'EUR', label: 'EUR' }
+    ]},
+    { name: 'issueDate', label: 'Issue Date', type: 'date' },
+    { name: 'dueDate', label: 'Due Date', type: 'date' }
+  ]
 
   return (
     <div className="space-y-6">
@@ -1722,19 +1762,14 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
         </div>
       </div>
 
+      <AdvancedSearch
+        items={invoices}
+        fields={invoiceFields}
+        onResultsChange={setFilteredInvoices}
+        placeholder="Search invoices or use query language (e.g., status = overdue amount > 1000)"
+      />
+
       <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <MagnifyingGlass 
-            size={18} 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
-          />
-          <Input
-            placeholder="Search by invoice number or client..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
         <Button variant="outline">
           <Download size={18} className="mr-2" />
           Export
@@ -1946,12 +1981,32 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
   const expiredDocs = complianceDocs.filter(d => d.status === 'expired')
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
+  const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>(complianceDocs)
   const [uploadFormData, setUploadFormData] = useState({
     workerId: '',
     workerName: '',
     documentType: '',
     expiryDate: ''
   })
+
+  const complianceFields: FilterField[] = [
+    { name: 'workerName', label: 'Worker Name', type: 'text' },
+    { name: 'documentType', label: 'Document Type', type: 'select', options: [
+      { value: 'DBS Check', label: 'DBS Check' },
+      { value: 'Right to Work', label: 'Right to Work' },
+      { value: 'Professional License', label: 'Professional License' },
+      { value: 'First Aid Certificate', label: 'First Aid Certificate' },
+      { value: 'Driving License', label: 'Driving License' },
+      { value: 'Passport', label: 'Passport' }
+    ]},
+    { name: 'status', label: 'Status', type: 'select', options: [
+      { value: 'valid', label: 'Valid' },
+      { value: 'expiring', label: 'Expiring' },
+      { value: 'expired', label: 'Expired' }
+    ]},
+    { name: 'daysUntilExpiry', label: 'Days Until Expiry', type: 'number' },
+    { name: 'expiryDate', label: 'Expiry Date', type: 'date' }
+  ]
 
   const handleSubmitUpload = () => {
     if (!uploadFormData.workerName || !uploadFormData.documentType || !uploadFormData.expiryDate) {
@@ -2048,6 +2103,13 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
         </Dialog>
       </div>
 
+      <AdvancedSearch
+        items={complianceDocs}
+        fields={complianceFields}
+        onResultsChange={setFilteredDocs}
+        placeholder="Search documents or use query language (e.g., status = expiring daysUntilExpiry < 30)"
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="border-l-4 border-warning/20">
           <CardHeader>
@@ -2079,21 +2141,24 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
       <Tabs defaultValue="expiring" className="space-y-4">
         <TabsList>
           <TabsTrigger value="expiring">
-            Expiring Soon ({expiringDocs.length})
+            Expiring Soon ({filteredDocs.filter(d => d.status === 'expiring').length})
           </TabsTrigger>
           <TabsTrigger value="expired">
-            Expired ({expiredDocs.length})
+            Expired ({filteredDocs.filter(d => d.status === 'expired').length})
           </TabsTrigger>
           <TabsTrigger value="valid">
-            Valid ({complianceDocs.filter(d => d.status === 'valid').length})
+            Valid ({filteredDocs.filter(d => d.status === 'valid').length})
+          </TabsTrigger>
+          <TabsTrigger value="all">
+            All ({filteredDocs.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="expiring" className="space-y-3">
-          {expiringDocs.map(doc => (
+          {filteredDocs.filter(d => d.status === 'expiring').map(doc => (
             <ComplianceCard key={doc.id} document={doc} onViewDetails={setViewingDocument} />
           ))}
-          {expiringDocs.length === 0 && (
+          {filteredDocs.filter(d => d.status === 'expiring').length === 0 && (
             <Card className="p-12 text-center">
               <CheckCircle size={48} className="mx-auto text-success mb-4" />
               <h3 className="text-lg font-semibold mb-2">All documents current</h3>
@@ -2103,13 +2168,19 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
         </TabsContent>
 
         <TabsContent value="expired" className="space-y-3">
-          {expiredDocs.map(doc => (
+          {filteredDocs.filter(d => d.status === 'expired').map(doc => (
             <ComplianceCard key={doc.id} document={doc} onViewDetails={setViewingDocument} />
           ))}
         </TabsContent>
 
         <TabsContent value="valid" className="space-y-3">
-          {complianceDocs.filter(d => d.status === 'valid').map(doc => (
+          {filteredDocs.filter(d => d.status === 'valid').map(doc => (
+            <ComplianceCard key={doc.id} document={doc} onViewDetails={setViewingDocument} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="all" className="space-y-3">
+          {filteredDocs.map(doc => (
             <ComplianceCard key={doc.id} document={doc} onViewDetails={setViewingDocument} />
           ))}
         </TabsContent>
@@ -2217,6 +2288,7 @@ function ExpensesView({
   const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [viewingExpense, setViewingExpense] = useState<Expense | null>(null)
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>(expenses)
   const [formData, setFormData] = useState({
     workerName: '',
     clientName: '',
@@ -2227,12 +2299,34 @@ function ExpensesView({
     billable: true
   })
 
-  const filteredExpenses = expenses.filter(e => {
-    const matchesSearch = e.workerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         e.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         e.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const expenseFields: FilterField[] = [
+    { name: 'workerName', label: 'Worker Name', type: 'text' },
+    { name: 'clientName', label: 'Client Name', type: 'text' },
+    { name: 'status', label: 'Status', type: 'select', options: [
+      { value: 'pending', label: 'Pending' },
+      { value: 'approved', label: 'Approved' },
+      { value: 'rejected', label: 'Rejected' },
+      { value: 'paid', label: 'Paid' }
+    ]},
+    { name: 'category', label: 'Category', type: 'select', options: [
+      { value: 'Travel', label: 'Travel' },
+      { value: 'Accommodation', label: 'Accommodation' },
+      { value: 'Meals', label: 'Meals' },
+      { value: 'Equipment', label: 'Equipment' },
+      { value: 'Training', label: 'Training' },
+      { value: 'Other', label: 'Other' }
+    ]},
+    { name: 'amount', label: 'Amount', type: 'number' },
+    { name: 'date', label: 'Date', type: 'date' },
+    { name: 'billable', label: 'Billable', type: 'select', options: [
+      { value: 'true', label: 'Yes' },
+      { value: 'false', label: 'No' }
+    ]}
+  ]
+
+  const expensesToFilter = expenses.filter(e => {
     const matchesStatus = statusFilter === 'all' || e.status === statusFilter
-    return matchesSearch && matchesStatus
+    return matchesStatus
   })
 
   const handleSubmitCreate = () => {
@@ -2372,19 +2466,14 @@ function ExpensesView({
         </Dialog>
       </div>
 
+      <AdvancedSearch
+        items={expensesToFilter}
+        fields={expenseFields}
+        onResultsChange={setFilteredExpenses}
+        placeholder="Search expenses or use query language (e.g., category = Travel billable = true)"
+      />
+
       <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <MagnifyingGlass 
-            size={18} 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
-          />
-          <Input
-            placeholder="Search expenses..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
           <SelectTrigger className="w-40">
             <div className="flex items-center gap-2">
