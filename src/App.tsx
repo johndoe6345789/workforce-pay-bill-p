@@ -1241,7 +1241,7 @@ function TimesheetsView({
     })
   }, [timesheets, statusFilter])
   
-  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>([])
+  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>(timesheetsToFilter)
   
   useEffect(() => {
     setFilteredTimesheets(timesheetsToFilter)
@@ -1736,7 +1736,7 @@ interface BillingViewProps {
 
 function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onCreatePlacementInvoice, onCreateCreditNote, rateCards }: BillingViewProps) {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(invoices)
   
   useEffect(() => {
     setFilteredInvoices(invoices)
@@ -2015,7 +2015,7 @@ interface ComplianceViewProps {
 function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProps) {
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
-  const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>([])
+  const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>(complianceDocs)
   
   useEffect(() => {
     setFilteredDocs(complianceDocs)
@@ -2341,7 +2341,7 @@ function ExpensesView({
     })
   }, [expenses, statusFilter])
   
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>(expensesToFilter)
   
   useEffect(() => {
     setFilteredExpenses(expensesToFilter)
