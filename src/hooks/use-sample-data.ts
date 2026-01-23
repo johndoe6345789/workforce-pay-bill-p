@@ -233,5 +233,5 @@ export function useSampleData() {
     setExpenses(sampleExpenses)
     setComplianceDocs(sampleComplianceDocs)
     setHasInitialized(true)
-  }, [hasInitialized, setTimesheets, setInvoices, setExpenses, setComplianceDocs, setHasInitialized])
+  }, [hasInitialized])
 }
