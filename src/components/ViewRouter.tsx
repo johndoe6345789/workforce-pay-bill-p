@@ -39,6 +39,7 @@ const QueryLanguageGuide = lazy(() => import('@/components/QueryLanguageGuide').
 const RoadmapView = lazy(() => import('@/components/roadmap-view').then(m => ({ default: m.RoadmapView })))
 const ComponentShowcase = lazy(() => import('@/components/ComponentShowcase').then(m => ({ default: m.ComponentShowcase })))
 const BusinessLogicDemo = lazy(() => import('@/components/BusinessLogicDemo').then(m => ({ default: m.BusinessLogicDemo })))
+const DataAdminView = lazy(() => import('@/components/views/data-admin-view').then(m => ({ default: m.DataAdminView })))
 
 interface ViewRouterProps {
   currentView: View
@@ -245,6 +246,9 @@ export function ViewRouter({
 
     case 'business-logic-demo':
       return <BusinessLogicDemo />
+
+    case 'data-admin':
+      return <DataAdminView />
 
     default:
       return <DashboardView metrics={metrics} />

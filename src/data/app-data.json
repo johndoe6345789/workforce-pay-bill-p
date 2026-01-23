@@ -1,0 +1,420 @@
+{
+  "timesheets": [
+    {
+      "id": "TS-001",
+      "workerId": "W-001",
+      "workerName": "Sarah Johnson",
+      "clientName": "Tech Solutions Ltd",
+      "weekEnding": "2024-01-19",
+      "totalHours": 40,
+      "regularHours": 40,
+      "overtimeHours": 0,
+      "status": "approved",
+      "rate": 25.50,
+      "total": 1020.00,
+      "submittedDate": "2024-01-19T09:30:00Z",
+      "approvedDate": "2024-01-19T14:20:00Z",
+      "shifts": [
+        { "date": "2024-01-15", "start": "09:00", "end": "17:00", "hours": 8, "type": "regular" },
+        { "date": "2024-01-16", "start": "09:00", "end": "17:00", "hours": 8, "type": "regular" },
+        { "date": "2024-01-17", "start": "09:00", "end": "17:00", "hours": 8, "type": "regular" },
+        { "date": "2024-01-18", "start": "09:00", "end": "17:00", "hours": 8, "type": "regular" },
+        { "date": "2024-01-19", "start": "09:00", "end": "17:00", "hours": 8, "type": "regular" }
+      ]
+    },
+    {
+      "id": "TS-002",
+      "workerId": "W-002",
+      "workerName": "Michael Chen",
+      "clientName": "Global Finance Corp",
+      "weekEnding": "2024-01-19",
+      "totalHours": 45,
+      "regularHours": 40,
+      "overtimeHours": 5,
+      "status": "pending",
+      "rate": 30.00,
+      "total": 1350.00,
+      "submittedDate": "2024-01-19T16:45:00Z",
+      "shifts": [
+        { "date": "2024-01-15", "start": "08:00", "end": "17:00", "hours": 9, "type": "regular" },
+        { "date": "2024-01-16", "start": "08:00", "end": "17:00", "hours": 9, "type": "regular" },
+        { "date": "2024-01-17", "start": "08:00", "end": "17:00", "hours": 9, "type": "regular" },
+        { "date": "2024-01-18", "start": "08:00", "end": "17:00", "hours": 9, "type": "regular" },
+        { "date": "2024-01-19", "start": "08:00", "end": "17:00", "hours": 9, "type": "regular" }
+      ]
+    },
+    {
+      "id": "TS-003",
+      "workerId": "W-003",
+      "workerName": "Emma Wilson",
+      "clientName": "Healthcare Plus",
+      "weekEnding": "2024-01-19",
+      "totalHours": 48,
+      "regularHours": 40,
+      "overtimeHours": 8,
+      "status": "approved",
+      "rate": 28.75,
+      "total": 1495.00,
+      "submittedDate": "2024-01-18T11:20:00Z",
+      "approvedDate": "2024-01-19T10:15:00Z",
+      "shifts": [
+        { "date": "2024-01-15", "start": "07:00", "end": "17:30", "hours": 10, "type": "regular" },
+        { "date": "2024-01-16", "start": "07:00", "end": "17:00", "hours": 10, "type": "regular" },
+        { "date": "2024-01-17", "start": "22:00", "end": "06:00", "hours": 8, "type": "night" },
+        { "date": "2024-01-18", "start": "07:00", "end": "17:00", "hours": 10, "type": "regular" },
+        { "date": "2024-01-19", "start": "07:00", "end": "17:00", "hours": 10, "type": "regular" }
+      ]
+    },
+    {
+      "id": "TS-004",
+      "workerId": "W-004",
+      "workerName": "James Brown",
+      "clientName": "Manufacturing Inc",
+      "weekEnding": "2024-01-19",
+      "totalHours": 50,
+      "regularHours": 40,
+      "overtimeHours": 10,
+      "status": "disputed",
+      "rate": 22.00,
+      "total": 1210.00,
+      "submittedDate": "2024-01-19T08:00:00Z",
+      "shifts": [
+        { "date": "2024-01-15", "start": "06:00", "end": "16:00", "hours": 10, "type": "regular" },
+        { "date": "2024-01-16", "start": "06:00", "end": "16:00", "hours": 10, "type": "regular" },
+        { "date": "2024-01-17", "start": "06:00", "end": "16:00", "hours": 10, "type": "regular" },
+        { "date": "2024-01-18", "start": "06:00", "end": "16:00", "hours": 10, "type": "regular" },
+        { "date": "2024-01-19", "start": "06:00", "end": "16:00", "hours": 10, "type": "regular" }
+      ]
+    }
+  ],
+  "invoices": [
+    {
+      "id": "INV-2024-001",
+      "clientName": "Tech Solutions Ltd",
+      "amount": 15250.00,
+      "vat": 3050.00,
+      "total": 18300.00,
+      "status": "paid",
+      "dueDate": "2024-02-15",
+      "invoiceDate": "2024-01-15",
+      "paidDate": "2024-02-10",
+      "items": [
+        { "description": "Contractor Services - Week 1", "quantity": 40, "rate": 75.00, "amount": 3000.00 },
+        { "description": "Contractor Services - Week 2", "quantity": 40, "rate": 75.00, "amount": 3000.00 },
+        { "description": "Contractor Services - Week 3", "quantity": 40, "rate": 75.00, "amount": 3000.00 },
+        { "description": "Contractor Services - Week 4", "quantity": 40, "rate": 75.00, "amount": 3000.00 }
+      ]
+    },
+    {
+      "id": "INV-2024-002",
+      "clientName": "Global Finance Corp",
+      "amount": 22500.00,
+      "vat": 4500.00,
+      "total": 27000.00,
+      "status": "pending",
+      "dueDate": "2024-02-28",
+      "invoiceDate": "2024-01-28",
+      "items": [
+        { "description": "Senior Developer - January", "quantity": 160, "rate": 95.00, "amount": 15200.00 },
+        { "description": "Project Management", "quantity": 1, "rate": 7300.00, "amount": 7300.00 }
+      ]
+    },
+    {
+      "id": "INV-2024-003",
+      "clientName": "Healthcare Plus",
+      "amount": 8750.00,
+      "vat": 1750.00,
+      "total": 10500.00,
+      "status": "overdue",
+      "dueDate": "2024-01-30",
+      "invoiceDate": "2024-01-10",
+      "items": [
+        { "description": "Nursing Services", "quantity": 125, "rate": 70.00, "amount": 8750.00 }
+      ]
+    }
+  ],
+  "payrollRuns": [
+    {
+      "id": "PR-2024-001",
+      "periodEnding": "2024-01-31",
+      "status": "completed",
+      "totalGross": 45250.00,
+      "totalNet": 35420.50,
+      "totalTax": 7829.50,
+      "totalNI": 2000.00,
+      "processedDate": "2024-02-01T10:30:00Z",
+      "paymentDate": "2024-02-05",
+      "workerCount": 12,
+      "entries": [
+        { "workerId": "W-001", "workerName": "Sarah Johnson", "gross": 4080.00, "net": 3185.20, "tax": 694.80, "ni": 200.00 },
+        { "workerId": "W-002", "workerName": "Michael Chen", "gross": 5400.00, "net": 4212.00, "tax": 938.00, "ni": 250.00 }
+      ]
+    },
+    {
+      "id": "PR-2024-002",
+      "periodEnding": "2024-02-15",
+      "status": "pending",
+      "totalGross": 38900.00,
+      "totalNet": 30450.75,
+      "totalTax": 6649.25,
+      "totalNI": 1800.00,
+      "workerCount": 10,
+      "entries": [
+        { "workerId": "W-003", "workerName": "Emma Wilson", "gross": 5980.00, "net": 4663.60, "tax": 1036.40, "ni": 280.00 }
+      ]
+    }
+  ],
+  "workers": [
+    {
+      "id": "W-001",
+      "name": "Sarah Johnson",
+      "email": "sarah.j@example.com",
+      "phone": "+44 7700 900001",
+      "status": "active",
+      "role": "Software Developer",
+      "startDate": "2023-06-15",
+      "paymentType": "Limited Company",
+      "currentClient": "Tech Solutions Ltd"
+    },
+    {
+      "id": "W-002",
+      "name": "Michael Chen",
+      "email": "m.chen@example.com",
+      "phone": "+44 7700 900002",
+      "status": "active",
+      "role": "Senior Developer",
+      "startDate": "2023-03-20",
+      "paymentType": "PAYE",
+      "currentClient": "Global Finance Corp"
+    },
+    {
+      "id": "W-003",
+      "name": "Emma Wilson",
+      "email": "emma.w@example.com",
+      "phone": "+44 7700 900003",
+      "status": "active",
+      "role": "Registered Nurse",
+      "startDate": "2023-09-10",
+      "paymentType": "PAYE",
+      "currentClient": "Healthcare Plus"
+    },
+    {
+      "id": "W-004",
+      "name": "James Brown",
+      "email": "j.brown@example.com",
+      "phone": "+44 7700 900004",
+      "status": "active",
+      "role": "Machine Operator",
+      "startDate": "2023-11-01",
+      "paymentType": "CIS",
+      "currentClient": "Manufacturing Inc"
+    }
+  ],
+  "complianceDocs": [
+    {
+      "id": "DOC-001",
+      "workerId": "W-001",
+      "workerName": "Sarah Johnson",
+      "documentType": "Right to Work",
+      "status": "valid",
+      "expiryDate": "2025-06-15",
+      "uploadDate": "2023-06-10",
+      "verifiedDate": "2023-06-12"
+    },
+    {
+      "id": "DOC-002",
+      "workerId": "W-001",
+      "workerName": "Sarah Johnson",
+      "documentType": "DBS Check",
+      "status": "valid",
+      "expiryDate": "2024-12-20",
+      "uploadDate": "2023-06-10",
+      "verifiedDate": "2023-06-15"
+    },
+    {
+      "id": "DOC-003",
+      "workerId": "W-002",
+      "workerName": "Michael Chen",
+      "documentType": "Right to Work",
+      "status": "expiring",
+      "expiryDate": "2024-03-20",
+      "uploadDate": "2023-03-15",
+      "verifiedDate": "2023-03-18"
+    },
+    {
+      "id": "DOC-004",
+      "workerId": "W-003",
+      "workerName": "Emma Wilson",
+      "documentType": "Professional Indemnity",
+      "status": "valid",
+      "expiryDate": "2024-09-10",
+      "uploadDate": "2023-09-05",
+      "verifiedDate": "2023-09-08"
+    },
+    {
+      "id": "DOC-005",
+      "workerId": "W-004",
+      "workerName": "James Brown",
+      "documentType": "CIS Verification",
+      "status": "expired",
+      "expiryDate": "2024-01-01",
+      "uploadDate": "2023-10-25",
+      "verifiedDate": "2023-10-28"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "EXP-001",
+      "workerId": "W-001",
+      "workerName": "Sarah Johnson",
+      "category": "Travel",
+      "amount": 45.50,
+      "date": "2024-01-15",
+      "status": "approved",
+      "description": "Client site visit - return journey",
+      "receiptAttached": true,
+      "approvedDate": "2024-01-16"
+    },
+    {
+      "id": "EXP-002",
+      "workerId": "W-002",
+      "workerName": "Michael Chen",
+      "category": "Accommodation",
+      "amount": 125.00,
+      "date": "2024-01-18",
+      "status": "pending",
+      "description": "Hotel stay for client meeting",
+      "receiptAttached": true
+    },
+    {
+      "id": "EXP-003",
+      "workerId": "W-003",
+      "workerName": "Emma Wilson",
+      "category": "Meals",
+      "amount": 28.75,
+      "date": "2024-01-17",
+      "status": "approved",
+      "description": "Working lunch during extended shift",
+      "receiptAttached": true,
+      "approvedDate": "2024-01-18"
+    },
+    {
+      "id": "EXP-004",
+      "workerId": "W-001",
+      "workerName": "Sarah Johnson",
+      "category": "Equipment",
+      "amount": 89.99,
+      "date": "2024-01-20",
+      "status": "rejected",
+      "description": "Keyboard and mouse",
+      "receiptAttached": false,
+      "rejectedDate": "2024-01-22",
+      "rejectionReason": "No receipt provided"
+    }
+  ],
+  "rateCards": [
+    {
+      "id": "RC-001",
+      "role": "Software Developer",
+      "clientName": "Tech Solutions Ltd",
+      "payRate": 25.50,
+      "chargeRate": 75.00,
+      "margin": 49.50,
+      "marginPercent": 66.0,
+      "currency": "GBP",
+      "validFrom": "2023-06-01",
+      "validUntil": "2024-05-31",
+      "overtimeMultiplier": 1.5,
+      "weekendMultiplier": 2.0
+    },
+    {
+      "id": "RC-002",
+      "role": "Senior Developer",
+      "clientName": "Global Finance Corp",
+      "payRate": 30.00,
+      "chargeRate": 95.00,
+      "margin": 65.00,
+      "marginPercent": 68.4,
+      "currency": "GBP",
+      "validFrom": "2023-03-01",
+      "validUntil": "2024-02-29",
+      "overtimeMultiplier": 1.5,
+      "weekendMultiplier": 1.8
+    },
+    {
+      "id": "RC-003",
+      "role": "Registered Nurse",
+      "clientName": "Healthcare Plus",
+      "payRate": 28.75,
+      "chargeRate": 70.00,
+      "margin": 41.25,
+      "marginPercent": 58.9,
+      "currency": "GBP",
+      "validFrom": "2023-09-01",
+      "validUntil": "2024-08-31",
+      "overtimeMultiplier": 1.5,
+      "weekendMultiplier": 2.0,
+      "nightMultiplier": 1.3
+    },
+    {
+      "id": "RC-004",
+      "role": "Machine Operator",
+      "clientName": "Manufacturing Inc",
+      "payRate": 22.00,
+      "chargeRate": 55.00,
+      "margin": 33.00,
+      "marginPercent": 60.0,
+      "currency": "GBP",
+      "validFrom": "2023-11-01",
+      "validUntil": "2024-10-31",
+      "overtimeMultiplier": 1.5,
+      "weekendMultiplier": 2.0
+    }
+  ],
+  "clients": [
+    {
+      "id": "C-001",
+      "name": "Tech Solutions Ltd",
+      "industry": "Technology",
+      "status": "active",
+      "creditLimit": 50000.00,
+      "outstandingBalance": 0.00,
+      "paymentTerms": 30,
+      "activeWorkers": 3,
+      "address": "123 Tech Street, London, EC1A 1BB"
+    },
+    {
+      "id": "C-002",
+      "name": "Global Finance Corp",
+      "industry": "Finance",
+      "status": "active",
+      "creditLimit": 100000.00,
+      "outstandingBalance": 27000.00,
+      "paymentTerms": 45,
+      "activeWorkers": 5,
+      "address": "456 Finance Road, London, E14 5AB"
+    },
+    {
+      "id": "C-003",
+      "name": "Healthcare Plus",
+      "industry": "Healthcare",
+      "status": "active",
+      "creditLimit": 75000.00,
+      "outstandingBalance": 10500.00,
+      "paymentTerms": 30,
+      "activeWorkers": 8,
+      "address": "789 Medical Way, Birmingham, B1 1AA"
+    },
+    {
+      "id": "C-004",
+      "name": "Manufacturing Inc",
+      "industry": "Manufacturing",
+      "status": "active",
+      "creditLimit": 60000.00,
+      "outstandingBalance": 5200.00,
+      "paymentTerms": 60,
+      "activeWorkers": 12,
+      "address": "321 Factory Lane, Manchester, M1 1AA"
+    }
+  ]
+}

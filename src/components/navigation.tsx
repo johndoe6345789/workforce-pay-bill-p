@@ -7,7 +7,8 @@ import {
   MapTrifold,
   Question,
   PuzzlePiece,
-  Code
+  Code,
+  Database
 } from '@phosphor-icons/react'
 import { NavItem } from '@/components/nav/NavItem'
 import { CoreOperationsNav, ReportsNav, ConfigurationNav, ToolsNav } from '@/components/nav/nav-sections'
@@ -112,6 +113,13 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           active={currentView === 'business-logic-demo'}
           onClick={() => setCurrentView('business-logic-demo')}
           view="business-logic-demo"
+        />
+        <NavItem
+          icon={<Database size={20} />}
+          label="Data Administration"
+          active={currentView === 'data-admin'}
+          onClick={() => setCurrentView('data-admin')}
+          view="data-admin"
         />
         <NavItem
           icon={<Question size={20} />}
