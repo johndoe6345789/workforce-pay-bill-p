@@ -19,6 +19,7 @@ import { StatCard } from '@/components/ui/stat-card'
 import { Avatar } from '@/components/ui/avatar'
 import { InfoBox } from '@/components/ui/info-box'
 import { Chip } from '@/components/ui/chip'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { 
   MagnifyingGlass, 
   Cube,
@@ -29,7 +30,7 @@ import {
   Stack,
   CircleNotch,
   CheckCircle,
-  List,
+  List as ListIcon,
   Play,
   Eye,
   Warning,
@@ -37,9 +38,13 @@ import {
   CheckCircle as CheckCircleIcon,
   TrendUp,
   User,
-  X
+  X,
+  Funnel,
+  SquaresFour,
+  Rows
 } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 type ComponentCategory = 
   | 'all'
@@ -454,7 +459,7 @@ const allItems = [...components, ...hooks]
 const categories = [
   { id: 'all', label: 'All', icon: Cube, count: allItems.length },
   { id: 'buttons', label: 'Buttons', icon: Lightning, count: components.filter(c => c.category.includes('buttons')).length },
-  { id: 'forms', label: 'Forms', icon: List, count: components.filter(c => c.category.includes('forms')).length },
+  { id: 'forms', label: 'Forms', icon: ListIcon, count: components.filter(c => c.category.includes('forms')).length },
   { id: 'data-display', label: 'Data Display', icon: Package, count: components.filter(c => c.category.includes('data-display')).length },
   { id: 'feedback', label: 'Feedback', icon: CheckCircle, count: components.filter(c => c.category.includes('feedback')).length },
   { id: 'layout', label: 'Layout', icon: Stack, count: components.filter(c => c.category.includes('layout')).length },
@@ -464,10 +469,13 @@ const categories = [
 ] as const
 
 export function ComponentShowcase() {
+  const isMobile = useIsMobile()
   const [selectedCategory, setSelectedCategory] = useState<ComponentCategory>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedComponent, setSelectedComponent] = useState<ComponentItem | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [showFilters, setShowFilters] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
 
   const filteredItems = allItems.filter(item => {
     const matchesCategory = selectedCategory === 'all' || item.category.includes(selectedCategory)
@@ -478,99 +486,141 @@ export function ComponentShowcase() {
     return matchesCategory && matchesSearch
   })
 
+  const handleComponentClick = (item: ComponentItem) => {
+    setSelectedComponent(item)
+    if (isMobile) {
+      setShowDetails(true)
+    }
+  }
+
+  const CategorySidebar = () => (
+    <>
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center gap-2 mb-4">
+          <Cube className="h-6 w-6 text-primary" />
+          <h2 className="text-lg font-semibold">Components</h2>
+        </div>
+        <div className="relative">
+          <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-9"
+          />
+        </div>
+      </div>
+
+      <ScrollArea className="flex-1">
+        <div className="p-2">
+          {categories.map(category => {
+            const Icon = category.icon
+            const isActive = selectedCategory === category.id
+            return (
+              <button
+                key={category.id}
+                onClick={() => {
+                  setSelectedCategory(category.id as ComponentCategory)
+                  if (isMobile) setShowFilters(false)
+                }}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors",
+                  isActive 
+                    ? "bg-primary text-primary-foreground" 
+                    : "hover:bg-muted text-foreground"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4" />
+                  <span>{category.label}</span>
+                </div>
+                <Badge variant={isActive ? "secondary" : "outline"} className="text-xs">
+                  {category.count}
+                </Badge>
+              </button>
+            )
+          })}
+        </div>
+      </ScrollArea>
+
+      <div className="p-4 border-t border-border">
+        <div className="text-xs text-muted-foreground space-y-1">
+          <div className="flex items-center justify-between">
+            <span>Components:</span>
+            <span className="font-mono">{components.length}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Hooks:</span>
+            <span className="font-mono">{hooks.length}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>New:</span>
+            <span className="font-mono">{allItems.filter(i => i.isNew).length}</span>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+
   return (
     <div className="flex h-[calc(100vh-8rem)] bg-background">
-      <aside className="w-64 border-r border-border bg-card flex flex-col">
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center gap-2 mb-4">
-            <Cube className="h-6 w-6 text-primary" />
-            <h2 className="text-lg font-semibold">Components</h2>
-          </div>
-          <div className="relative">
-            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9"
-            />
-          </div>
-        </div>
+      {!isMobile && (
+        <aside className="w-64 border-r border-border bg-card flex flex-col">
+          <CategorySidebar />
+        </aside>
+      )}
 
-        <ScrollArea className="flex-1">
-          <div className="p-2">
-            {categories.map(category => {
-              const Icon = category.icon
-              const isActive = selectedCategory === category.id
-              return (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id as ComponentCategory)}
-                  className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors",
-                    isActive 
-                      ? "bg-primary text-primary-foreground" 
-                      : "hover:bg-muted text-foreground"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-4 w-4" />
-                    <span>{category.label}</span>
-                  </div>
-                  <Badge variant={isActive ? "secondary" : "outline"} className="text-xs">
-                    {category.count}
-                  </Badge>
-                </button>
-              )
-            })}
-          </div>
-        </ScrollArea>
+      {isMobile && (
+        <Sheet open={showFilters} onOpenChange={setShowFilters}>
+          <SheetContent side="left" className="w-80 p-0 flex flex-col">
+            <CategorySidebar />
+          </SheetContent>
+        </Sheet>
+      )}
 
-        <div className="p-4 border-t border-border">
-          <div className="text-xs text-muted-foreground space-y-1">
-            <div className="flex items-center justify-between">
-              <span>Components:</span>
-              <span className="font-mono">{components.length}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Hooks:</span>
-              <span className="font-mono">{hooks.length}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>New:</span>
-              <span className="font-mono">{allItems.filter(i => i.isNew).length}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <main className="flex-1 flex flex-col">
-        <div className="border-b border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">
-                {categories.find(c => c.id === selectedCategory)?.label || 'All Components'}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'} available
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="border-b border-border bg-card px-4 lg:px-6 py-3 lg:py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                {isMobile && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFilters(true)}
+                    className="shrink-0"
+                  >
+                    <Funnel className="h-4 w-4" />
+                  </Button>
+                )}
+                <h1 className="text-lg lg:text-2xl font-bold truncate">
+                  {categories.find(c => c.id === selectedCategory)?.label || 'All Components'}
+                </h1>
+              </div>
+              <p className="text-xs lg:text-sm text-muted-foreground">
+                {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
+                className="hidden sm:flex"
               >
-                Grid
+                <SquaresFour className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Grid</span>
               </Button>
               <Button
                 variant={viewMode === 'list' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('list')}
+                className="hidden sm:flex"
               >
-                List
+                <Rows className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">List</span>
               </Button>
-              <Badge variant="outline" className="gap-1 ml-2">
+              <Badge variant="outline" className="hidden lg:flex gap-1">
                 <Code className="h-3 w-3" />
                 v2.0
               </Badge>
@@ -579,9 +629,9 @@ export function ComponentShowcase() {
         </div>
 
         <ScrollArea className="flex-1">
-          <div className="p-6">
+          <div className="p-4 lg:p-6">
             {filteredItems.length === 0 ? (
-              <Card className="p-12">
+              <Card className="p-8 lg:p-12">
                 <div className="text-center space-y-2">
                   <MagnifyingGlass className="h-12 w-12 mx-auto text-muted-foreground" />
                   <h3 className="text-lg font-semibold">No components found</h3>
@@ -591,31 +641,31 @@ export function ComponentShowcase() {
                 </div>
               </Card>
             ) : viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-4">
                 {filteredItems.map(item => (
                   <Card 
                     key={item.id}
                     className="hover:border-primary/50 transition-colors cursor-pointer group overflow-hidden"
-                    onClick={() => setSelectedComponent(item)}
+                    onClick={() => handleComponentClick(item)}
                   >
-                    <CardContent className="p-4">
+                    <CardContent className="p-3 lg:p-4">
                       <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">
+                            <h3 className="font-semibold text-sm group-hover:text-primary transition-colors truncate">
                               {item.name}
                             </h3>
                             {item.isNew && (
-                              <Badge variant="default" className="text-xs px-1.5 py-0">
+                              <Badge variant="default" className="text-xs px-1.5 py-0 shrink-0">
                                 New
                               </Badge>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                             {item.description}
                           </p>
                         </div>
-                        <Eye className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Eye className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
                       </div>
                       {item.tags && item.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-3">
@@ -632,7 +682,7 @@ export function ComponentShowcase() {
                             <Play className="h-3 w-3" />
                             Preview
                           </div>
-                          <div className="bg-muted/30 p-3 rounded-md flex items-center justify-center min-h-[80px]">
+                          <div className="bg-muted/30 p-3 rounded-md flex items-center justify-center min-h-[80px] overflow-x-auto">
                             {item.demo()}
                           </div>
                         </div>
@@ -647,12 +697,12 @@ export function ComponentShowcase() {
                   <Card 
                     key={item.id}
                     className="hover:border-primary/50 transition-colors cursor-pointer group"
-                    onClick={() => setSelectedComponent(item)}
+                    onClick={() => handleComponentClick(item)}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                    <CardContent className="p-3 lg:p-4">
+                      <div className="flex items-start gap-3 lg:gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h3 className="font-semibold group-hover:text-primary transition-colors">
                               {item.name}
                             </h3>
@@ -675,12 +725,12 @@ export function ComponentShowcase() {
                             </div>
                           )}
                         </div>
-                        {item.demo && (
-                          <div className="w-64 bg-muted/30 p-3 rounded-md flex items-center justify-center">
+                        {item.demo && !isMobile && (
+                          <div className="w-48 lg:w-64 bg-muted/30 p-3 rounded-md flex items-center justify-center overflow-x-auto shrink-0">
                             {item.demo()}
                           </div>
                         )}
-                        <Eye className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Eye className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                       </div>
                     </CardContent>
                   </Card>
@@ -691,8 +741,8 @@ export function ComponentShowcase() {
         </ScrollArea>
       </main>
 
-      {selectedComponent && (
-        <aside className="w-96 border-l border-border bg-card flex flex-col">
+      {selectedComponent && !isMobile && (
+        <aside className="w-96 border-l border-border bg-card flex flex-col overflow-hidden">
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold">{selectedComponent.name}</h2>
@@ -741,7 +791,7 @@ export function ComponentShowcase() {
                   <div>
                     <h3 className="text-sm font-semibold mb-2">Import</h3>
                     <div className="bg-muted p-3 rounded-md">
-                      <code className="text-xs font-mono">
+                      <code className="text-xs font-mono break-all">
                         {selectedComponent.category.includes('hooks')
                           ? `import { ${selectedComponent.name} } from '@/hooks'`
                           : `import { ${selectedComponent.name} } from '@/components/ui/${selectedComponent.id}'`
@@ -753,7 +803,7 @@ export function ComponentShowcase() {
                   <div>
                     <h3 className="text-sm font-semibold mb-2">Basic Example</h3>
                     <div className="bg-muted p-3 rounded-md">
-                      <code className="text-xs font-mono whitespace-pre-wrap">
+                      <code className="text-xs font-mono whitespace-pre-wrap break-all">
                         {selectedComponent.category.includes('hooks')
                           ? `const value = ${selectedComponent.name}()`
                           : `<${selectedComponent.name} />`
@@ -826,6 +876,138 @@ export function ComponentShowcase() {
             </div>
           </ScrollArea>
         </aside>
+      )}
+
+      {isMobile && selectedComponent && (
+        <Sheet open={showDetails} onOpenChange={setShowDetails}>
+          <SheetContent side="bottom" className="h-[85vh] p-0 flex flex-col">
+            <SheetHeader className="p-4 border-b border-border">
+              <div className="flex items-center justify-between mb-2">
+                <SheetTitle className="text-lg font-semibold">{selectedComponent.name}</SheetTitle>
+              </div>
+              <p className="text-sm text-muted-foreground text-left">
+                {selectedComponent.description}
+              </p>
+              {selectedComponent.isNew && (
+                <Badge variant="default" className="mt-2 w-fit">
+                  New Component
+                </Badge>
+              )}
+            </SheetHeader>
+
+            <ScrollArea className="flex-1">
+              <div className="p-4 space-y-6">
+                {selectedComponent.demo && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Play className="h-4 w-4 text-primary" />
+                      <h3 className="text-sm font-semibold">Live Preview</h3>
+                    </div>
+                    <Card>
+                      <CardContent className="p-4 flex items-center justify-center min-h-[120px] overflow-x-auto">
+                        {selectedComponent.demo()}
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                <Tabs defaultValue="usage" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="usage" className="text-xs">Usage</TabsTrigger>
+                    <TabsTrigger value="overview" className="text-xs">Details</TabsTrigger>
+                    <TabsTrigger value="api" className="text-xs">API</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="usage" className="space-y-4 mt-4">
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Import</h3>
+                      <div className="bg-muted p-3 rounded-md overflow-x-auto">
+                        <code className="text-xs font-mono">
+                          {selectedComponent.category.includes('hooks')
+                            ? `import { ${selectedComponent.name} } from '@/hooks'`
+                            : `import { ${selectedComponent.name} } from '@/components/ui/${selectedComponent.id}'`
+                          }
+                        </code>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Basic Example</h3>
+                      <div className="bg-muted p-3 rounded-md overflow-x-auto">
+                        <code className="text-xs font-mono">
+                          {selectedComponent.category.includes('hooks')
+                            ? `const value = ${selectedComponent.name}()`
+                            : `<${selectedComponent.name} />`
+                          }
+                        </code>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground">
+                      See component files for full implementation details and examples.
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="overview" className="space-y-4 mt-4">
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Category</h3>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedComponent.category.map(cat => (
+                          <Badge key={cat} variant="secondary">
+                            {categories.find(c => c.id === cat)?.label || cat}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {selectedComponent.tags && (
+                      <div>
+                        <h3 className="text-sm font-semibold mb-2">Tags</h3>
+                        <div className="flex flex-wrap gap-1">
+                          {selectedComponent.tags.map(tag => (
+                            <Badge key={tag} variant="outline">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Description</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedComponent.description}
+                      </p>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="api" className="space-y-4 mt-4">
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Props & API</h3>
+                      <p className="text-sm text-muted-foreground">
+                        View the TypeScript definitions in the component file for complete prop types and API documentation.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">File Location</h3>
+                      <div className="bg-muted p-3 rounded-md overflow-x-auto">
+                        <code className="text-xs font-mono">
+                          {selectedComponent.category.includes('hooks')
+                            ? `src/hooks/${selectedComponent.id}.ts`
+                            : `src/components/ui/${selectedComponent.id}.tsx`
+                          }
+                        </code>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
       )}
     </div>
   )
