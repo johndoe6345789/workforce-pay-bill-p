@@ -67,9 +67,9 @@ export function ComponentShowcase() {
     useWizard(wizardSteps)
 
   const stepperSteps = [
-    { id: '1', label: 'Start', description: 'Getting started' },
-    { id: '2', label: 'Configure', description: 'Setup options' },
-    { id: '3', label: 'Complete', description: 'Finish up' }
+    { id: '1', label: 'Start', description: 'Getting started', status: 'completed' as const },
+    { id: '2', label: 'Configure', description: 'Setup options', status: 'current' as const },
+    { id: '3', label: 'Complete', description: 'Finish up', status: 'pending' as const }
   ]
 
   const timelineItems = [
@@ -191,8 +191,7 @@ export function ComponentShowcase() {
         <CardContent className="space-y-6">
           <Stepper
             steps={stepperSteps}
-            currentStep={currentStepIndex}
-            onStepClick={(index) => console.log('Go to step', index)}
+            orientation="horizontal"
           />
           <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
             <div>
