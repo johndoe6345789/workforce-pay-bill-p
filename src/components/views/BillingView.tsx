@@ -1,17 +1,21 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Plus,
   Download,
   Receipt,
-  Envelope
+  Envelope,
+  ChartLine,
+  Warning
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PermanentPlacementInvoice } from '@/components/PermanentPlacementInvoice'
 import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
 import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
+import { useInvoicing } from '@/hooks/use-invoicing'
+import { toast } from 'sonner'
 import type { Invoice, RateCard } from '@/lib/types'
 
 interface BillingViewProps {
@@ -35,6 +39,14 @@ export function BillingView({
 }: BillingViewProps) {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  
+  const {
+    calculateInvoiceAging,
+    getOverdueInvoices,
+    calculateTotalRevenue,
+    getInvoicesByStatus
+  } = useInvoicing()
   
   useEffect(() => {
     setFilteredInvoices(invoices)
@@ -43,6 +55,11 @@ export function BillingView({
   const handleResultsChange = useCallback((results: Invoice[]) => {
     setFilteredInvoices(results)
   }, [])
+
+  const agingData = useMemo(() => calculateInvoiceAging(), [calculateInvoiceAging])
+  const overdueInvoices = useMemo(() => getOverdueInvoices(), [getOverdueInvoices])
+  const totalRevenue = useMemo(() => calculateTotalRevenue(), [calculateTotalRevenue])
+  const draftInvoices = useMemo(() => getInvoicesByStatus('draft'), [getInvoicesByStatus])
   
   const invoiceFields: FilterField[] = [
     { name: 'invoiceNumber', label: 'Invoice Number', type: 'text' },
@@ -71,6 +88,13 @@ export function BillingView({
           <p className="text-muted-foreground mt-1">Manage invoices and track payments</p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowAnalytics(!showAnalytics)}
+          >
+            <ChartLine size={18} className="mr-2" />
+            {showAnalytics ? 'Hide' : 'Show'} Analytics
+          </Button>
           <PermanentPlacementInvoice onCreateInvoice={onCreatePlacementInvoice} />
           <CreditNoteGenerator invoices={invoices} onCreateCreditNote={onCreateCreditNote} />
           <Button>
@@ -79,6 +103,87 @@ export function BillingView({
           </Button>
         </div>
       </div>
+
+      {showAnalytics && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm text-muted-foreground">Total Revenue</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold font-mono">
+                  £{totalRevenue.toLocaleString()}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm text-muted-foreground">Draft Invoices</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold">{draftInvoices.length}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm text-muted-foreground">Overdue</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-semibold">{overdueInvoices.length}</div>
+                  {overdueInvoices.length > 0 && (
+                    <Badge variant="destructive" className="text-xs">
+                      <Warning size={12} className="mr-1" />
+                      Action needed
+                    </Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm text-muted-foreground">Outstanding</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold font-mono">
+                  £{(agingData.current + agingData.days30 + agingData.days60 + agingData.days90 + agingData.over90).toLocaleString()}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Invoice Aging Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-5 gap-4">
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Current</div>
+                  <div className="font-semibold font-mono">£{agingData.current.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">1-30 Days</div>
+                  <div className="font-semibold font-mono">£{agingData.days30.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">31-60 Days</div>
+                  <div className="font-semibold font-mono text-warning">£{agingData.days60.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">61-90 Days</div>
+                  <div className="font-semibold font-mono text-warning">£{agingData.days90.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">90+ Days</div>
+                  <div className="font-semibold font-mono text-destructive">£{agingData.over90.toLocaleString()}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <AdvancedSearch
         items={invoices}
