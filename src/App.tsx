@@ -77,6 +77,7 @@ import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
 import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
 import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { ComplianceDetailDialog } from '@/components/ComplianceDetailDialog'
+import { PayrollDetailDialog } from '@/components/PayrollDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { QueryLanguageGuide } from '@/components/QueryLanguageGuide'
 import type { 
@@ -1872,6 +1873,8 @@ interface PayrollViewProps {
 }
 
 function PayrollView({ payrollRuns }: PayrollViewProps) {
+  const [viewingPayroll, setViewingPayroll] = useState<PayrollRun | null>(null)
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -1919,7 +1922,11 @@ function PayrollView({ payrollRuns }: PayrollViewProps) {
 
       <div className="space-y-3">
         {payrollRuns.map(run => (
-          <Card key={run.id}>
+          <Card 
+            key={run.id}
+            className="hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => setViewingPayroll(run)}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2 flex-1">
@@ -1951,8 +1958,10 @@ function PayrollView({ payrollRuns }: PayrollViewProps) {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 ml-4">
-                  <Button size="sm" variant="outline">View Details</Button>
+                <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
+                  <Button size="sm" variant="outline" onClick={() => setViewingPayroll(run)}>
+                    View Details
+                  </Button>
                   {run.status === 'completed' && (
                     <Button size="sm" variant="outline">
                       <Download size={16} className="mr-2" />
@@ -1973,6 +1982,14 @@ function PayrollView({ payrollRuns }: PayrollViewProps) {
           </Card>
         )}
       </div>
+
+      <PayrollDetailDialog
+        payrollRun={viewingPayroll}
+        open={viewingPayroll !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingPayroll(null)
+        }}
+      />
     </div>
   )
 }
