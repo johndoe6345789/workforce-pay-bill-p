@@ -696,7 +696,7 @@ export function ComponentShowcase() {
                 {filteredItems.map(item => (
                   <Card 
                     key={item.id}
-                    className="hover:border-primary/50 transition-colors cursor-pointer group"
+                    className="hover:border-primary/50 transition-colors cursor-pointer group overflow-hidden"
                     onClick={() => handleComponentClick(item)}
                   >
                     <CardContent className="p-3 lg:p-4">
@@ -726,8 +726,10 @@ export function ComponentShowcase() {
                           )}
                         </div>
                         {item.demo && !isMobile && (
-                          <div className="w-48 lg:w-64 bg-muted/30 p-3 rounded-md flex items-center justify-center overflow-x-auto shrink-0">
-                            {item.demo()}
+                          <div className="w-48 lg:w-64 bg-muted/30 p-3 rounded-md flex items-center justify-center shrink-0 max-w-[16rem] lg:max-w-xs overflow-hidden">
+                            <div className="w-full flex items-center justify-center scale-90 origin-center">
+                              {item.demo()}
+                            </div>
                           </div>
                         )}
                         <Eye className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
