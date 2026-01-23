@@ -71,6 +71,7 @@ import { PermanentPlacementInvoice } from '@/components/PermanentPlacementInvoic
 import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
 import { ShiftPremiumCalculator } from '@/components/ShiftPremiumCalculator'
 import { ContractValidator } from '@/components/ContractValidator'
+import { DetailedTimesheetEntry } from '@/components/DetailedTimesheetEntry'
 import type { 
   Timesheet, 
   Invoice, 
@@ -83,7 +84,8 @@ import type {
   ComplianceStatus,
   Expense,
   ExpenseStatus,
-  RateCard
+  RateCard,
+  ShiftEntry
 } from '@/lib/types'
 
 type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation'
@@ -238,6 +240,33 @@ function App() {
 
     setTimesheets(current => [...(current || []), newTimesheet])
     toast.success('Timesheet created successfully')
+  }
+
+  const handleCreateDetailedTimesheet = (data: {
+    workerName: string
+    clientName: string
+    weekEnding: string
+    shifts: ShiftEntry[]
+    totalHours: number
+    totalAmount: number
+    baseRate: number
+  }) => {
+    const newTimesheet: Timesheet = {
+      id: `TS-${Date.now()}`,
+      workerId: `W-${Date.now()}`,
+      workerName: data.workerName,
+      clientName: data.clientName,
+      weekEnding: data.weekEnding,
+      hours: data.totalHours,
+      status: 'pending',
+      submittedDate: new Date().toISOString(),
+      amount: data.totalAmount,
+      rate: data.baseRate,
+      shifts: data.shifts
+    }
+
+    setTimesheets(current => [...(current || []), newTimesheet])
+    toast.success(`Detailed timesheet created with ${data.shifts.length} shifts`)
   }
 
   const handleBulkImport = (csvData: string) => {
@@ -704,6 +733,7 @@ function App() {
               onReject={handleRejectTimesheet}
               onCreateInvoice={handleCreateInvoice}
               onCreateTimesheet={handleCreateTimesheet}
+              onCreateDetailedTimesheet={handleCreateDetailedTimesheet}
               onBulkImport={handleBulkImport}
               onAdjust={handleAdjustTimesheet}
             />
@@ -1141,6 +1171,15 @@ interface TimesheetsViewProps {
     rate: number
     weekEnding: string
   }) => void
+  onCreateDetailedTimesheet: (data: {
+    workerName: string
+    clientName: string
+    weekEnding: string
+    shifts: ShiftEntry[]
+    totalHours: number
+    totalAmount: number
+    baseRate: number
+  }) => void
   onBulkImport: (csvData: string) => void
   onAdjust: (timesheetId: string, adjustment: any) => void
 }
@@ -1153,6 +1192,7 @@ function TimesheetsView({
   onReject,
   onCreateInvoice,
   onCreateTimesheet,
+  onCreateDetailedTimesheet,
   onBulkImport,
   onAdjust
 }: TimesheetsViewProps) {
@@ -1219,6 +1259,7 @@ function TimesheetsView({
           <p className="text-muted-foreground mt-1">Manage and approve worker timesheets</p>
         </div>
         <div className="flex gap-2">
+          <DetailedTimesheetEntry onSubmit={onCreateDetailedTimesheet} />
           <Dialog open={isBulkImportOpen} onOpenChange={setIsBulkImportOpen}>
             <DialogTrigger asChild>
               <Button variant="outline">
@@ -1446,6 +1487,8 @@ interface TimesheetCardProps {
 }
 
 function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdjust }: TimesheetCardProps) {
+  const [showShifts, setShowShifts] = useState(false)
+  
   const statusConfig = {
     pending: { icon: ClockCounterClockwise, color: 'text-warning' },
     approved: { icon: CheckCircle, color: 'text-success' },
@@ -1454,6 +1497,20 @@ function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdju
   }
 
   const StatusIcon = statusConfig[timesheet.status].icon
+
+  const getShiftBadgeColor = (shiftType: string) => {
+    switch (shiftType) {
+      case 'night': return 'bg-purple-500/10 text-purple-500 border-purple-500/20'
+      case 'evening': return 'bg-orange-500/10 text-orange-500 border-orange-500/20'
+      case 'weekend': return 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+      case 'holiday': return 'bg-red-500/10 text-red-500 border-red-500/20'
+      case 'overtime': return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+      case 'early-morning': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+      default: return 'bg-muted text-muted-foreground border-border'
+    }
+  }
+
+  const hasShifts = timesheet.shifts && timesheet.shifts.length > 0
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -1472,6 +1529,11 @@ function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdju
                   <Badge variant={timesheet.status === 'approved' ? 'success' : timesheet.status === 'rejected' ? 'destructive' : 'warning'}>
                     {timesheet.status}
                   </Badge>
+                  {hasShifts && (
+                    <Badge variant="outline" className="text-xs">
+                      {timesheet.shifts!.length} shifts
+                    </Badge>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
@@ -1484,17 +1546,64 @@ function TimesheetCard({ timesheet, onApprove, onReject, onCreateInvoice, onAdju
                   </div>
                   <div>
                     <p className="text-muted-foreground">Hours</p>
-                    <p className="font-medium font-mono">{timesheet.hours}</p>
+                    <p className="font-medium font-mono">{timesheet.hours.toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Amount</p>
-                    <p className="font-medium font-mono">£{timesheet.amount.toLocaleString()}</p>
+                    <p className="font-medium font-mono">£{timesheet.amount.toFixed(2)}</p>
                   </div>
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground">
                   Submitted {new Date(timesheet.submittedDate).toLocaleDateString()}
                   {timesheet.approvedDate && ` • Approved ${new Date(timesheet.approvedDate).toLocaleDateString()}`}
                 </div>
+
+                {hasShifts && (
+                  <div className="mt-3">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setShowShifts(!showShifts)}
+                      className="h-8 px-2 text-xs"
+                    >
+                      {showShifts ? 'Hide' : 'Show'} Shift Details
+                      <CaretDown size={14} className={cn('ml-1 transition-transform', showShifts && 'rotate-180')} />
+                    </Button>
+                    
+                    {showShifts && (
+                      <div className="mt-3 space-y-2 pl-4 border-l-2 border-accent/30">
+                        {timesheet.shifts!.map((shift) => (
+                          <div key={shift.id} className="flex items-center justify-between text-xs bg-muted/30 rounded p-2">
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium">
+                                {new Date(shift.date).toLocaleDateString('en-GB', { 
+                                  weekday: 'short', 
+                                  day: 'numeric', 
+                                  month: 'short' 
+                                })}
+                              </span>
+                              <Badge className={getShiftBadgeColor(shift.shiftType)}>
+                                {shift.shiftType}
+                              </Badge>
+                              <span className="font-mono text-muted-foreground">
+                                {shift.startTime} - {shift.endTime}
+                              </span>
+                              {shift.rateMultiplier > 1.0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  {shift.rateMultiplier}x
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono">{shift.hours.toFixed(2)}h</span>
+                              <span className="font-mono font-semibold">£{shift.amount.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

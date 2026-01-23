@@ -46,6 +46,30 @@ export function ShiftPremiumCalculator({ rateCards, onCalculate }: ShiftPremiumC
     }
   }
 
+  const getDayOfWeek = (dateStr: string) => {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const
+    return days[new Date(dateStr).getDay()]
+  }
+
+  const getMultiplier = (shiftType: ShiftType, rateCard: RateCard): number => {
+    switch (shiftType) {
+      case 'overtime':
+        return rateCard.overtimeMultiplier
+      case 'weekend':
+        return rateCard.weekendMultiplier
+      case 'night':
+        return rateCard.nightMultiplier
+      case 'holiday':
+        return rateCard.holidayMultiplier
+      case 'evening':
+        return 1.2
+      case 'early-morning':
+        return 1.1
+      default:
+        return 1.0
+    }
+  }
+
   const calculateShifts = (): ShiftEntry[] => {
     if (!selectedRateCard) return []
 
@@ -53,15 +77,21 @@ export function ShiftPremiumCalculator({ rateCards, onCalculate }: ShiftPremiumC
       .filter(s => s.date && s.hours)
       .map((shift, index) => {
         const hours = parseFloat(shift.hours)
-        const rate = getShiftRate(shift.shiftType, selectedRateCard.standardRate, selectedRateCard)
+        const multiplier = getMultiplier(shift.shiftType, selectedRateCard)
+        const rate = selectedRateCard.standardRate * multiplier
         const amount = hours * rate
 
         return {
           id: `SHIFT-${Date.now()}-${index}`,
           date: shift.date,
+          dayOfWeek: getDayOfWeek(shift.date),
           shiftType: shift.shiftType,
+          startTime: '09:00',
+          endTime: '17:00',
+          breakMinutes: 0,
           hours: hours,
           rate: rate,
+          rateMultiplier: multiplier,
           amount: amount
         }
       })
@@ -119,6 +149,12 @@ export function ShiftPremiumCalculator({ rateCards, onCalculate }: ShiftPremiumC
         return { label: 'Night', color: 'bg-accent/20' }
       case 'holiday':
         return { label: 'Holiday', color: 'bg-success/20' }
+      case 'evening':
+        return { label: 'Evening', color: 'bg-orange-500/20' }
+      case 'early-morning':
+        return { label: 'Early Morning', color: 'bg-yellow-500/20' }
+      case 'split-shift':
+        return { label: 'Split Shift', color: 'bg-purple-500/20' }
     }
   }
 

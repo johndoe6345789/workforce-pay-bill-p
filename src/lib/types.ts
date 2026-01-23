@@ -1,7 +1,8 @@
 export type TimesheetStatus = 'pending' | 'approved' | 'rejected' | 'processing' | 'awaiting-client' | 'awaiting-manager'
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'credit' | 'cancelled'
 export type InvoiceType = 'timesheet' | 'permanent-placement' | 'credit-note' | 'adhoc'
-export type ShiftType = 'standard' | 'overtime' | 'weekend' | 'night' | 'holiday'
+export type ShiftType = 'standard' | 'overtime' | 'weekend' | 'night' | 'holiday' | 'evening' | 'early-morning' | 'split-shift'
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
 export type PayrollStatus = 'scheduled' | 'processing' | 'completed' | 'failed'
 export type ComplianceStatus = 'valid' | 'expiring' | 'expired'
 export type ExpenseStatus = 'pending' | 'approved' | 'rejected' | 'paid'
@@ -34,10 +35,16 @@ export interface Timesheet {
 export interface ShiftEntry {
   id: string
   date: string
+  dayOfWeek: DayOfWeek
   shiftType: ShiftType
+  startTime: string
+  endTime: string
+  breakMinutes: number
   hours: number
   rate: number
+  rateMultiplier: number
   amount: number
+  notes?: string
 }
 
 export interface ApprovalHistoryEntry {
