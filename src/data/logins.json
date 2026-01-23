@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "id": "user-001",
+      "email": "admin@workforce.com",
+      "password": "admin123",
+      "name": "Sarah Admin",
+      "roleId": "admin",
+      "role": "Administrator",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-002",
+      "email": "finance@workforce.com",
+      "password": "finance123",
+      "name": "Michael Chen",
+      "roleId": "finance-manager",
+      "role": "Finance Manager",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-003",
+      "email": "payroll@workforce.com",
+      "password": "payroll123",
+      "name": "Jennifer Williams",
+      "roleId": "payroll-manager",
+      "role": "Payroll Manager",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-004",
+      "email": "compliance@workforce.com",
+      "password": "compliance123",
+      "name": "David Thompson",
+      "roleId": "compliance-officer",
+      "role": "Compliance Officer",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-005",
+      "email": "operations@workforce.com",
+      "password": "operations123",
+      "name": "Emily Rodriguez",
+      "roleId": "operations-manager",
+      "role": "Operations Manager",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-006",
+      "email": "recruiter@workforce.com",
+      "password": "recruiter123",
+      "name": "James Patterson",
+      "roleId": "recruiter",
+      "role": "Recruiter",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-007",
+      "email": "client@workforce.com",
+      "password": "client123",
+      "name": "Lisa Anderson",
+      "roleId": "client-manager",
+      "role": "Client Manager",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-008",
+      "email": "auditor@workforce.com",
+      "password": "auditor123",
+      "name": "Robert Lee",
+      "roleId": "auditor",
+      "role": "Auditor",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-009",
+      "email": "superadmin@workforce.com",
+      "password": "super123",
+      "name": "Alex Mitchell",
+      "roleId": "super-admin",
+      "role": "Super Administrator",
+      "avatarUrl": null
+    },
+    {
+      "id": "user-010",
+      "email": "worker@workforce.com",
+      "password": "worker123",
+      "name": "Maria Garcia",
+      "roleId": "worker",
+      "role": "Worker",
+      "avatarUrl": null
+    }
+  ]
+}

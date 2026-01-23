@@ -7,6 +7,8 @@ import { Buildings, Lock, User, Eye, EyeSlash } from '@phosphor-icons/react'
 import { useAppDispatch } from '@/store/hooks'
 import { login } from '@/store/slices/authSlice'
 import { toast } from 'sonner'
+import loginsData from '@/data/logins.json'
+import rolesData from '@/data/roles-permissions.json'
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
@@ -27,15 +29,28 @@ export default function LoginScreen() {
     setIsLoading(true)
     
     setTimeout(() => {
+      const user = loginsData.users.find(u => u.email === email && u.password === password)
+      
+      if (!user) {
+        toast.error('Invalid credentials')
+        setIsLoading(false)
+        return
+      }
+
+      const role = rolesData.roles.find(r => r.id === user.roleId)
+      const permissions = role?.permissions || []
+
       dispatch(login({
-        id: '1',
-        email,
-        name: email.split('@')[0].split('.').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-        role: 'Admin',
-        avatarUrl: undefined,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        roleId: user.roleId,
+        avatarUrl: user.avatarUrl || undefined,
+        permissions
       }))
       
-      toast.success('Welcome back!')
+      toast.success(`Welcome back, ${user.name}!`)
       setIsLoading(false)
     }, 800)
   }
@@ -183,6 +198,38 @@ export default function LoginScreen() {
               {isLoading ? 'Logging in...' : 'Log In'}
             </Button>
           </form>
+
+          <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+            <details className="group">
+              <summary className="text-sm font-medium cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                Test Accounts (Click to expand)
+              </summary>
+              <div className="mt-3 space-y-2 text-xs">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="font-mono">
+                    <div className="font-semibold mb-1">Admin:</div>
+                    <div>admin@workforce.com</div>
+                    <div className="text-muted-foreground">admin123</div>
+                  </div>
+                  <div className="font-mono">
+                    <div className="font-semibold mb-1">Finance:</div>
+                    <div>finance@workforce.com</div>
+                    <div className="text-muted-foreground">finance123</div>
+                  </div>
+                  <div className="font-mono">
+                    <div className="font-semibold mb-1">Payroll:</div>
+                    <div>payroll@workforce.com</div>
+                    <div className="text-muted-foreground">payroll123</div>
+                  </div>
+                  <div className="font-mono">
+                    <div className="font-semibold mb-1">Compliance:</div>
+                    <div>compliance@workforce.com</div>
+                    <div className="text-muted-foreground">compliance123</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
 
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">

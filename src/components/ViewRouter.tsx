@@ -42,6 +42,7 @@ const BusinessLogicDemo = lazy(() => import('@/components/BusinessLogicDemo').th
 const DataAdminView = lazy(() => import('@/components/views/data-admin-view').then(m => ({ default: m.DataAdminView })))
 const TranslationDemo = lazy(() => import('@/components/TranslationDemo').then(m => ({ default: m.TranslationDemo })))
 const ProfileView = lazy(() => import('@/components/views/profile-view').then(m => ({ default: m.ProfileView })))
+const RolesPermissionsView = lazy(() => import('@/components/views/roles-permissions-view').then(m => ({ default: m.RolesPermissionsView })))
 
 interface ViewRouterProps {
   currentView: View
@@ -257,6 +258,9 @@ export function ViewRouter({
 
     case 'profile':
       return <ProfileView />
+
+    case 'roles-permissions':
+      return <RolesPermissionsView />
 
     default:
       return <DashboardView metrics={metrics} />

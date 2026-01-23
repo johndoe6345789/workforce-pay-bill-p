@@ -1,0 +1,552 @@
+{
+  "roles": [
+    {
+      "id": "super-admin",
+      "name": "Super Administrator",
+      "description": "Full system access across all entities and modules",
+      "color": "destructive",
+      "permissions": ["*"]
+    },
+    {
+      "id": "admin",
+      "name": "Administrator",
+      "description": "Full access to agency operations and configuration",
+      "color": "primary",
+      "permissions": [
+        "timesheets.*",
+        "expenses.*",
+        "invoices.*",
+        "payroll.*",
+        "compliance.*",
+        "reports.*",
+        "users.view",
+        "users.create",
+        "users.edit",
+        "settings.view",
+        "settings.edit",
+        "rates.*",
+        "clients.*",
+        "workers.*"
+      ]
+    },
+    {
+      "id": "finance-manager",
+      "name": "Finance Manager",
+      "description": "Manages billing, invoicing, and financial operations",
+      "color": "accent",
+      "permissions": [
+        "timesheets.view",
+        "timesheets.approve",
+        "expenses.view",
+        "expenses.approve",
+        "invoices.*",
+        "payroll.view",
+        "payroll.process",
+        "reports.view",
+        "reports.financial",
+        "clients.view",
+        "workers.view",
+        "rates.view"
+      ]
+    },
+    {
+      "id": "payroll-manager",
+      "name": "Payroll Manager",
+      "description": "Processes payroll and manages payment operations",
+      "color": "success",
+      "permissions": [
+        "timesheets.view",
+        "timesheets.approve",
+        "payroll.*",
+        "expenses.view",
+        "expenses.approve",
+        "reports.view",
+        "reports.payroll",
+        "workers.view",
+        "rates.view",
+        "compliance.view"
+      ]
+    },
+    {
+      "id": "compliance-officer",
+      "name": "Compliance Officer",
+      "description": "Manages compliance documentation and regulatory requirements",
+      "color": "warning",
+      "permissions": [
+        "compliance.*",
+        "workers.view",
+        "workers.edit",
+        "clients.view",
+        "reports.view",
+        "reports.compliance",
+        "timesheets.view"
+      ]
+    },
+    {
+      "id": "operations-manager",
+      "name": "Operations Manager",
+      "description": "Oversees day-to-day operations and approvals",
+      "color": "info",
+      "permissions": [
+        "timesheets.view",
+        "timesheets.create",
+        "timesheets.edit",
+        "timesheets.approve",
+        "expenses.view",
+        "expenses.create",
+        "expenses.approve",
+        "invoices.view",
+        "payroll.view",
+        "compliance.view",
+        "reports.view",
+        "workers.view",
+        "workers.create",
+        "workers.edit",
+        "clients.view",
+        "clients.edit",
+        "rates.view"
+      ]
+    },
+    {
+      "id": "recruiter",
+      "name": "Recruiter",
+      "description": "Manages worker relationships and placement operations",
+      "color": "secondary",
+      "permissions": [
+        "workers.view",
+        "workers.create",
+        "workers.edit",
+        "clients.view",
+        "timesheets.view",
+        "timesheets.create",
+        "compliance.view",
+        "reports.view"
+      ]
+    },
+    {
+      "id": "client-manager",
+      "name": "Client Manager",
+      "description": "Manages client relationships and service delivery",
+      "color": "accent",
+      "permissions": [
+        "clients.view",
+        "clients.edit",
+        "timesheets.view",
+        "timesheets.approve",
+        "invoices.view",
+        "workers.view",
+        "reports.view"
+      ]
+    },
+    {
+      "id": "client-user",
+      "name": "Client User",
+      "description": "Client portal access for timesheet approval",
+      "color": "muted",
+      "permissions": [
+        "timesheets.view",
+        "timesheets.approve",
+        "invoices.view",
+        "workers.view"
+      ]
+    },
+    {
+      "id": "worker",
+      "name": "Worker",
+      "description": "Worker portal access for timesheet and expense submission",
+      "color": "muted",
+      "permissions": [
+        "timesheets.view-own",
+        "timesheets.create-own",
+        "expenses.view-own",
+        "expenses.create-own",
+        "compliance.view-own"
+      ]
+    },
+    {
+      "id": "auditor",
+      "name": "Auditor",
+      "description": "Read-only access for audit and compliance review",
+      "color": "muted",
+      "permissions": [
+        "timesheets.view",
+        "expenses.view",
+        "invoices.view",
+        "payroll.view",
+        "compliance.view",
+        "reports.view",
+        "reports.audit",
+        "workers.view",
+        "clients.view"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "id": "timesheets.*",
+      "module": "timesheets",
+      "name": "All Timesheet Actions",
+      "description": "Full access to timesheet management"
+    },
+    {
+      "id": "timesheets.view",
+      "module": "timesheets",
+      "name": "View Timesheets",
+      "description": "View all timesheets"
+    },
+    {
+      "id": "timesheets.view-own",
+      "module": "timesheets",
+      "name": "View Own Timesheets",
+      "description": "View only your own timesheets"
+    },
+    {
+      "id": "timesheets.create",
+      "module": "timesheets",
+      "name": "Create Timesheets",
+      "description": "Create timesheets for workers"
+    },
+    {
+      "id": "timesheets.create-own",
+      "module": "timesheets",
+      "name": "Create Own Timesheets",
+      "description": "Submit your own timesheets"
+    },
+    {
+      "id": "timesheets.edit",
+      "module": "timesheets",
+      "name": "Edit Timesheets",
+      "description": "Edit pending timesheets"
+    },
+    {
+      "id": "timesheets.approve",
+      "module": "timesheets",
+      "name": "Approve Timesheets",
+      "description": "Approve submitted timesheets"
+    },
+    {
+      "id": "timesheets.delete",
+      "module": "timesheets",
+      "name": "Delete Timesheets",
+      "description": "Delete timesheets"
+    },
+    {
+      "id": "expenses.*",
+      "module": "expenses",
+      "name": "All Expense Actions",
+      "description": "Full access to expense management"
+    },
+    {
+      "id": "expenses.view",
+      "module": "expenses",
+      "name": "View Expenses",
+      "description": "View all expenses"
+    },
+    {
+      "id": "expenses.view-own",
+      "module": "expenses",
+      "name": "View Own Expenses",
+      "description": "View only your own expenses"
+    },
+    {
+      "id": "expenses.create",
+      "module": "expenses",
+      "name": "Create Expenses",
+      "description": "Create expense entries"
+    },
+    {
+      "id": "expenses.create-own",
+      "module": "expenses",
+      "name": "Create Own Expenses",
+      "description": "Submit your own expenses"
+    },
+    {
+      "id": "expenses.edit",
+      "module": "expenses",
+      "name": "Edit Expenses",
+      "description": "Edit pending expenses"
+    },
+    {
+      "id": "expenses.approve",
+      "module": "expenses",
+      "name": "Approve Expenses",
+      "description": "Approve submitted expenses"
+    },
+    {
+      "id": "expenses.delete",
+      "module": "expenses",
+      "name": "Delete Expenses",
+      "description": "Delete expenses"
+    },
+    {
+      "id": "invoices.*",
+      "module": "invoices",
+      "name": "All Invoice Actions",
+      "description": "Full access to invoice management"
+    },
+    {
+      "id": "invoices.view",
+      "module": "invoices",
+      "name": "View Invoices",
+      "description": "View all invoices"
+    },
+    {
+      "id": "invoices.create",
+      "module": "invoices",
+      "name": "Create Invoices",
+      "description": "Generate invoices"
+    },
+    {
+      "id": "invoices.edit",
+      "module": "invoices",
+      "name": "Edit Invoices",
+      "description": "Edit draft invoices"
+    },
+    {
+      "id": "invoices.approve",
+      "module": "invoices",
+      "name": "Approve Invoices",
+      "description": "Approve invoices for sending"
+    },
+    {
+      "id": "invoices.send",
+      "module": "invoices",
+      "name": "Send Invoices",
+      "description": "Send invoices to clients"
+    },
+    {
+      "id": "invoices.delete",
+      "module": "invoices",
+      "name": "Delete Invoices",
+      "description": "Delete draft invoices"
+    },
+    {
+      "id": "payroll.*",
+      "module": "payroll",
+      "name": "All Payroll Actions",
+      "description": "Full access to payroll processing"
+    },
+    {
+      "id": "payroll.view",
+      "module": "payroll",
+      "name": "View Payroll",
+      "description": "View payroll runs"
+    },
+    {
+      "id": "payroll.process",
+      "module": "payroll",
+      "name": "Process Payroll",
+      "description": "Process and submit payroll"
+    },
+    {
+      "id": "payroll.approve",
+      "module": "payroll",
+      "name": "Approve Payroll",
+      "description": "Approve payroll for payment"
+    },
+    {
+      "id": "compliance.*",
+      "module": "compliance",
+      "name": "All Compliance Actions",
+      "description": "Full access to compliance management"
+    },
+    {
+      "id": "compliance.view",
+      "module": "compliance",
+      "name": "View Compliance",
+      "description": "View compliance documents"
+    },
+    {
+      "id": "compliance.view-own",
+      "module": "compliance",
+      "name": "View Own Compliance",
+      "description": "View your own compliance documents"
+    },
+    {
+      "id": "compliance.manage",
+      "module": "compliance",
+      "name": "Manage Compliance",
+      "description": "Upload and manage compliance documents"
+    },
+    {
+      "id": "workers.*",
+      "module": "workers",
+      "name": "All Worker Actions",
+      "description": "Full access to worker management"
+    },
+    {
+      "id": "workers.view",
+      "module": "workers",
+      "name": "View Workers",
+      "description": "View worker records"
+    },
+    {
+      "id": "workers.create",
+      "module": "workers",
+      "name": "Create Workers",
+      "description": "Add new workers"
+    },
+    {
+      "id": "workers.edit",
+      "module": "workers",
+      "name": "Edit Workers",
+      "description": "Edit worker records"
+    },
+    {
+      "id": "workers.delete",
+      "module": "workers",
+      "name": "Delete Workers",
+      "description": "Delete worker records"
+    },
+    {
+      "id": "clients.*",
+      "module": "clients",
+      "name": "All Client Actions",
+      "description": "Full access to client management"
+    },
+    {
+      "id": "clients.view",
+      "module": "clients",
+      "name": "View Clients",
+      "description": "View client records"
+    },
+    {
+      "id": "clients.create",
+      "module": "clients",
+      "name": "Create Clients",
+      "description": "Add new clients"
+    },
+    {
+      "id": "clients.edit",
+      "module": "clients",
+      "name": "Edit Clients",
+      "description": "Edit client records"
+    },
+    {
+      "id": "clients.delete",
+      "module": "clients",
+      "name": "Delete Clients",
+      "description": "Delete client records"
+    },
+    {
+      "id": "rates.*",
+      "module": "rates",
+      "name": "All Rate Actions",
+      "description": "Full access to rate management"
+    },
+    {
+      "id": "rates.view",
+      "module": "rates",
+      "name": "View Rates",
+      "description": "View rate cards"
+    },
+    {
+      "id": "rates.create",
+      "module": "rates",
+      "name": "Create Rates",
+      "description": "Create rate cards"
+    },
+    {
+      "id": "rates.edit",
+      "module": "rates",
+      "name": "Edit Rates",
+      "description": "Edit rate cards"
+    },
+    {
+      "id": "rates.delete",
+      "module": "rates",
+      "name": "Delete Rates",
+      "description": "Delete rate cards"
+    },
+    {
+      "id": "reports.*",
+      "module": "reports",
+      "name": "All Report Actions",
+      "description": "Full access to reporting"
+    },
+    {
+      "id": "reports.view",
+      "module": "reports",
+      "name": "View Reports",
+      "description": "View standard reports"
+    },
+    {
+      "id": "reports.financial",
+      "module": "reports",
+      "name": "Financial Reports",
+      "description": "Access financial reports"
+    },
+    {
+      "id": "reports.payroll",
+      "module": "reports",
+      "name": "Payroll Reports",
+      "description": "Access payroll reports"
+    },
+    {
+      "id": "reports.compliance",
+      "module": "reports",
+      "name": "Compliance Reports",
+      "description": "Access compliance reports"
+    },
+    {
+      "id": "reports.audit",
+      "module": "reports",
+      "name": "Audit Reports",
+      "description": "Access audit trail reports"
+    },
+    {
+      "id": "reports.custom",
+      "module": "reports",
+      "name": "Custom Reports",
+      "description": "Create custom reports"
+    },
+    {
+      "id": "users.*",
+      "module": "users",
+      "name": "All User Actions",
+      "description": "Full access to user management"
+    },
+    {
+      "id": "users.view",
+      "module": "users",
+      "name": "View Users",
+      "description": "View user accounts"
+    },
+    {
+      "id": "users.create",
+      "module": "users",
+      "name": "Create Users",
+      "description": "Create new user accounts"
+    },
+    {
+      "id": "users.edit",
+      "module": "users",
+      "name": "Edit Users",
+      "description": "Edit user accounts and roles"
+    },
+    {
+      "id": "users.delete",
+      "module": "users",
+      "name": "Delete Users",
+      "description": "Delete user accounts"
+    },
+    {
+      "id": "settings.*",
+      "module": "settings",
+      "name": "All Settings Actions",
+      "description": "Full access to system settings"
+    },
+    {
+      "id": "settings.view",
+      "module": "settings",
+      "name": "View Settings",
+      "description": "View system settings"
+    },
+    {
+      "id": "settings.edit",
+      "module": "settings",
+      "name": "Edit Settings",
+      "description": "Modify system settings"
+    }
+  ]
+}

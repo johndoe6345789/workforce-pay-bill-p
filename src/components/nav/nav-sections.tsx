@@ -16,7 +16,8 @@ import {
   FileText,
   UserPlus,
   CalendarBlank,
-  Translate
+  Translate,
+  Shield
 } from '@phosphor-icons/react'
 import { NavItem } from './NavItem'
 import { NavGroup } from './NavGroup'
@@ -171,6 +172,13 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'contract-validation'}
         onClick={() => setCurrentView('contract-validation')}
         view="contract-validation"
+      />
+      <NavItem
+        icon={<Shield size={20} />}
+        label="Roles & Permissions"
+        active={currentView === 'roles-permissions'}
+        onClick={() => setCurrentView('roles-permissions')}
+        view="roles-permissions"
       />
     </NavGroup>
   )

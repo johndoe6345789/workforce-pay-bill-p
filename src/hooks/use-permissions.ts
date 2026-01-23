@@ -1,81 +1,76 @@
 import { useMemo } from 'react'
+import { useAppSelector } from '@/store/hooks'
+import rolesData from '@/data/roles-permissions.json'
 
-export type Permission = 
-  | 'timesheets.view'
-  | 'timesheets.approve'
-  | 'timesheets.create'
-  | 'timesheets.edit'
-  | 'invoices.view'
-  | 'invoices.create'
-  | 'invoices.send'
-  | 'payroll.view'
-  | 'payroll.process'
-  | 'compliance.view'
-  | 'compliance.upload'
-  | 'expenses.view'
-  | 'expenses.approve'
-  | 'reports.view'
-  | 'settings.manage'
-  | 'users.manage'
-
-export type Role = 'admin' | 'manager' | 'accountant' | 'viewer'
-
-const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-  admin: [
-    'timesheets.view', 'timesheets.approve', 'timesheets.create', 'timesheets.edit',
-    'invoices.view', 'invoices.create', 'invoices.send',
-    'payroll.view', 'payroll.process',
-    'compliance.view', 'compliance.upload',
-    'expenses.view', 'expenses.approve',
-    'reports.view',
-    'settings.manage', 'users.manage'
-  ],
-  manager: [
-    'timesheets.view', 'timesheets.approve', 'timesheets.create',
-    'invoices.view', 'invoices.create',
-    'payroll.view',
-    'compliance.view', 'compliance.upload',
-    'expenses.view', 'expenses.approve',
-    'reports.view'
-  ],
-  accountant: [
-    'timesheets.view',
-    'invoices.view', 'invoices.create', 'invoices.send',
-    'payroll.view', 'payroll.process',
-    'expenses.view', 'expenses.approve',
-    'reports.view'
-  ],
-  viewer: [
-    'timesheets.view',
-    'invoices.view',
-    'payroll.view',
-    'compliance.view',
-    'expenses.view',
-    'reports.view'
-  ]
+export interface Permission {
+  id: string
+  module: string
+  name: string
+  description: string
 }
 
-export function usePermissions(userRole: Role = 'viewer') {
-  const permissions = useMemo(() => {
-    return new Set(ROLE_PERMISSIONS[userRole] || [])
-  }, [userRole])
+export interface Role {
+  id: string
+  name: string
+  description: string
+  color: string
+  permissions: string[]
+}
 
-  const hasPermission = (permission: Permission): boolean => {
-    return permissions.has(permission)
+export function usePermissions() {
+  const user = useAppSelector(state => state.auth.user)
+  
+  const userPermissions = useMemo(() => {
+    if (!user) return []
+    
+    if (user.permissions && user.permissions.length > 0) {
+      return user.permissions
+    }
+    
+    const userRole = rolesData.roles.find(role => 
+      role.id === user.roleId || role.name === user.role
+    )
+    
+    if (!userRole) return []
+    
+    return userRole.permissions
+  }, [user])
+
+  const hasPermission = (permission: string): boolean => {
+    if (!user) return false
+    
+    if (userPermissions.includes('*')) return true
+    
+    if (userPermissions.includes(permission)) return true
+    
+    const [module, action] = permission.split('.')
+    const wildcardPermission = `${module}.*`
+    
+    return userPermissions.includes(wildcardPermission)
   }
 
-  const hasAnyPermission = (...perms: Permission[]): boolean => {
-    return perms.some(p => permissions.has(p))
+  const hasAnyPermission = (permissions: string[]): boolean => {
+    return permissions.some(permission => hasPermission(permission))
   }
 
-  const hasAllPermissions = (...perms: Permission[]): boolean => {
-    return perms.every(p => permissions.has(p))
+  const hasAllPermissions = (permissions: string[]): boolean => {
+    return permissions.every(permission => hasPermission(permission))
+  }
+
+  const canAccess = (module: string, action?: string): boolean => {
+    if (!action) {
+      return hasPermission(`${module}.view`)
+    }
+    return hasPermission(`${module}.${action}`)
   }
 
   return {
+    userPermissions,
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
-    permissions: Array.from(permissions)
+    canAccess,
+    roles: rolesData.roles as Role[],
+    permissions: rolesData.permissions as Permission[]
   }
 }

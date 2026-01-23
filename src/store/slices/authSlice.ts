@@ -5,7 +5,9 @@ interface User {
   email: string
   name: string
   role: string
+  roleId?: string
   avatarUrl?: string
+  permissions?: string[]
 }
 
 interface AuthState {
@@ -35,8 +37,15 @@ const authSlice = createSlice({
     setCurrentEntity: (state, action: PayloadAction<string>) => {
       state.currentEntity = action.payload
     },
+    updateUserRole: (state, action: PayloadAction<{ roleId: string; roleName: string; permissions: string[] }>) => {
+      if (state.user) {
+        state.user.roleId = action.payload.roleId
+        state.user.role = action.payload.roleName
+        state.user.permissions = action.payload.permissions
+      }
+    },
   },
 })
 
-export const { login, logout, setCurrentEntity } = authSlice.actions
+export const { login, logout, setCurrentEntity, updateUserRole } = authSlice.actions
 export default authSlice.reducer
