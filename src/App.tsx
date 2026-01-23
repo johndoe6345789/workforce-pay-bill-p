@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useSampleData } from '@/hooks/use-sample-data'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useAppData } from '@/hooks/use-app-data'
@@ -8,16 +7,22 @@ import { Sidebar } from '@/components/navigation'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { ViewRouter } from '@/components/ViewRouter'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import LoginScreen from '@/components/LoginScreen'
+import { useAppSelector, useAppDispatch } from '@/store/hooks'
+import { setCurrentView, setSearchQuery } from '@/store/slices/uiSlice'
+import { setCurrentEntity } from '@/store/slices/authSlice'
 
 export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase' | 'business-logic-demo' | 'data-admin' | 'translation-demo'
 
 function App() {
+  const dispatch = useAppDispatch()
+  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated)
+  const currentEntity = useAppSelector(state => state.auth.currentEntity)
+  const currentView = useAppSelector(state => state.ui.currentView)
+  const searchQuery = useAppSelector(state => state.ui.searchQuery)
+
   useSampleData()
   useViewPreload()
-  
-  const [currentView, setCurrentView] = useState<View>('dashboard')
-  const [currentEntity, setCurrentEntity] = useState('Main Agency')
-  const [searchQuery, setSearchQuery] = useState('')
   
   const { notifications, addNotification, markAsRead, markAllAsRead, deleteNotification, unreadCount } = useNotifications()
   
@@ -47,13 +52,17 @@ function App() {
     addNotification
   )
 
+  if (!isAuthenticated) {
+    return <LoginScreen />
+  }
+
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar 
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={(view) => dispatch(setCurrentView(view as View))}
         currentEntity={currentEntity}
-        setCurrentEntity={setCurrentEntity}
+        setCurrentEntity={(entity) => dispatch(setCurrentEntity(entity))}
         metrics={metrics}
       />
 
@@ -78,7 +87,7 @@ function App() {
           <ViewRouter
             currentView={currentView}
             searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+            setSearchQuery={(query) => dispatch(setSearchQuery(query))}
             metrics={metrics}
             timesheets={timesheets}
             invoices={invoices}

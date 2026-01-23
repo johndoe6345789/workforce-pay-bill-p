@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
 import {
   ChartBar,
   Buildings,
@@ -8,10 +9,12 @@ import {
   Question,
   PuzzlePiece,
   Code,
-  Database
+  Database,
+  SignOut
 } from '@phosphor-icons/react'
 import { NavItem } from '@/components/nav/NavItem'
 import { CoreOperationsNav, ReportsNav, ConfigurationNav, ToolsNav } from '@/components/nav/nav-sections'
+import { useAuth } from '@/hooks/use-auth'
 import type { View } from '@/App'
 import type { DashboardMetrics } from '@/lib/types'
 
@@ -25,6 +28,7 @@ interface SidebarProps {
 
 export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrentEntity, metrics }: SidebarProps) {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['core']))
+  const { user, logout } = useAuth()
   
   const toggleGroup = (groupId: string) => {
     setExpandedGroups(prev => {
@@ -36,6 +40,16 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
       }
       return next
     })
+  }
+
+  const getUserInitials = () => {
+    if (!user) return 'U'
+    return user.name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
   }
 
   return (
@@ -137,16 +151,25 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
         />
       </nav>
 
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t border-border space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
-            AD
+            {getUserInitials()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">Admin User</p>
-            <p className="text-xs text-muted-foreground truncate">admin@workforce.io</p>
+            <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>
+            <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
           </div>
         </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full justify-start gap-2"
+          onClick={logout}
+        >
+          <SignOut size={16} />
+          Log Out
+        </Button>
       </div>
     </aside>
   )

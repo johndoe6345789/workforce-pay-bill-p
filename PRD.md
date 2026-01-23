@@ -8,14 +8,21 @@ A cloud-based workforce back-office platform that centralizes timesheet manageme
 3. **Transparent** - Clear visibility into workflow status, approval chains, and data lineage with comprehensive audit trails and real-time updates
 
 **Complexity Level**: Complex Application (advanced functionality, likely with multiple views)
-This is a multi-module enterprise platform requiring navigation between distinct functional areas (timesheets, billing, payroll, compliance), role-based access control, real-time dashboards, complex form workflows, and extensive data visualization capabilities.
+This is a multi-module enterprise platform requiring navigation between distinct functional areas (timesheets, billing, payroll, compliance), role-based access control, real-time dashboards, complex form workflows, extensive data visualization capabilities, and Redux-powered state management for scalable, predictable application state.
 
 ## Essential Features
+
+**Authentication & Login**
+- Functionality: Salesforce-style login screen with email/password authentication
+- Purpose: Secure access to the platform with professional enterprise-grade authentication
+- Trigger: User navigates to application without authenticated session
+- Progression: Enter credentials → Validate → Show loading state → Redirect to dashboard
+- Success criteria: Smooth authentication flow, password visibility toggle, remember me option, secure session management
 
 **Dashboard Overview**
 - Functionality: Displays real-time KPIs, alerts, and quick actions across all modules
 - Purpose: Provides at-a-glance operational health and reduces time to critical actions
-- Trigger: User login or navigation to home
+- Trigger: Successful user login or navigation to home
 - Progression: Login → Dashboard loads with widgets → User scans metrics → Clicks widget to drill down → Navigates to relevant module
 - Success criteria: All KPIs update in real-time, widgets are interactive, no data older than 5 minutes
 
