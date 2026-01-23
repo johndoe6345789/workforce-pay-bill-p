@@ -628,7 +628,7 @@ export function ComponentShowcase() {
           </div>
         </div>
 
-        <ScrollArea className="flex-1">
+        <div className="flex-1 overflow-y-auto">
           <div className="p-4 lg:p-6">
             {filteredItems.length === 0 ? (
               <Card className="p-8 lg:p-12">
@@ -692,7 +692,7 @@ export function ComponentShowcase() {
                 ))}
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3 pb-4">
                 {filteredItems.map(item => (
                   <Card 
                     key={item.id}
@@ -740,7 +740,7 @@ export function ComponentShowcase() {
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </main>
 
       {selectedComponent && !isMobile && (
