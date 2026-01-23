@@ -1269,6 +1269,11 @@ function TimesheetsView({
     { name: 'submittedDate', label: 'Submitted Date', type: 'date' }
   ]
 
+  const handleSubmitCreate = () => {
+    if (!formData.workerName || !formData.clientName || !formData.hours || !formData.rate || !formData.weekEnding) {
+      toast.error('Please fill in all fields')
+      return
+    }
 
     onCreateTimesheet({
       workerName: formData.workerName,
@@ -1731,7 +1736,7 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
   const handleResultsChange = useCallback((results: Invoice[]) => {
     setFilteredInvoices(results)
   }, [])
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(invoices)
+  
   const invoiceFields: FilterField[] = [
     { name: 'invoiceNumber', label: 'Invoice Number', type: 'text' },
     { name: 'clientName', label: 'Client Name', type: 'text' },
