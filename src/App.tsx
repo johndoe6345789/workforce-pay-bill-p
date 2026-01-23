@@ -72,6 +72,7 @@ import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
 import { ShiftPremiumCalculator } from '@/components/ShiftPremiumCalculator'
 import { ContractValidator } from '@/components/ContractValidator'
 import { DetailedTimesheetEntry } from '@/components/DetailedTimesheetEntry'
+import { ShiftPatternManager } from '@/components/ShiftPatternManager'
 import type { 
   Timesheet, 
   Invoice, 
@@ -88,7 +89,7 @@ import type {
   ShiftEntry
 } from '@/lib/types'
 
-type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation'
+type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -549,6 +550,12 @@ function App() {
               onClick={() => setCurrentView('rate-templates')}
             />
             <NavItem
+              icon={<Clock size={20} />}
+              label="Shift Patterns"
+              active={currentView === 'shift-patterns'}
+              onClick={() => setCurrentView('shift-patterns')}
+            />
+            <NavItem
               icon={<Envelope size={20} />}
               label="Email Templates"
               active={currentView === 'email-templates'}
@@ -867,6 +874,10 @@ function App() {
               timesheets={timesheets}
               rateCards={rateCards}
             />
+          )}
+
+          {currentView === 'shift-patterns' && (
+            <ShiftPatternManager />
           )}
 
           {currentView === 'roadmap' && (

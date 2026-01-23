@@ -281,3 +281,27 @@ export interface AuditLogEntry {
   changes: Record<string, { from: any; to: any }>
   ipAddress?: string
 }
+
+export interface ShiftPatternTemplate {
+  id: string
+  name: string
+  description: string
+  shiftType: ShiftType
+  isRecurring: boolean
+  recurrencePattern?: RecurrencePattern
+  defaultStartTime: string
+  defaultEndTime: string
+  defaultBreakMinutes: number
+  daysOfWeek: DayOfWeek[]
+  rateMultiplier: number
+  createdDate: string
+  lastUsedDate?: string
+  usageCount: number
+}
+
+export interface RecurrencePattern {
+  frequency: 'weekly' | 'fortnightly' | 'monthly' | 'custom'
+  interval?: number
+  endDate?: string
+  excludeDates?: string[]
+}

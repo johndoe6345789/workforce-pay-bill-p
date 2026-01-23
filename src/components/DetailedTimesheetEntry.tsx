@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,6 +7,8 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { 
   Plus, 
   Trash, 
@@ -15,11 +18,12 @@ import {
   Sun, 
   SunHorizon,
   Calendar,
-  CurrencyDollar
+  CurrencyDollar,
+  Lightning
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { ShiftDetailDialog } from './ShiftDetailDialog'
-import type { ShiftEntry } from '@/lib/types'
+import type { ShiftEntry, ShiftPatternTemplate, DayOfWeek } from '@/lib/types'
 
 interface DetailedTimesheetEntryProps {
   onSubmit: (data: {
@@ -42,6 +46,8 @@ export function DetailedTimesheetEntry({ onSubmit }: DetailedTimesheetEntryProps
   const [weekEnding, setWeekEnding] = useState('')
   const [baseRate, setBaseRate] = useState('25.00')
   const [shifts, setShifts] = useState<ShiftEntry[]>([])
+  const [patterns = []] = useKV<ShiftPatternTemplate[]>('shift-patterns', [])
+  const [selectedPattern, setSelectedPattern] = useState<string>('')
 
   const handleAddShift = (shiftData: Omit<ShiftEntry, 'id'>) => {
     const newShift: ShiftEntry = {
@@ -76,6 +82,82 @@ export function DetailedTimesheetEntry({ onSubmit }: DetailedTimesheetEntryProps
   const handleEditShift = (shift: ShiftEntry) => {
     setEditingShift(shift)
     setIsShiftDialogOpen(true)
+  }
+
+  const applyShiftPattern = () => {
+    if (!selectedPattern || !weekEnding) {
+      toast.error('Please select a pattern and set the week ending date')
+      return
+    }
+
+    const pattern = patterns.find(p => p.id === selectedPattern)
+    if (!pattern) return
+
+    const weekEndDate = new Date(weekEnding)
+    const generatedShifts: ShiftEntry[] = []
+
+    const calculateHours = (startTime: string, endTime: string, breakMinutes: number): number => {
+      const [startHour, startMin] = startTime.split(':').map(Number)
+      const [endHour, endMin] = endTime.split(':').map(Number)
+      
+      let totalMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin)
+      
+      if (totalMinutes < 0) {
+        totalMinutes += 24 * 60
+      }
+      
+      totalMinutes -= breakMinutes
+      
+      return totalMinutes / 60
+    }
+
+    const dayMap: Record<DayOfWeek, number> = {
+      'sunday': 0,
+      'monday': 1,
+      'tuesday': 2,
+      'wednesday': 3,
+      'thursday': 4,
+      'friday': 5,
+      'saturday': 6
+    }
+
+    pattern.daysOfWeek.forEach(dayOfWeek => {
+      const targetDayIndex = dayMap[dayOfWeek]
+      const weekEndDayIndex = weekEndDate.getDay()
+      
+      let daysBack = weekEndDayIndex - targetDayIndex
+      if (daysBack < 0) daysBack += 7
+      
+      const shiftDate = new Date(weekEndDate)
+      shiftDate.setDate(shiftDate.getDate() - daysBack)
+
+      const hours = calculateHours(pattern.defaultStartTime, pattern.defaultEndTime, pattern.defaultBreakMinutes)
+      const rate = parseFloat(baseRate) * pattern.rateMultiplier
+      
+      const shift: ShiftEntry = {
+        id: `shift-${Date.now()}-${Math.random()}`,
+        date: shiftDate.toISOString().split('T')[0],
+        dayOfWeek,
+        shiftType: pattern.shiftType,
+        startTime: pattern.defaultStartTime,
+        endTime: pattern.defaultEndTime,
+        breakMinutes: pattern.defaultBreakMinutes,
+        hours,
+        rate,
+        rateMultiplier: pattern.rateMultiplier,
+        amount: hours * rate,
+        notes: `Applied from pattern: ${pattern.name}`
+      }
+
+      generatedShifts.push(shift)
+    })
+
+    setShifts(prev => [...prev, ...generatedShifts].sort((a, b) => 
+      new Date(a.date + 'T' + a.startTime).getTime() - new Date(b.date + 'T' + b.startTime).getTime()
+    ))
+    
+    toast.success(`Applied ${generatedShifts.length} shifts from pattern "${pattern.name}"`)
+    setSelectedPattern('')
   }
 
   const handleSubmit = () => {
@@ -195,16 +277,44 @@ export function DetailedTimesheetEntry({ onSubmit }: DetailedTimesheetEntryProps
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label>Shifts ({shifts.length})</Label>
-              <Button
-                size="sm"
-                onClick={() => {
-                  setEditingShift(undefined)
-                  setIsShiftDialogOpen(true)
-                }}
-              >
-                <Plus size={16} className="mr-2" />
-                Add Shift
-              </Button>
+              <div className="flex gap-2">
+                {patterns.length > 0 && (
+                  <>
+                    <Select value={selectedPattern} onValueChange={setSelectedPattern}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue placeholder="Choose pattern..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {patterns.map(pattern => (
+                          <SelectItem key={pattern.id} value={pattern.id}>
+                            {pattern.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={applyShiftPattern}
+                      disabled={!selectedPattern}
+                    >
+                      <Lightning size={16} className="mr-2" />
+                      Apply
+                    </Button>
+                    <Separator orientation="vertical" className="h-8" />
+                  </>
+                )}
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setEditingShift(undefined)
+                    setIsShiftDialogOpen(true)
+                  }}
+                >
+                  <Plus size={16} className="mr-2" />
+                  Add Shift
+                </Button>
+              </div>
             </div>
 
             <ScrollArea className="h-64 border rounded-lg">
