@@ -726,8 +726,8 @@ export function ComponentShowcase() {
                           )}
                         </div>
                         {item.demo && !isMobile && (
-                          <div className="w-48 lg:w-64 bg-muted/30 p-3 rounded-md flex items-center justify-center shrink-0 max-w-[16rem] lg:max-w-xs overflow-hidden">
-                            <div className="w-full flex items-center justify-center scale-90 origin-center">
+                          <div className="w-48 lg:w-64 bg-muted/30 p-3 rounded-md flex items-center justify-center shrink-0 max-w-[16rem] lg:max-w-xs overflow-x-auto">
+                            <div className="w-full flex items-center justify-center">
                               {item.demo()}
                             </div>
                           </div>
