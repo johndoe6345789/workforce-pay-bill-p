@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSampleData } from '@/hooks/use-sample-data'
@@ -1232,7 +1232,15 @@ function TimesheetsView({
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null)
   const [viewingTimesheet, setViewingTimesheet] = useState<Timesheet | null>(null)
-  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>([])
+  
+  const timesheetsToFilter = useMemo(() => {
+    return timesheets.filter(t => {
+      const matchesStatus = statusFilter === 'all' || t.status === statusFilter
+      return matchesStatus
+    })
+  }, [timesheets, statusFilter])
+  
+  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>(timesheetsToFilter)
   
   const handleResultsChange = useCallback((results: Timesheet[]) => {
     setFilteredTimesheets(results)
@@ -1260,11 +1268,6 @@ function TimesheetsView({
     { name: 'weekEnding', label: 'Week Ending', type: 'date' },
     { name: 'submittedDate', label: 'Submitted Date', type: 'date' }
   ]
-
-  const timesheetsToFilter = timesheets.filter(t => {
-    const matchesStatus = statusFilter === 'all' || t.status === statusFilter
-    return matchesStatus
-  })
 
   const handleSubmitCreate = () => {
     if (!formData.workerName || !formData.clientName || !formData.hours || !formData.rate || !formData.weekEnding) {
@@ -1728,7 +1731,7 @@ interface BillingViewProps {
 
 function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onCreatePlacementInvoice, onCreateCreditNote, rateCards }: BillingViewProps) {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(invoices)
   
   const handleResultsChange = useCallback((results: Invoice[]) => {
     setFilteredInvoices(results)
@@ -1987,7 +1990,7 @@ interface ComplianceViewProps {
 function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProps) {
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
-  const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>([])
+  const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>(complianceDocs)
   
   const handleResultsChange = useCallback((results: ComplianceDocument[]) => {
     setFilteredDocs(results)
@@ -2301,7 +2304,15 @@ function ExpensesView({
   const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [viewingExpense, setViewingExpense] = useState<Expense | null>(null)
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
+  
+  const expensesToFilter = useMemo(() => {
+    return expenses.filter(e => {
+      const matchesStatus = statusFilter === 'all' || e.status === statusFilter
+      return matchesStatus
+    })
+  }, [expenses, statusFilter])
+  
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>(expensesToFilter)
   
   const handleResultsChange = useCallback((results: Expense[]) => {
     setFilteredExpenses(results)
@@ -2340,11 +2351,6 @@ function ExpensesView({
       { value: 'false', label: 'No' }
     ]}
   ]
-
-  const expensesToFilter = expenses.filter(e => {
-    const matchesStatus = statusFilter === 'all' || e.status === statusFilter
-    return matchesStatus
-  })
 
   const handleSubmitCreate = () => {
     if (!formData.workerName || !formData.clientName || !formData.date || !formData.category || !formData.amount) {

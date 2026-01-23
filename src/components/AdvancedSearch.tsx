@@ -58,8 +58,7 @@ export function AdvancedSearch<T extends Record<string, any>>({
 
   useEffect(() => {
     onResultsChange(filteredItems)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredItems])
+  }, [filteredItems, onResultsChange])
 
   const addFilter = (field: string, operator: string, value: string) => {
     const newFilter = { field, operator, value }
