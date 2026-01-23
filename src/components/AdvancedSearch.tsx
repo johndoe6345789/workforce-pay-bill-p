@@ -58,7 +58,7 @@ export function AdvancedSearch<T extends Record<string, any>>({
 
   useEffect(() => {
     onResultsChange(filteredItems)
-  }, [filteredItems, onResultsChange])
+  }, [filteredItems])
 
   const addFilter = (field: string, operator: string, value: string) => {
     const newFilter = { field, operator, value }
