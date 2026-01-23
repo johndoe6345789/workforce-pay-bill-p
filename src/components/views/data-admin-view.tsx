@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Database, Download, ArrowClockwise, FileJs } from '@phosphor-icons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
+import { PermissionGate } from '@/components/PermissionGate'
 
 export function DataAdminView() {
   const resetAllData = async () => {
@@ -79,25 +80,26 @@ export function DataAdminView() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold mb-2">Data Administration</h1>
-        <p className="text-muted-foreground">
-          Manage application data loaded from JSON files
-        </p>
-      </div>
+    <PermissionGate permission="settings.edit">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-semibold mb-2">Data Administration</h1>
+          <p className="text-muted-foreground">
+            Manage application data loaded from JSON files
+          </p>
+        </div>
 
-      <Alert>
-        <FileJs className="h-4 w-4" />
-        <AlertTitle>JSON-Based Data</AlertTitle>
-        <AlertDescription>
-          All application data is loaded from <code className="px-1 py-0.5 bg-muted rounded text-xs">/src/data/app-data.json</code> into persistent KV storage.
-          Changes you make in the app are saved to KV storage and persist between sessions.
-        </AlertDescription>
-      </Alert>
+        <Alert>
+          <FileJs className="h-4 w-4" />
+          <AlertTitle>JSON-Based Data</AlertTitle>
+          <AlertDescription>
+            All application data is loaded from <code className="px-1 py-0.5 bg-muted rounded text-xs">/src/data/app-data.json</code> into persistent KV storage.
+            Changes you make in the app are saved to KV storage and persist between sessions.
+          </AlertDescription>
+        </Alert>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
@@ -241,6 +243,7 @@ export function DataAdminView() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </PermissionGate>
   )
 }

@@ -25,6 +25,7 @@ import { MetricCard } from '@/components/ui/metric-card'
 import { toast } from 'sonner'
 import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
+import { usePermissions } from '@/hooks/use-permissions'
 import type { Expense, ExpenseStatus } from '@/lib/types'
 
 interface ExpensesViewProps {
@@ -52,6 +53,7 @@ export function ExpensesView({
   onApprove,
   onReject
 }: ExpensesViewProps) {
+  const { hasPermission } = usePermissions()
   const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [viewingExpense, setViewingExpense] = useState<Expense | null>(null)
@@ -162,13 +164,14 @@ export function ExpensesView({
         title="Expense Management"
         description="Manage worker expenses and reimbursements"
         actions={
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus size={18} className="mr-2" />
-                Create Expense
-              </Button>
-            </DialogTrigger>
+          hasPermission('expenses.create') && (
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus size={18} className="mr-2" />
+                  Create Expense
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create New Expense</DialogTitle>
@@ -262,6 +265,7 @@ export function ExpensesView({
               </Stack>
             </DialogContent>
           </Dialog>
+          )
         }
       />
 
@@ -402,6 +406,7 @@ interface ExpenseCardProps {
 }
 
 function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCardProps) {
+  const { hasPermission } = usePermissions()
   const statusConfig = {
     pending: { icon: ClockCounterClockwise, color: 'text-warning' },
     approved: { icon: CheckCircle, color: 'text-success' },
@@ -467,7 +472,7 @@ function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCar
           </Stack>
           
           <Stack direction="horizontal" spacing={2} className="ml-4" onClick={(e) => e.stopPropagation()}>
-            {expense.status === 'pending' && onApprove && onReject && (
+            {expense.status === 'pending' && onApprove && onReject && hasPermission('expenses.approve') && (
               <>
                 <Button 
                   size="sm" 

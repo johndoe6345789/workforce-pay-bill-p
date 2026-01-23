@@ -134,6 +134,7 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           active={currentView === 'data-admin'}
           onClick={() => setCurrentView('data-admin')}
           view="data-admin"
+          permission="settings.edit"
         />
         <NavItem
           icon={<Question size={20} />}

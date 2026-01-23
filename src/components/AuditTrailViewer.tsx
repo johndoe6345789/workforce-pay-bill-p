@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
+import { usePermissions } from '@/hooks/use-permissions'
 
 type AuditAction = 'create' | 'update' | 'delete' | 'approve' | 'reject' | 'send' | 'adjust' | 'import'
 type AuditEntity = 'timesheet' | 'invoice' | 'expense' | 'worker' | 'compliance' | 'payroll' | 'po'
@@ -36,6 +37,7 @@ interface AuditTrailViewerProps {
 }
 
 export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps) {
+  const { hasPermission } = usePermissions()
   const [auditLogs = [], setAuditLogs] = useKV<AuditLogEntry[]>('audit-logs', [])
   const [searchQuery, setSearchQuery] = useState('')
   const [actionFilter, setActionFilter] = useState<'all' | AuditAction>('all')
@@ -130,10 +132,12 @@ export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps
             <SelectItem value="compliance">Compliance</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" onClick={exportAuditLog}>
-          <Download size={18} className="mr-2" />
-          Export
-        </Button>
+        {hasPermission('reports.audit') && (
+          <Button variant="outline" onClick={exportAuditLog}>
+            <Download size={18} className="mr-2" />
+            Export
+          </Button>
+        )}
       </div>
 
       <Card>

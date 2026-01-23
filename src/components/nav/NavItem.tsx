@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { usePermissions } from '@/hooks/use-permissions'
 import type { View } from '@/App'
 import { preloadView } from '@/lib/view-preloader'
 
@@ -10,13 +11,20 @@ interface NavItemProps {
   onClick?: () => void
   badge?: number
   view?: View
+  permission?: string
 }
 
-export function NavItem({ icon, label, active, onClick, badge, view }: NavItemProps) {
+export function NavItem({ icon, label, active, onClick, badge, view, permission }: NavItemProps) {
+  const { hasPermission } = usePermissions()
+  
   const handleMouseEnter = () => {
     if (view) {
       preloadView(view)
     }
+  }
+
+  if (permission && !hasPermission(permission)) {
+    return null
   }
 
   return (

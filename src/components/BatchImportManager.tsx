@@ -8,6 +8,7 @@ import { FileCsv, FileText, CheckCircle, XCircle, Warning, Download, Upload } fr
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { PermissionGate } from '@/components/PermissionGate'
 
 interface ValidationResult {
   valid: boolean
@@ -144,11 +145,12 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-semibold tracking-tight">Batch Import Manager</h2>
-        <p className="text-muted-foreground mt-1">Import timesheets, expenses, and workers in bulk via CSV</p>
-      </div>
+    <PermissionGate permissions={['timesheets.create', 'expenses.create', 'workers.create']}>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">Batch Import Manager</h2>
+          <p className="text-muted-foreground mt-1">Import timesheets, expenses, and workers in bulk via CSV</p>
+        </div>
 
       <Tabs defaultValue="timesheets" className="space-y-4">
         <TabsList>
@@ -368,6 +370,7 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
           </TabsContent>
         ))}
       </Tabs>
-    </div>
+      </div>
+    </PermissionGate>
   )
 }

@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { usePermissions } from '@/hooks/use-permissions'
 import type { Timesheet, PayrollRun } from '@/lib/types'
 
 interface OneClickPayrollProps {
@@ -24,6 +25,7 @@ interface OneClickPayrollProps {
 }
 
 export function OneClickPayroll({ timesheets, onPayrollComplete }: OneClickPayrollProps) {
+  const { hasPermission } = usePermissions()
   const [isProcessing, setIsProcessing] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [payrollPreview, setPayrollPreview] = useState<PayrollPreviewData | null>(null)
@@ -147,11 +149,17 @@ export function OneClickPayroll({ timesheets, onPayrollComplete }: OneClickPayro
             className="w-full" 
             size="lg"
             onClick={generatePayrollPreview}
+            disabled={!hasPermission('payroll.process')}
           >
             <CurrencyDollar size={20} className="mr-2" />
             Process Payroll Now
             <ArrowRight size={20} className="ml-2" />
           </Button>
+          {!hasPermission('payroll.process') && (
+            <p className="text-sm text-muted-foreground text-center">
+              You don't have permission to process payroll
+            </p>
+          )}
         </CardContent>
       </Card>
 

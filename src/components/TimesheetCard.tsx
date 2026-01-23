@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { usePermissions } from '@/hooks/use-permissions'
 import type { Timesheet } from '@/lib/types'
 
 interface TimesheetCardProps {
@@ -30,6 +31,7 @@ export function TimesheetCard({
   onAdjust, 
   onViewDetails 
 }: TimesheetCardProps) {
+  const { hasPermission } = usePermissions()
   const [showShifts, setShowShifts] = useState(false)
   
   const statusConfig = {
@@ -155,7 +157,7 @@ export function TimesheetCard({
           </div>
           
           <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
-            {timesheet.status === 'pending' && (
+            {timesheet.status === 'pending' && hasPermission('timesheets.approve') && (
               <>
                 <Button 
                   size="sm" 
@@ -175,7 +177,7 @@ export function TimesheetCard({
                 </Button>
               </>
             )}
-            {(timesheet.status === 'approved' || timesheet.status === 'pending') && onAdjust && (
+            {(timesheet.status === 'approved' || timesheet.status === 'pending') && onAdjust && hasPermission('timesheets.edit') && (
               <Button 
                 size="sm" 
                 variant="outline"
@@ -185,7 +187,7 @@ export function TimesheetCard({
                 Adjust
               </Button>
             )}
-            {timesheet.status === 'approved' && (
+            {timesheet.status === 'approved' && hasPermission('invoices.create') && (
               <Button 
                 size="sm" 
                 variant="outline"

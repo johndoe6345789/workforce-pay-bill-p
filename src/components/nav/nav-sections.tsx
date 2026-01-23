@@ -130,6 +130,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'currency'}
         onClick={() => setCurrentView('currency')}
         view="currency"
+        permission="settings.edit"
       />
       <NavItem
         icon={<CurrencyCircleDollar size={20} />}
@@ -137,6 +138,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'rate-templates'}
         onClick={() => setCurrentView('rate-templates')}
         view="rate-templates"
+        permission="rates.view"
       />
       <NavItem
         icon={<Clock size={20} />}
@@ -144,6 +146,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'shift-patterns'}
         onClick={() => setCurrentView('shift-patterns')}
         view="shift-patterns"
+        permission="settings.edit"
       />
       <NavItem
         icon={<Envelope size={20} />}
@@ -151,6 +154,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'email-templates'}
         onClick={() => setCurrentView('email-templates')}
         view="email-templates"
+        permission="settings.edit"
       />
       <NavItem
         icon={<Palette size={20} />}
@@ -158,6 +162,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'invoice-templates'}
         onClick={() => setCurrentView('invoice-templates')}
         view="invoice-templates"
+        permission="settings.edit"
       />
       <NavItem
         icon={<Gear size={20} />}
@@ -165,6 +170,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'notification-rules'}
         onClick={() => setCurrentView('notification-rules')}
         view="notification-rules"
+        permission="settings.edit"
       />
       <NavItem
         icon={<ShieldCheck size={20} />}
@@ -172,6 +178,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'contract-validation'}
         onClick={() => setCurrentView('contract-validation')}
         view="contract-validation"
+        permission="settings.view"
       />
       <NavItem
         icon={<Shield size={20} />}
@@ -179,6 +186,7 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         active={currentView === 'roles-permissions'}
         onClick={() => setCurrentView('roles-permissions')}
         view="roles-permissions"
+        permission="users.edit"
       />
     </NavGroup>
   )
@@ -205,6 +213,7 @@ export function ToolsNav({ currentView, setCurrentView, expandedGroups, toggleGr
         active={currentView === 'batch-import'}
         onClick={() => setCurrentView('batch-import')}
         view="batch-import"
+        permission="timesheets.create"
       />
       <NavItem
         icon={<FileText size={20} />}
@@ -212,6 +221,7 @@ export function ToolsNav({ currentView, setCurrentView, expandedGroups, toggleGr
         active={currentView === 'purchase-orders'}
         onClick={() => setCurrentView('purchase-orders')}
         view="purchase-orders"
+        permission="invoices.view"
       />
       <NavItem
         icon={<UserPlus size={20} />}
@@ -219,6 +229,7 @@ export function ToolsNav({ currentView, setCurrentView, expandedGroups, toggleGr
         active={currentView === 'onboarding'}
         onClick={() => setCurrentView('onboarding')}
         view="onboarding"
+        permission="workers.create"
       />
       <NavItem
         icon={<CalendarBlank size={20} />}
@@ -226,6 +237,7 @@ export function ToolsNav({ currentView, setCurrentView, expandedGroups, toggleGr
         active={currentView === 'holiday-pay'}
         onClick={() => setCurrentView('holiday-pay')}
         view="holiday-pay"
+        permission="payroll.view"
       />
       <NavItem
         icon={<ClockCounterClockwise size={20} />}
@@ -233,6 +245,7 @@ export function ToolsNav({ currentView, setCurrentView, expandedGroups, toggleGr
         active={currentView === 'audit-trail'}
         onClick={() => setCurrentView('audit-trail')}
         view="audit-trail"
+        permission="reports.audit"
       />
       <NavItem
         icon={<Translate size={20} />}
