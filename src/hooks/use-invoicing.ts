@@ -45,14 +45,14 @@ export function useInvoicing() {
       ? timesheets.map(ts => ({
           id: `LINE-${ts.id}`,
           description: `${ts.workerName} - Week ending ${new Date(ts.weekEnding).toLocaleDateString()}`,
-          quantity: ts.hours,
+          quantity: ts.hours || 0,
           rate: ts.rate || 0,
-          amount: ts.amount,
+          amount: ts.amount || 0,
           timesheetId: ts.id
         }))
       : []
 
-    const subtotal = timesheets.reduce((sum, ts) => sum + ts.amount, 0)
+    const subtotal = timesheets.reduce((sum, ts) => sum + (ts.amount || 0), 0)
     const tax = applyTax ? subtotal * taxRate : 0
     const total = Number((subtotal + tax).toFixed(roundingPrecision))
 

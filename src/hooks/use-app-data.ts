@@ -24,8 +24,8 @@ export function useAppData() {
     pendingApprovals: timesheets.filter(t => t.status === 'pending').length,
     overdueInvoices: invoices.filter(i => i.status === 'overdue').length,
     complianceAlerts: complianceDocs.filter(d => d.status === 'expiring' || d.status === 'expired').length,
-    monthlyRevenue: invoices.reduce((sum, inv) => sum + inv.amount, 0),
-    monthlyPayroll: payrollRuns.reduce((sum, pr) => sum + pr.totalAmount, 0),
+    monthlyRevenue: invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0),
+    monthlyPayroll: payrollRuns.reduce((sum, pr) => sum + (pr.totalAmount || (pr as any).totalGross || 0), 0),
     grossMargin: 0,
     activeWorkers: workers.filter(w => w.status === 'active').length,
     pendingExpenses: expenses.filter(e => e.status === 'pending').length

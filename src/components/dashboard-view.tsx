@@ -64,7 +64,7 @@ export function DashboardView({ metrics }: DashboardViewProps) {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold font-mono">
-              £{metrics.monthlyRevenue.toLocaleString()}
+              £{(metrics.monthlyRevenue || 0).toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm text-success">
               <ArrowUp size={16} weight="bold" />
@@ -80,7 +80,7 @@ export function DashboardView({ metrics }: DashboardViewProps) {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold font-mono">
-              £{metrics.monthlyPayroll.toLocaleString()}
+              £{(metrics.monthlyPayroll || 0).toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
               <ArrowUp size={16} weight="bold" />
@@ -96,7 +96,7 @@ export function DashboardView({ metrics }: DashboardViewProps) {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold font-mono">
-              {metrics.grossMargin.toFixed(1)}%
+              {(metrics.grossMargin || 0).toFixed(1)}%
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm text-success">
               <ArrowUp size={16} weight="bold" />

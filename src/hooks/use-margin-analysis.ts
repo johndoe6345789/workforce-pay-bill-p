@@ -73,9 +73,9 @@ export function useMarginAnalysis() {
         })
       : []
 
-    const revenue = periodInvoices.reduce((sum, inv) => sum + inv.amount, 0)
-    const payrollCosts = periodTimesheets.reduce((sum, ts) => sum + ts.amount, 0)
-    const expenseCosts = periodExpenses.reduce((sum, exp) => sum + exp.amount, 0)
+    const revenue = periodInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0)
+    const payrollCosts = periodTimesheets.reduce((sum, ts) => sum + (ts.amount || 0), 0)
+    const expenseCosts = periodExpenses.reduce((sum, exp) => sum + (exp.amount || 0), 0)
     const totalCosts = payrollCosts + expenseCosts
 
     const grossMargin = revenue - totalCosts
@@ -147,7 +147,7 @@ export function useMarginAnalysis() {
     filteredInvoices.forEach(inv => {
       const existing = clientData.get(inv.clientName) || { revenue: 0, costs: 0, invoiceCount: 0 }
       clientData.set(inv.clientName, {
-        revenue: existing.revenue + inv.amount,
+        revenue: existing.revenue + (inv.amount || 0),
         costs: existing.costs,
         invoiceCount: existing.invoiceCount + 1
       })
@@ -157,7 +157,7 @@ export function useMarginAnalysis() {
       const existing = clientData.get(ts.clientName) || { revenue: 0, costs: 0, invoiceCount: 0 }
       clientData.set(ts.clientName, {
         ...existing,
-        costs: existing.costs + ts.amount
+        costs: existing.costs + (ts.amount || 0)
       })
     })
 
@@ -190,8 +190,8 @@ export function useMarginAnalysis() {
       const existing = workerData.get(ts.workerId) || { name: ts.workerName, hours: 0, revenue: 0 }
       workerData.set(ts.workerId, {
         name: existing.name,
-        hours: existing.hours + ts.hours,
-        revenue: existing.revenue + ts.amount
+        hours: existing.hours + (ts.hours || 0),
+        revenue: existing.revenue + (ts.amount || 0)
       })
     })
 

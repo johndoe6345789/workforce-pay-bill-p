@@ -17,11 +17,23 @@ export function useSampleData() {
     if (hasInitialized) return
 
     const initializeData = async () => {
-      setTimesheets(appData.timesheets)
+      const transformedTimesheets = appData.timesheets.map((ts: any) => ({
+        ...ts,
+        hours: ts.totalHours || ts.hours || 0,
+        amount: ts.total || ts.amount || 0
+      }))
+      
+      const transformedPayrollRuns = appData.payrollRuns.map((pr: any) => ({
+        ...pr,
+        totalAmount: pr.totalGross || pr.totalAmount || 0,
+        workersCount: pr.workerCount || pr.workersCount || 0
+      }))
+      
+      setTimesheets(transformedTimesheets)
       setInvoices(appData.invoices)
       setExpenses(appData.expenses)
       setComplianceDocs(appData.complianceDocs)
-      setPayrollRuns(appData.payrollRuns)
+      setPayrollRuns(transformedPayrollRuns)
       setWorkers(appData.workers)
       setRateCards(appData.rateCards)
       setClients(appData.clients)

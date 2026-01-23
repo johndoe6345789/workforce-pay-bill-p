@@ -53,7 +53,7 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
   )
 
   const totalPendingValue = useMemo(() =>
-    pendingTimesheets.reduce((sum, ts) => sum + ts.amount, 0),
+    pendingTimesheets.reduce((sum, ts) => sum + (ts.amount || 0), 0),
     [pendingTimesheets]
   )
 

@@ -202,7 +202,7 @@ export function usePayrollCalculations(config: Partial<PayrollConfig> = {}) {
       if (!acc[ts.workerId]) {
         acc[ts.workerId] = { grossPay: 0, workerName: ts.workerName }
       }
-      acc[ts.workerId].grossPay += ts.amount
+      acc[ts.workerId].grossPay += (ts.amount || 0)
       return acc
     }, {} as Record<string, { grossPay: number; workerName: string }>)
 
@@ -224,7 +224,7 @@ export function usePayrollCalculations(config: Partial<PayrollConfig> = {}) {
       return tsDate >= startDate && tsDate <= endDate
     })
 
-    const eligibleHours = workerTimesheets.reduce((sum, ts) => sum + ts.hours, 0)
+    const eligibleHours = workerTimesheets.reduce((sum, ts) => sum + (ts.hours || 0), 0)
     const accruedHoliday = eligibleHours * holidayAccrualRate
 
     const avgRate = workerTimesheets.length > 0
