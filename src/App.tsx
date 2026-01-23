@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSampleData } from '@/hooks/use-sample-data'
@@ -1233,6 +1233,10 @@ function TimesheetsView({
   const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null)
   const [viewingTimesheet, setViewingTimesheet] = useState<Timesheet | null>(null)
   const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>(timesheets)
+  
+  const handleResultsChange = useCallback((results: Timesheet[]) => {
+    setFilteredTimesheets(results)
+  }, [])
   const [formData, setFormData] = useState({
     workerName: '',
     clientName: '',
@@ -1414,7 +1418,7 @@ function TimesheetsView({
       <AdvancedSearch
         items={timesheetsToFilter}
         fields={timesheetFields}
-        onResultsChange={setFilteredTimesheets}
+        onResultsChange={handleResultsChange}
         placeholder="Search timesheets or use query language (e.g., status = pending hours > 40)"
       />
 
@@ -1726,6 +1730,10 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(invoices)
   
+  const handleResultsChange = useCallback((results: Invoice[]) => {
+    setFilteredInvoices(results)
+  }, [])
+  
   const invoiceFields: FilterField[] = [
     { name: 'invoiceNumber', label: 'Invoice Number', type: 'text' },
     { name: 'clientName', label: 'Client Name', type: 'text' },
@@ -1765,7 +1773,7 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
       <AdvancedSearch
         items={invoices}
         fields={invoiceFields}
-        onResultsChange={setFilteredInvoices}
+        onResultsChange={handleResultsChange}
         placeholder="Search invoices or use query language (e.g., status = overdue amount > 1000)"
       />
 
@@ -1982,6 +1990,10 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
   const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>(complianceDocs)
+  
+  const handleResultsChange = useCallback((results: ComplianceDocument[]) => {
+    setFilteredDocs(results)
+  }, [])
   const [uploadFormData, setUploadFormData] = useState({
     workerId: '',
     workerName: '',
@@ -2106,7 +2118,7 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
       <AdvancedSearch
         items={complianceDocs}
         fields={complianceFields}
-        onResultsChange={setFilteredDocs}
+        onResultsChange={handleResultsChange}
         placeholder="Search documents or use query language (e.g., status = expiring daysUntilExpiry < 30)"
       />
 
@@ -2289,6 +2301,10 @@ function ExpensesView({
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [viewingExpense, setViewingExpense] = useState<Expense | null>(null)
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>(expenses)
+  
+  const handleResultsChange = useCallback((results: Expense[]) => {
+    setFilteredExpenses(results)
+  }, [])
   const [formData, setFormData] = useState({
     workerName: '',
     clientName: '',
@@ -2469,7 +2485,7 @@ function ExpensesView({
       <AdvancedSearch
         items={expensesToFilter}
         fields={expenseFields}
-        onResultsChange={setFilteredExpenses}
+        onResultsChange={handleResultsChange}
         placeholder="Search expenses or use query language (e.g., category = Travel billable = true)"
       />
 
