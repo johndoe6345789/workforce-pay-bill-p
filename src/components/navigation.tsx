@@ -6,7 +6,8 @@ import {
   Buildings,
   MapTrifold,
   Question,
-  PuzzlePiece
+  PuzzlePiece,
+  Code
 } from '@phosphor-icons/react'
 import { NavItem } from '@/components/nav/NavItem'
 import { CoreOperationsNav, ReportsNav, ConfigurationNav, ToolsNav } from '@/components/nav/nav-sections'
@@ -102,6 +103,12 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           label="Component Library"
           active={currentView === 'component-showcase'}
           onClick={() => setCurrentView('component-showcase')}
+        />
+        <NavItem
+          icon={<Code size={20} />}
+          label="Business Logic Hooks"
+          active={currentView === 'business-logic-demo'}
+          onClick={() => setCurrentView('business-logic-demo')}
         />
         <NavItem
           icon={<Question size={20} />}

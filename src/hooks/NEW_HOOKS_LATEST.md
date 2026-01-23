@@ -2,6 +2,178 @@
 
 This document lists all newly added custom hooks to the library.
 
+## Business Logic Hooks (Specialized)
+
+### `useInvoicing`
+Comprehensive invoicing hook with generation, aging analysis, and invoice management.
+
+```tsx
+const {
+  invoices,
+  isProcessing,
+  generateInvoiceNumber,
+  createInvoiceFromTimesheets,
+  createPlacementInvoice,
+  createCreditNote,
+  saveInvoice,
+  updateInvoiceStatus,
+  calculateInvoiceAging,
+  getInvoicesByClient,
+  getInvoicesByStatus,
+  getOverdueInvoices
+} = useInvoicing()
+
+// Create invoice from approved timesheets
+const invoice = createInvoiceFromTimesheets(
+  approvedTimesheets,
+  'Client Name',
+  { applyTax: true, taxRate: 0.20, paymentTermsDays: 30 }
+)
+await saveInvoice(invoice)
+
+// Analyze invoice aging
+const aging = calculateInvoiceAging()
+console.log(`Overdue 90+ days: £${aging.over90}`)
+```
+
+### `usePayrollCalculations`
+Full-featured payroll calculation hook with UK tax, NI, pension, and statutory payments.
+
+```tsx
+const {
+  calculatePayroll,
+  calculateBatchPayroll,
+  calculateHolidayPay,
+  processPayrollRun,
+  calculateCISDeduction,
+  calculateStatutoryPayments,
+  payrollConfig
+} = usePayrollCalculations()
+
+// Calculate single worker payroll
+const result = calculatePayroll('worker-123', 3000, 36000, true)
+console.log(`Net pay: £${result.netPay}`)
+console.log(`Employer cost: £${result.totalCost}`)
+
+// Process batch payroll
+const payrollRun = await processPayrollRun('2024-01-31', timesheetIds)
+
+// Calculate holiday pay
+const holiday = calculateHolidayPay('worker-123', startDate, endDate)
+console.log(`Accrued: ${holiday.accruedHoliday} hours`)
+```
+
+### `useTimeTracking`
+Advanced time tracking with shift calculations, validation, and analytics.
+
+```tsx
+const {
+  calculateShiftHours,
+  determineShiftType,
+  calculateShiftPay,
+  validateTimesheet,
+  analyzeWorkingTime,
+  createTimesheetFromShifts,
+  calculateOvertimeHours,
+  findRateCard
+} = useTimeTracking()
+
+// Calculate shift with premiums
+const shift = calculateShiftPay({
+  date: '2024-01-15',
+  dayOfWeek: 'saturday',
+  shiftType: 'weekend',
+  startTime: '08:00',
+  endTime: '16:00',
+  breakMinutes: 30,
+  hours: 0, // will be calculated
+  rate: 0,  // will be calculated
+  notes: 'Saturday shift'
+}, { baseRate: 15, applyPremiums: true })
+
+// Validate timesheet
+const validation = validateTimesheet(timesheet)
+if (!validation.isValid) {
+  console.error('Errors:', validation.errors)
+}
+
+// Analyze working time
+const analytics = analyzeWorkingTime('worker-123', startDate, endDate)
+console.log(`Total: ${analytics.totalHours}h, Overtime: ${analytics.overtimeHours}h`)
+```
+
+### `useMarginAnalysis`
+Business intelligence hook for margin calculation, profitability analysis, and forecasting.
+
+```tsx
+const {
+  calculateMarginForPeriod,
+  analyzeClientProfitability,
+  analyzeWorkerUtilization,
+  comparePeriods,
+  calculateBreakEvenPoint,
+  forecastRevenue
+} = useMarginAnalysis()
+
+// Calculate margin for a period
+const margin = calculateMarginForPeriod(startDate, endDate, true)
+console.log(`Margin: ${margin.marginPercentage.toFixed(2)}%`)
+
+// Analyze client profitability
+const clients = analyzeClientProfitability(startDate, endDate)
+const topClient = clients[0]
+console.log(`${topClient.clientName}: £${topClient.margin} margin`)
+
+// Worker utilization
+const workers = analyzeWorkerUtilization(startDate, endDate, 40)
+workers.forEach(w => {
+  console.log(`${w.workerName}: ${w.utilizationRate.toFixed(1)}% utilized`)
+})
+
+// Forecast revenue
+const forecast = forecastRevenue(6, 3)
+console.log('Next 3 months forecast:', forecast)
+```
+
+### `useComplianceTracking`
+Compliance document tracking with expiry monitoring and worker eligibility checks.
+
+```tsx
+const {
+  complianceDocs,
+  complianceRules,
+  checkWorkerCompliance,
+  addComplianceDocument,
+  updateDocumentExpiry,
+  getComplianceDashboard,
+  getRenewalAlerts,
+  getNonCompliantWorkers,
+  canWorkerBeAssigned
+} = useComplianceTracking()
+
+// Check worker compliance
+const check = checkWorkerCompliance('worker-123')
+if (!check.isCompliant) {
+  console.log('Missing:', check.missingDocuments)
+  console.log('Expired:', check.expiredDocuments.length)
+}
+
+// Get compliance dashboard
+const dashboard = getComplianceDashboard()
+console.log(`Compliance rate: ${dashboard.complianceRate.toFixed(1)}%`)
+
+// Get renewal alerts
+const alerts = getRenewalAlerts(90) // next 90 days
+alerts.forEach(alert => {
+  console.log(`${alert.workerName}: ${alert.documentType} expires in ${alert.daysUntilExpiry} days`)
+})
+
+// Check if worker can be assigned
+if (canWorkerBeAssigned('worker-123')) {
+  assignToPlacement(workerId, placementId)
+}
+```
+
 ## Data Fetching & State Management
 
 ### `useFetch`

@@ -32,6 +32,7 @@ import { ShiftPatternManager } from '@/components/ShiftPatternManager'
 import { QueryLanguageGuide } from '@/components/QueryLanguageGuide'
 import { RoadmapView } from '@/components/roadmap-view'
 import { ComponentShowcase } from '@/components/ComponentShowcase'
+import { BusinessLogicDemo } from '@/components/BusinessLogicDemo'
 import type { 
   Timesheet, 
   Invoice, 
@@ -47,7 +48,7 @@ import type {
   ShiftEntry
 } from '@/lib/types'
 
-export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase'
+export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase' | 'business-logic-demo'
 
 function App() {
   useSampleData()
@@ -564,6 +565,10 @@ function App() {
 
           {currentView === 'component-showcase' && (
             <ComponentShowcase />
+          )}
+
+          {currentView === 'business-logic-demo' && (
+            <BusinessLogicDemo />
           )}
         </div>
       </main>

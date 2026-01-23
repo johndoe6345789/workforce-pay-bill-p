@@ -87,6 +87,12 @@ export { useNetworkStatus } from './use-network-status'
 export { useUpdateEffect } from './use-update-effect'
 export { useEvent, useLatest } from './use-event'
 
+export { useInvoicing } from './use-invoicing'
+export { usePayrollCalculations } from './use-payroll-calculations'
+export { useTimeTracking } from './use-time-tracking'
+export { useMarginAnalysis } from './use-margin-analysis'
+export { useComplianceTracking } from './use-compliance-tracking'
+
 export type { AsyncState } from './use-async'
 export type { FormErrors } from './use-form-validation'
 export type { IntersectionObserverOptions } from './use-intersection-observer'
