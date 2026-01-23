@@ -24,18 +24,34 @@ import {
   ClockCounterClockwise,
   CalendarBlank,
   Envelope,
-  X
+  X,
+  CaretDown,
+  CaretRight,
+  CheckCircle,
+  XCircle,
+  Warning,
+  ArrowUp,
+  ArrowDown,
+  Download,
+  Plus,
+  Funnel,
+  FileCsv,
+  Camera
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { NavItem, NavGroup } from '@/components/navigation'
-import { DashboardView } from '@/components/dashboard-view'
-import { RoadmapView } from '@/components/roadmap-view'
 import { ReportsView } from '@/components/ReportsView'
 import { CurrencyManagement } from '@/components/CurrencyManagement'
 import { EmailTemplateManager } from '@/components/EmailTemplateManager'
@@ -63,7 +79,6 @@ import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { ComplianceDetailDialog } from '@/components/ComplianceDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { QueryLanguageGuide } from '@/components/QueryLanguageGuide'
-import { TimesheetsView, BillingView, PayrollView, ExpensesView, ComplianceView } from '@/components/views'
 import type { 
   Timesheet, 
   Invoice, 
@@ -893,6 +908,14 @@ function App() {
 }
 
 export default App
+
+interface NavItemProps {
+  icon: React.ReactNode
+  label: string
+  active: boolean
+  onClick: () => void
+  badge?: number
+}
 
 function NavItem({ icon, label, active, onClick, badge }: NavItemProps) {
   return (
