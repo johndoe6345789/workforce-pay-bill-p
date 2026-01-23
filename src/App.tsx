@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSampleData } from '@/hooks/use-sample-data'
@@ -1243,6 +1243,10 @@ function TimesheetsView({
   
   const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>(timesheetsToFilter)
   
+  useEffect(() => {
+    setFilteredTimesheets(timesheetsToFilter)
+  }, [timesheetsToFilter])
+  
   const handleResultsChange = useCallback((results: Timesheet[]) => {
     setFilteredTimesheets(results)
   }, [])
@@ -1734,6 +1738,10 @@ function BillingView({ invoices, searchQuery, setSearchQuery, onSendInvoice, onC
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(invoices)
   
+  useEffect(() => {
+    setFilteredInvoices(invoices)
+  }, [invoices])
+  
   const handleResultsChange = useCallback((results: Invoice[]) => {
     setFilteredInvoices(results)
   }, [])
@@ -2008,6 +2016,10 @@ function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProp
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
   const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>(complianceDocs)
+  
+  useEffect(() => {
+    setFilteredDocs(complianceDocs)
+  }, [complianceDocs])
   
   const handleResultsChange = useCallback((results: ComplianceDocument[]) => {
     setFilteredDocs(results)
@@ -2330,6 +2342,10 @@ function ExpensesView({
   }, [expenses, statusFilter])
   
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>(expensesToFilter)
+  
+  useEffect(() => {
+    setFilteredExpenses(expensesToFilter)
+  }, [expensesToFilter])
   
   const handleResultsChange = useCallback((results: Expense[]) => {
     setFilteredExpenses(results)
