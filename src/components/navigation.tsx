@@ -5,7 +5,8 @@ import {
   ChartBar,
   Buildings,
   MapTrifold,
-  Question
+  Question,
+  PuzzlePiece
 } from '@phosphor-icons/react'
 import { NavItem } from '@/components/nav/NavItem'
 import { CoreOperationsNav, ReportsNav, ConfigurationNav, ToolsNav } from '@/components/nav/nav-sections'
@@ -96,6 +97,12 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
         />
 
         <Separator className="my-2" />
+        <NavItem
+          icon={<PuzzlePiece size={20} />}
+          label="Component Library"
+          active={currentView === 'component-showcase'}
+          onClick={() => setCurrentView('component-showcase')}
+        />
         <NavItem
           icon={<Question size={20} />}
           label="Query Guide"
