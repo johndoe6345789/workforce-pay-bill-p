@@ -19,6 +19,13 @@ This is a multi-module enterprise platform requiring navigation between distinct
 - Progression: Enter credentials → Validate → Show loading state → Redirect to dashboard
 - Success criteria: Smooth authentication flow, password visibility toggle, remember me option, secure session management
 
+**User Profile & Settings**
+- Functionality: Comprehensive profile management with personal details, preferences, notifications, and security settings
+- Purpose: Enables users to customize their experience, manage account security, and control notification preferences
+- Trigger: User clicks on their profile avatar/name in the sidebar
+- Progression: Click user profile → View profile tabs → Edit information → Configure preferences → Save changes → See confirmation
+- Success criteria: Profile updates persist, settings apply immediately, password changes require current password, session management visible
+
 **Dashboard Overview**
 - Functionality: Displays real-time KPIs, alerts, and quick actions across all modules
 - Purpose: Provides at-a-glance operational health and reduces time to critical actions
