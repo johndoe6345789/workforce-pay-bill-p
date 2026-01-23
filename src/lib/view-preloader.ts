@@ -28,6 +28,7 @@ const viewPreloadMap: Record<View, () => Promise<any>> = {
   'component-showcase': () => import('@/components/ComponentShowcase'),
   'business-logic-demo': () => import('@/components/BusinessLogicDemo'),
   'data-admin': () => import('@/components/views/data-admin-view'),
+  'translation-demo': () => import('@/components/TranslationDemo'),
 }
 
 const preloadedViews = new Set<View>()

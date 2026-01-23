@@ -15,7 +15,8 @@ import {
   UploadSimple,
   FileText,
   UserPlus,
-  CalendarBlank
+  CalendarBlank,
+  Translate
 } from '@phosphor-icons/react'
 import { NavItem } from './NavItem'
 import { NavGroup } from './NavGroup'
@@ -224,6 +225,13 @@ export function ToolsNav({ currentView, setCurrentView, expandedGroups, toggleGr
         active={currentView === 'audit-trail'}
         onClick={() => setCurrentView('audit-trail')}
         view="audit-trail"
+      />
+      <NavItem
+        icon={<Translate size={20} />}
+        label="Translations"
+        active={currentView === 'translation-demo'}
+        onClick={() => setCurrentView('translation-demo')}
+        view="translation-demo"
       />
     </NavGroup>
   )

@@ -40,6 +40,7 @@ const RoadmapView = lazy(() => import('@/components/roadmap-view').then(m => ({ 
 const ComponentShowcase = lazy(() => import('@/components/ComponentShowcase').then(m => ({ default: m.ComponentShowcase })))
 const BusinessLogicDemo = lazy(() => import('@/components/BusinessLogicDemo').then(m => ({ default: m.BusinessLogicDemo })))
 const DataAdminView = lazy(() => import('@/components/views/data-admin-view').then(m => ({ default: m.DataAdminView })))
+const TranslationDemo = lazy(() => import('@/components/TranslationDemo').then(m => ({ default: m.TranslationDemo })))
 
 interface ViewRouterProps {
   currentView: View
@@ -249,6 +250,9 @@ export function ViewRouter({
 
     case 'data-admin':
       return <DataAdminView />
+
+    case 'translation-demo':
+      return <TranslationDemo />
 
     default:
       return <DashboardView metrics={metrics} />

@@ -7,8 +7,9 @@ import { useViewPreload } from '@/hooks/use-view-preload'
 import { Sidebar } from '@/components/navigation'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { ViewRouter } from '@/components/ViewRouter'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
-export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase' | 'business-logic-demo' | 'data-admin'
+export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase' | 'business-logic-demo' | 'data-admin' | 'translation-demo'
 
 function App() {
   useSampleData()
@@ -60,13 +61,16 @@ function App() {
         <div className="border-b border-border bg-card flex-shrink-0 z-10">
           <div className="flex items-center justify-between px-6 py-3">
             <div className="flex-1" />
-            <NotificationCenter 
-              notifications={notifications}
-              unreadCount={unreadCount}
-              onMarkAsRead={markAsRead}
-              onMarkAllAsRead={markAllAsRead}
-              onDelete={deleteNotification}
-            />
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <NotificationCenter 
+                notifications={notifications}
+                unreadCount={unreadCount}
+                onMarkAsRead={markAsRead}
+                onMarkAllAsRead={markAllAsRead}
+                onDelete={deleteNotification}
+              />
+            </div>
           </div>
         </div>
 
