@@ -2,61 +2,50 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
+  title: string
+  description?: string
+  actions?: React.ReactNode
+  breadcrumbs?: React.ReactNode
+  backButton?: React.ReactNode
 }
 
-export function PageHeader({ children, className, ...props }: PageHeaderProps) {
-  return (
-    <div className={cn('space-y-2 mb-6', className)} {...props}>
-      {children}
-    </div>
-  )
-}
+const PageHeader = React.forwardRef<HTMLDivElement, PageHeaderProps>(
+  ({ className, title, description, actions, breadcrumbs, backButton, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn('space-y-4 pb-6 border-b border-border', className)}
+        {...props}
+      >
+        {breadcrumbs && (
+          <div className="text-sm text-muted-foreground">
+            {breadcrumbs}
+          </div>
+        )}
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1 flex-1">
+            <div className="flex items-center gap-3">
+              {backButton}
+              <h1 className="text-3xl font-bold tracking-tight">
+                {title}
+              </h1>
+            </div>
+            {description && (
+              <p className="text-muted-foreground text-lg">
+                {description}
+              </p>
+            )}
+          </div>
+          {actions && (
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {actions}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+)
+PageHeader.displayName = 'PageHeader'
 
-export interface PageTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  children: React.ReactNode
-}
-
-export function PageTitle({ children, className, ...props }: PageTitleProps) {
-  return (
-    <h1 className={cn('text-3xl font-bold text-foreground', className)} {...props}>
-      {children}
-    </h1>
-  )
-}
-
-export interface PageDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  children: React.ReactNode
-}
-
-export function PageDescription({ children, className, ...props }: PageDescriptionProps) {
-  return (
-    <p className={cn('text-muted-foreground', className)} {...props}>
-      {children}
-    </p>
-  )
-}
-
-export interface PageActionsProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-}
-
-export function PageActions({ children, className, ...props }: PageActionsProps) {
-  return (
-    <div className={cn('flex items-center gap-2', className)} {...props}>
-      {children}
-    </div>
-  )
-}
-
-export interface PageHeaderRowProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-}
-
-export function PageHeaderRow({ children, className, ...props }: PageHeaderRowProps) {
-  return (
-    <div className={cn('flex items-start justify-between gap-4', className)} {...props}>
-      {children}
-    </div>
-  )
-}
+export { PageHeader }

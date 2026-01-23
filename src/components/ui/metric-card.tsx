@@ -1,114 +1,64 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
+import { Card } from './card'
 
-const MetricCard = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'rounded-lg border border-border bg-card p-6 shadow-sm',
-      className
-    )}
-    {...props}
-  />
-))
+export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  label: string
+  value: string | number
+  change?: {
+    value: number
+    trend: 'up' | 'down' | 'neutral'
+  }
+  icon?: React.ReactNode
+  description?: string
+  loading?: boolean
+}
+
+const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
+  ({ className, label, value, change, icon, description, loading = false, ...props }, ref) => {
+    const trendColor = change?.trend === 'up' 
+      ? 'text-success' 
+      : change?.trend === 'down' 
+        ? 'text-destructive' 
+        : 'text-muted-foreground'
+
+    const trendSign = change?.trend === 'up' ? '+' : change?.trend === 'down' ? '-' : ''
+
+    return (
+      <Card ref={ref} className={cn('p-6', className)} {...props}>
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground font-medium">
+              {label}
+            </p>
+            {loading ? (
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+            ) : (
+              <p className="text-3xl font-bold tracking-tight">
+                {value}
+              </p>
+            )}
+            {change && (
+              <p className={cn('text-sm font-medium', trendColor)}>
+                {trendSign}{Math.abs(change.value)}%
+              </p>
+            )}
+            {description && (
+              <p className="text-xs text-muted-foreground">
+                {description}
+              </p>
+            )}
+          </div>
+          {icon && (
+            <div className="flex-shrink-0 text-muted-foreground">
+              {icon}
+            </div>
+          )}
+        </div>
+      </Card>
+    )
+  }
+)
 MetricCard.displayName = 'MetricCard'
 
-const MetricCardHeader = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn('flex items-center justify-between mb-2', className)}
-    {...props}
-  />
-))
-MetricCardHeader.displayName = 'MetricCardHeader'
-
-const MetricCardTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={cn('text-sm font-medium text-muted-foreground', className)}
-    {...props}
-  />
-))
-MetricCardTitle.displayName = 'MetricCardTitle'
-
-const MetricCardIcon = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn('text-muted-foreground', className)}
-    {...props}
-  />
-))
-MetricCardIcon.displayName = 'MetricCardIcon'
-
-const MetricCardContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn('', className)} {...props} />
-))
-MetricCardContent.displayName = 'MetricCardContent'
-
-const MetricCardValue = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn('text-3xl font-bold text-foreground', className)}
-    {...props}
-  />
-))
-MetricCardValue.displayName = 'MetricCardValue'
-
-const MetricCardDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={cn('text-xs text-muted-foreground mt-1', className)}
-    {...props}
-  />
-))
-MetricCardDescription.displayName = 'MetricCardDescription'
-
-const MetricCardTrend = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { trend?: 'up' | 'down' | 'neutral' }
->(({ className, trend = 'neutral', ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'inline-flex items-center gap-1 text-xs font-medium mt-2',
-      trend === 'up' && 'text-success',
-      trend === 'down' && 'text-destructive',
-      trend === 'neutral' && 'text-muted-foreground',
-      className
-    )}
-    {...props}
-  />
-))
-MetricCardTrend.displayName = 'MetricCardTrend'
-
-export {
-  MetricCard,
-  MetricCardHeader,
-  MetricCardTitle,
-  MetricCardIcon,
-  MetricCardContent,
-  MetricCardValue,
-  MetricCardDescription,
-  MetricCardTrend
-}
+export { MetricCard }

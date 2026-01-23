@@ -1,37 +1,31 @@
 import { useState, useCallback } from 'react'
 
-export interface UseSetActions<T> {
-  add: (item: T) => void
-  remove: (item: T) => void
-  toggle: (item: T) => void
-  clear: () => void
-  has: (item: T) => boolean
-}
+export function useSet<T>(initialSet?: Set<T>) {
+  const [set, setSet] = useState<Set<T>>(initialSet || new Set())
 
-export function useSet<T>(
-  initialValue?: Set<T>
-): [Set<T>, UseSetActions<T>] {
-  const [set, setSet] = useState<Set<T>>(initialValue || new Set())
-
-  const add = useCallback((item: T) => {
-    setSet((prev) => new Set(prev).add(item))
-  }, [])
-
-  const remove = useCallback((item: T) => {
-    setSet((prev) => {
-      const newSet = new Set(prev)
-      newSet.delete(item)
+  const add = useCallback((value: T) => {
+    setSet((prevSet) => {
+      const newSet = new Set(prevSet)
+      newSet.add(value)
       return newSet
     })
   }, [])
 
-  const toggle = useCallback((item: T) => {
-    setSet((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(item)) {
-        newSet.delete(item)
+  const remove = useCallback((value: T) => {
+    setSet((prevSet) => {
+      const newSet = new Set(prevSet)
+      newSet.delete(value)
+      return newSet
+    })
+  }, [])
+
+  const toggle = useCallback((value: T) => {
+    setSet((prevSet) => {
+      const newSet = new Set(prevSet)
+      if (newSet.has(value)) {
+        newSet.delete(value)
       } else {
-        newSet.add(item)
+        newSet.add(value)
       }
       return newSet
     })
@@ -41,18 +35,23 @@ export function useSet<T>(
     setSet(new Set())
   }, [])
 
-  const has = useCallback((item: T) => {
-    return set.has(item)
+  const has = useCallback((value: T) => {
+    return set.has(value)
   }, [set])
 
-  return [
+  const reset = useCallback(() => {
+    setSet(initialSet || new Set())
+  }, [initialSet])
+
+  return {
     set,
-    {
-      add,
-      remove,
-      toggle,
-      clear,
-      has
-    }
-  ]
+    add,
+    remove,
+    toggle,
+    clear,
+    has,
+    reset,
+    size: set.size,
+    values: Array.from(set)
+  }
 }

@@ -1,11 +1,19 @@
 import { useState, useCallback } from 'react'
 
-export interface UseStepsOptions {
-  initialStep?: number
-  totalSteps: number
+export interface UseStepsReturn {
+  currentStep: number
+  nextStep: () => void
+  previousStep: () => void
+  goToStep: (step: number) => void
+  reset: () => void
+  canGoNext: boolean
+  canGoPrevious: boolean
+  isFirstStep: boolean
+  isLastStep: boolean
+  progress: number
 }
 
-export function useSteps({ initialStep = 0, totalSteps }: UseStepsOptions) {
+export function useSteps(totalSteps: number, initialStep = 0): UseStepsReturn {
   const [currentStep, setCurrentStep] = useState(initialStep)
 
   const nextStep = useCallback(() => {
@@ -17,9 +25,7 @@ export function useSteps({ initialStep = 0, totalSteps }: UseStepsOptions) {
   }, [])
 
   const goToStep = useCallback((step: number) => {
-    if (step >= 0 && step < totalSteps) {
-      setCurrentStep(step)
-    }
+    setCurrentStep(Math.max(0, Math.min(step, totalSteps - 1)))
   }, [totalSteps])
 
   const reset = useCallback(() => {
@@ -28,13 +34,14 @@ export function useSteps({ initialStep = 0, totalSteps }: UseStepsOptions) {
 
   return {
     currentStep,
-    isFirstStep: currentStep === 0,
-    isLastStep: currentStep === totalSteps - 1,
-    progress: ((currentStep + 1) / totalSteps) * 100,
     nextStep,
     previousStep,
     goToStep,
     reset,
-    setStep: setCurrentStep
+    canGoNext: currentStep < totalSteps - 1,
+    canGoPrevious: currentStep > 0,
+    isFirstStep: currentStep === 0,
+    isLastStep: currentStep === totalSteps - 1,
+    progress: ((currentStep + 1) / totalSteps) * 100
   }
 }

@@ -1,29 +1,41 @@
 import { useState, useCallback } from 'react'
 
-export function useClipboard(timeout = 2000) {
+export interface UseClipboardOptions {
+  timeout?: number
+}
+
+export function useClipboard(options: UseClipboardOptions = {}) {
+  const { timeout = 2000 } = options
   const [isCopied, setIsCopied] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
 
   const copy = useCallback(async (text: string) => {
-    if (!navigator?.clipboard) {
-      console.warn('Clipboard API not available')
-      return false
-    }
-
     try {
       await navigator.clipboard.writeText(text)
       setIsCopied(true)
-      
+      setError(null)
+
       setTimeout(() => {
         setIsCopied(false)
       }, timeout)
-      
+
       return true
-    } catch (error) {
-      console.warn('Copy failed', error)
+    } catch (err) {
+      setError(err as Error)
       setIsCopied(false)
       return false
     }
   }, [timeout])
 
-  return { isCopied, copy }
+  const reset = useCallback(() => {
+    setIsCopied(false)
+    setError(null)
+  }, [])
+
+  return {
+    isCopied,
+    error,
+    copy,
+    reset
+  }
 }

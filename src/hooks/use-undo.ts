@@ -1,28 +1,36 @@
 import { useState, useCallback } from 'react'
 
-export function useUndo<T>(initialState: T, maxHistory = 50) {
+export interface UseUndoReturn<T> {
+  state: T
+  set: (newState: T | ((prev: T) => T)) => void
+  undo: () => void
+  redo: () => void
+  canUndo: boolean
+  canRedo: boolean
+  clear: () => void
+  reset: () => void
+}
+
+export function useUndo<T>(initialState: T, maxHistory = 50): UseUndoReturn<T> {
   const [history, setHistory] = useState<T[]>([initialState])
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const current = history[currentIndex]
-  const canUndo = currentIndex > 0
-  const canRedo = currentIndex < history.length - 1
+  const state = history[currentIndex]
 
-  const setState = useCallback((newState: T | ((prev: T) => T)) => {
-    setHistory(prevHistory => {
-      const currentState = prevHistory[currentIndex]
-      const nextState = typeof newState === 'function'
-        ? (newState as (prev: T) => T)(currentState)
+  const set = useCallback((newState: T | ((prev: T) => T)) => {
+    setHistory((prev) => {
+      const nextState = typeof newState === 'function' 
+        ? (newState as (prev: T) => T)(prev[currentIndex])
         : newState
 
-      const newHistory = prevHistory.slice(0, currentIndex + 1)
+      const newHistory = prev.slice(0, currentIndex + 1)
       newHistory.push(nextState)
 
       if (newHistory.length > maxHistory) {
         newHistory.shift()
-        setCurrentIndex(currentIndex)
+        setCurrentIndex(maxHistory - 1)
       } else {
-        setCurrentIndex(currentIndex + 1)
+        setCurrentIndex(newHistory.length - 1)
       }
 
       return newHistory
@@ -30,37 +38,35 @@ export function useUndo<T>(initialState: T, maxHistory = 50) {
   }, [currentIndex, maxHistory])
 
   const undo = useCallback(() => {
-    if (canUndo) {
-      setCurrentIndex(prev => prev - 1)
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1)
     }
-  }, [canUndo])
+  }, [currentIndex])
 
   const redo = useCallback(() => {
-    if (canRedo) {
-      setCurrentIndex(prev => prev + 1)
+    if (currentIndex < history.length - 1) {
+      setCurrentIndex((prev) => prev + 1)
     }
-  }, [canRedo])
+  }, [currentIndex, history.length])
+
+  const clear = useCallback(() => {
+    setHistory([state])
+    setCurrentIndex(0)
+  }, [state])
 
   const reset = useCallback(() => {
     setHistory([initialState])
     setCurrentIndex(0)
   }, [initialState])
 
-  const clear = useCallback(() => {
-    setHistory([current])
-    setCurrentIndex(0)
-  }, [current])
-
   return {
-    state: current,
-    setState,
+    state,
+    set,
     undo,
     redo,
-    canUndo,
-    canRedo,
-    reset,
+    canUndo: currentIndex > 0,
+    canRedo: currentIndex < history.length - 1,
     clear,
-    history: history.length,
-    currentIndex
+    reset
   }
 }

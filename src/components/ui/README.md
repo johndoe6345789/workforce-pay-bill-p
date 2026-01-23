@@ -365,6 +365,196 @@ Table header with sort indicators.
 
 ## Component Props
 
+### New Advanced Components
+
+#### Grid & GridItem
+Responsive grid layout system.
+
+```tsx
+<Grid cols={3} gap={4} responsive>
+  <GridItem colSpan={2}>Main content</GridItem>
+  <GridItem>Sidebar</GridItem>
+  <GridItem colSpan="full">Footer</GridItem>
+</Grid>
+```
+
+#### Stack
+Flexible stack layout (horizontal/vertical).
+
+```tsx
+<Stack direction="horizontal" spacing={4} align="center" justify="between">
+  <div>Item 1</div>
+  <div>Item 2</div>
+  <div>Item 3</div>
+</Stack>
+```
+
+#### Section
+Page section with header and action area.
+
+```tsx
+<Section
+  title="Timesheets"
+  description="Manage worker timesheets"
+  action={<Button>Create New</Button>}
+>
+  <TimesheetList />
+</Section>
+```
+
+#### PageHeader
+Full-featured page header.
+
+```tsx
+<PageHeader
+  title="Dashboard"
+  description="Overview of your workforce operations"
+  breadcrumbs={<Breadcrumb items={breadcrumbItems} />}
+  backButton={<Button variant="ghost" size="sm"><ArrowLeft /></Button>}
+  actions={
+    <>
+      <Button variant="outline">Export</Button>
+      <Button>Create New</Button>
+    </>
+  }
+/>
+```
+
+#### MetricCard (Enhanced)
+Metric card with change tracking.
+
+```tsx
+<MetricCard
+  label="Active Workers"
+  value={1234}
+  change={{ value: 12, trend: 'up' }}
+  icon={<Users size={20} />}
+  description="Compared to last month"
+  loading={false}
+/>
+```
+
+#### FilterBar (Enhanced)
+Active filter display with removal.
+
+```tsx
+<FilterBar
+  activeFilters={[
+    { key: 'status', label: 'Status', value: 'Active' },
+    { key: 'date', label: 'Date Range', value: 'Last 30 days' }
+  ]}
+  onRemoveFilter={(key) => removeFilter(key)}
+  onClearAll={() => clearFilters()}
+  onOpenFilters={() => setShowFilters(true)}
+  showFilterButton
+/>
+```
+
+#### QuickPagination (Enhanced)
+Pagination with item count display.
+
+```tsx
+<QuickPagination
+  currentPage={page}
+  totalPages={totalPages}
+  onPageChange={setPage}
+  itemsPerPage={10}
+  totalItems={totalItems}
+  showInfo
+/>
+```
+
+#### Modal & ConfirmModal
+Dialog components with proper structure.
+
+```tsx
+<Modal
+  open={isOpen}
+  onOpenChange={setIsOpen}
+  title="Edit Timesheet"
+  description="Update timesheet details"
+  size="lg"
+  footer={
+    <>
+      <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+      <Button onClick={handleSave}>Save</Button>
+    </>
+  }
+>
+  <TimesheetForm />
+</Modal>
+
+<ConfirmModal
+  open={isConfirmOpen}
+  onOpenChange={setIsConfirmOpen}
+  title="Delete Timesheet"
+  description="This action cannot be undone."
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  onConfirm={handleDelete}
+  variant="destructive"
+  loading={isDeleting}
+/>
+```
+
+#### Tag
+Enhanced tag component with variants.
+
+```tsx
+<Tag variant="primary" size="md">Featured</Tag>
+<Tag variant="success" onRemove={() => removeTag('active')}>Active</Tag>
+<Tag variant="destructive" size="sm">Urgent</Tag>
+```
+
+#### DataTable (Full-Featured)
+Complete data table with all features.
+
+```tsx
+<DataTable
+  data={items}
+  columns={[
+    {
+      key: 'name',
+      header: 'Name',
+      sortable: true,
+      accessor: (item) => item.name
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (item) => <StatusBadge status={item.status} />
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (item) => (
+        <Button size="sm" onClick={() => edit(item)}>Edit</Button>
+      )
+    }
+  ]}
+  loading={isLoading}
+  emptyMessage="No data found"
+  emptyIcon={<FileX size={48} />}
+  onSort={(key, direction) => handleSort(key, direction)}
+  sortKey={sortKey}
+  sortDirection={sortDirection}
+  selectable
+  selectedIds={selectedIds}
+  onSelectionChange={setSelectedIds}
+  getRowId={(item) => item.id}
+  onRowClick={(item) => viewDetails(item)}
+  pagination={{
+    currentPage: page,
+    totalPages: totalPages,
+    onPageChange: setPage,
+    itemsPerPage: 10,
+    totalItems: totalItems
+  }}
+/>
+```
+
+## Component Props
+
 All components support standard HTML attributes and can be styled using Tailwind classes via the `className` prop.
 
 ## Accessibility
@@ -374,3 +564,13 @@ All components are built with accessibility in mind:
 - ARIA labels where appropriate
 - Keyboard navigation support
 - Focus management
+
+## Usage Tips
+
+1. **Layout Components**: Use `Grid`, `Stack`, and `Section` for consistent layouts
+2. **Data Display**: Combine `DataTable` with `FilterBar` and `QuickPagination` for full-featured tables
+3. **Metrics**: Use `MetricCard` for dashboard KPIs
+4. **Navigation**: Use `PageHeader` with breadcrumbs and actions on all main pages
+5. **Modals**: Use `ConfirmModal` for destructive actions, `Modal` for forms
+6. **Tags**: Use `Tag` component for filters, categories, and status indicators
+7. **Feedback**: Always provide `EmptyState` when data is unavailable

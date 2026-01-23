@@ -1,61 +1,54 @@
 import { useState, useCallback } from 'react'
 
-export interface ConfirmationOptions {
+export interface UseConfirmationOptions {
   title?: string
   message?: string
   confirmLabel?: string
   cancelLabel?: string
-  variant?: 'default' | 'destructive'
 }
 
-export interface ConfirmationState extends ConfirmationOptions {
+export interface UseConfirmationReturn {
   isOpen: boolean
-  onConfirm: (() => void) | null
-  onCancel: (() => void) | null
+  data: UseConfirmationOptions
+  confirm: (options?: UseConfirmationOptions) => Promise<boolean>
+  handleConfirm: () => void
+  handleCancel: () => void
 }
 
-export function useConfirmation() {
-  const [state, setState] = useState<ConfirmationState>({
-    isOpen: false,
-    onConfirm: null,
-    onCancel: null,
-    title: 'Are you sure?',
-    message: 'This action cannot be undone.',
-    confirmLabel: 'Confirm',
-    cancelLabel: 'Cancel',
-    variant: 'default'
-  })
+export function useConfirmation(): UseConfirmationReturn {
+  const [isOpen, setIsOpen] = useState(false)
+  const [data, setData] = useState<UseConfirmationOptions>({})
+  const [resolveRef, setResolveRef] = useState<((value: boolean) => void) | null>(null)
 
-  const confirm = useCallback((options?: ConfirmationOptions) => {
+  const confirm = useCallback((options: UseConfirmationOptions = {}) => {
     return new Promise<boolean>((resolve) => {
-      setState({
-        isOpen: true,
-        title: options?.title || 'Are you sure?',
-        message: options?.message || 'This action cannot be undone.',
-        confirmLabel: options?.confirmLabel || 'Confirm',
-        cancelLabel: options?.cancelLabel || 'Cancel',
-        variant: options?.variant || 'default',
-        onConfirm: () => {
-          setState(prev => ({ ...prev, isOpen: false }))
-          resolve(true)
-        },
-        onCancel: () => {
-          setState(prev => ({ ...prev, isOpen: false }))
-          resolve(false)
-        }
-      })
+      setData(options)
+      setIsOpen(true)
+      setResolveRef(() => resolve)
     })
   }, [])
 
-  const close = useCallback(() => {
-    if (state.onCancel) {
-      state.onCancel()
+  const handleConfirm = useCallback(() => {
+    if (resolveRef) {
+      resolveRef(true)
     }
-  }, [state])
+    setIsOpen(false)
+    setResolveRef(null)
+  }, [resolveRef])
+
+  const handleCancel = useCallback(() => {
+    if (resolveRef) {
+      resolveRef(false)
+    }
+    setIsOpen(false)
+    setResolveRef(null)
+  }, [resolveRef])
 
   return {
-    ...state,
+    isOpen,
+    data,
     confirm,
-    close
+    handleConfirm,
+    handleCancel
   }
 }

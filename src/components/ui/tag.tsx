@@ -1,56 +1,77 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import { Button } from './button'
-import { X } from '@phosphor-icons/react'
 
-export interface TagProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
+export interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'destructive' | 'info'
+  size?: 'sm' | 'md' | 'lg'
   onRemove?: () => void
-  variant?: 'default' | 'primary' | 'success' | 'warning' | 'destructive'
+  removable?: boolean
 }
 
-export function Tag({
-  children,
-  onRemove,
-  variant = 'default',
-  className,
-  ...props
-}: TagProps) {
-  return (
-    <div
-      className={cn(
-        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium',
-        variant === 'default' && 'bg-muted text-foreground',
-        variant === 'primary' && 'bg-primary/10 text-primary',
-        variant === 'success' && 'bg-success/10 text-success',
-        variant === 'warning' && 'bg-warning/10 text-warning',
-        variant === 'destructive' && 'bg-destructive/10 text-destructive',
-        className
-      )}
-      {...props}
-    >
-      <span>{children}</span>
-      {onRemove && (
-        <button
-          onClick={onRemove}
-          className="hover:opacity-70 transition-opacity"
-          aria-label="Remove"
-        >
-          <X className="h-3 w-3" />
-        </button>
-      )}
-    </div>
-  )
-}
+const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
+  ({ 
+    className, 
+    variant = 'default', 
+    size = 'md',
+    onRemove,
+    removable = false,
+    children, 
+    ...props 
+  }, ref) => {
+    const variantClasses = {
+      default: 'bg-muted text-muted-foreground hover:bg-muted/80',
+      primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+      success: 'bg-success/10 text-success hover:bg-success/20',
+      warning: 'bg-warning/10 text-warning hover:bg-warning/20',
+      destructive: 'bg-destructive/10 text-destructive hover:bg-destructive/20',
+      info: 'bg-info/10 text-info hover:bg-info/20'
+    }
 
-export interface TagGroupProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-}
+    const sizeClasses = {
+      sm: 'text-xs px-2 py-0.5',
+      md: 'text-sm px-2.5 py-1',
+      lg: 'text-base px-3 py-1.5'
+    }
 
-export function TagGroup({ children, className, ...props }: TagGroupProps) {
-  return (
-    <div className={cn('flex flex-wrap items-center gap-2', className)} {...props}>
-      {children}
-    </div>
-  )
-}
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          'inline-flex items-center gap-1.5 rounded-full font-medium transition-colors',
+          variantClasses[variant],
+          sizeClasses[size],
+          (onRemove || removable) && 'pr-1',
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {(onRemove || removable) && (
+          <button
+            type="button"
+            onClick={onRemove}
+            className="hover:bg-current/10 rounded-full p-0.5 transition-colors"
+          >
+            <svg
+              className="h-3 w-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
+      </span>
+    )
+  }
+)
+Tag.displayName = 'Tag'
+
+export { Tag }

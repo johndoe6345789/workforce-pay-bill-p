@@ -1,110 +1,128 @@
 import * as React from 'react'
-import { cn } from '@/lib/utils'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './dialog'
 import { Button } from './button'
-import { X } from '@phosphor-icons/react'
 
 export interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  description?: string
   children: React.ReactNode
+  footer?: React.ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
-  className?: string
+  showCloseButton?: boolean
 }
 
-export function Modal({
-  isOpen,
-  onClose,
+const Modal: React.FC<ModalProps> = ({
+  open,
+  onOpenChange,
+  title,
+  description,
   children,
+  footer,
   size = 'md',
-  className
-}: ModalProps) {
-  if (!isOpen) return null
+  showCloseButton = true
+}) => {
+  const sizeClasses = {
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
+    full: 'max-w-7xl'
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div
-        className={cn(
-          'relative z-10 bg-card rounded-lg shadow-lg max-h-[90vh] overflow-auto',
-          size === 'sm' && 'w-full max-w-sm',
-          size === 'md' && 'w-full max-w-md',
-          size === 'lg' && 'w-full max-w-lg',
-          size === 'xl' && 'w-full max-w-xl',
-          size === 'full' && 'w-[calc(100%-2rem)] max-w-6xl',
-          className
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className={sizeClasses[size]}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+        <div className="py-4">
+          {children}
+        </div>
+        {footer && (
+          <DialogFooter>
+            {footer}
+          </DialogFooter>
         )}
-      >
-        {children}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
+Modal.displayName = 'Modal'
 
-export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-  onClose?: () => void
+export interface ConfirmModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  description?: string
+  confirmLabel?: string
+  cancelLabel?: string
+  onConfirm: () => void
+  onCancel?: () => void
+  variant?: 'default' | 'destructive'
+  loading?: boolean
 }
 
-export function ModalHeader({ children, onClose, className, ...props }: ModalHeaderProps) {
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  onConfirm,
+  onCancel,
+  variant = 'default',
+  loading = false
+}) => {
+  const handleCancel = () => {
+    onOpenChange(false)
+    onCancel?.()
+  }
+
+  const handleConfirm = () => {
+    onConfirm()
+    if (!loading) {
+      onOpenChange(false)
+    }
+  }
+
   return (
-    <div
-      className={cn(
-        'flex items-center justify-between px-6 py-4 border-b border-border',
-        className
-      )}
-      {...props}
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      description={description}
+      size="sm"
+      footer={
+        <>
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            disabled={loading}
+          >
+            {cancelLabel}
+          </Button>
+          <Button
+            variant={variant === 'destructive' ? 'destructive' : 'default'}
+            onClick={handleConfirm}
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : confirmLabel}
+          </Button>
+        </>
+      }
     >
-      <div className="flex-1">{children}</div>
-      {onClose && (
-        <Button variant="ghost" size="sm" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
+      {description && (
+        <p className="text-sm text-muted-foreground">
+          {description}
+        </p>
       )}
-    </div>
+    </Modal>
   )
 }
+ConfirmModal.displayName = 'ConfirmModal'
 
-export interface ModalTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  children: React.ReactNode
-}
-
-export function ModalTitle({ children, className, ...props }: ModalTitleProps) {
-  return (
-    <h2 className={cn('text-xl font-semibold text-foreground', className)} {...props}>
-      {children}
-    </h2>
-  )
-}
-
-export interface ModalBodyProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-}
-
-export function ModalBody({ children, className, ...props }: ModalBodyProps) {
-  return (
-    <div className={cn('px-6 py-4', className)} {...props}>
-      {children}
-    </div>
-  )
-}
-
-export interface ModalFooterProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-}
-
-export function ModalFooter({ children, className, ...props }: ModalFooterProps) {
-  return (
-    <div
-      className={cn(
-        'flex items-center justify-end gap-2 px-6 py-4 border-t border-border',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  )
-}
+export { Modal, ConfirmModal }

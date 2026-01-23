@@ -1,14 +1,27 @@
 import { useState, useCallback } from 'react'
 
-export function useArray<T>(initialValue: T[] = []) {
-  const [array, setArray] = useState<T[]>(initialValue)
+export interface UseArrayReturn<T> {
+  array: T[]
+  set: (newArray: T[]) => void
+  push: (element: T) => void
+  filter: (callback: (item: T, index: number) => boolean) => void
+  update: (index: number, newElement: T) => void
+  remove: (index: number) => void
+  clear: () => void
+  insert: (index: number, element: T) => void
+  move: (fromIndex: number, toIndex: number) => void
+  swap: (indexA: number, indexB: number) => void
+}
+
+export function useArray<T>(initialArray: T[] = []): UseArrayReturn<T> {
+  const [array, setArray] = useState<T[]>(initialArray)
+
+  const set = useCallback((newArray: T[]) => {
+    setArray(newArray)
+  }, [])
 
   const push = useCallback((element: T) => {
     setArray((prev) => [...prev, element])
-  }, [])
-
-  const remove = useCallback((index: number) => {
-    setArray((prev) => prev.filter((_, i) => i !== index))
   }, [])
 
   const filter = useCallback((callback: (item: T, index: number) => boolean) => {
@@ -16,15 +29,19 @@ export function useArray<T>(initialValue: T[] = []) {
   }, [])
 
   const update = useCallback((index: number, newElement: T) => {
-    setArray((prev) => prev.map((item, i) => (i === index ? newElement : item)))
+    setArray((prev) => {
+      const newArray = [...prev]
+      newArray[index] = newElement
+      return newArray
+    })
+  }, [])
+
+  const remove = useCallback((index: number) => {
+    setArray((prev) => prev.filter((_, i) => i !== index))
   }, [])
 
   const clear = useCallback(() => {
     setArray([])
-  }, [])
-
-  const set = useCallback((newArray: T[]) => {
-    setArray(newArray)
   }, [])
 
   const insert = useCallback((index: number, element: T) => {
@@ -35,12 +52,19 @@ export function useArray<T>(initialValue: T[] = []) {
     })
   }, [])
 
+  const move = useCallback((fromIndex: number, toIndex: number) => {
+    setArray((prev) => {
+      const newArray = [...prev]
+      const [element] = newArray.splice(fromIndex, 1)
+      newArray.splice(toIndex, 0, element)
+      return newArray
+    })
+  }, [])
+
   const swap = useCallback((indexA: number, indexB: number) => {
     setArray((prev) => {
       const newArray = [...prev]
-      const temp = newArray[indexA]
-      newArray[indexA] = newArray[indexB]
-      newArray[indexB] = temp
+      ;[newArray[indexA], newArray[indexB]] = [newArray[indexB], newArray[indexA]]
       return newArray
     })
   }, [])
@@ -49,11 +73,12 @@ export function useArray<T>(initialValue: T[] = []) {
     array,
     set,
     push,
-    remove,
     filter,
     update,
+    remove,
     clear,
     insert,
+    move,
     swap
   }
 }

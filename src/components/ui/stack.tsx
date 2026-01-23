@@ -2,46 +2,62 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 export interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
   direction?: 'horizontal' | 'vertical'
-  spacing?: 'none' | 'sm' | 'md' | 'lg' | 'xl'
-  align?: 'start' | 'center' | 'end' | 'stretch'
-  justify?: 'start' | 'center' | 'end' | 'between' | 'around'
+  spacing?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12
+  align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
+  justify?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'
+  wrap?: boolean
 }
 
-export function Stack({
-  children,
-  direction = 'vertical',
-  spacing = 'md',
-  align = 'stretch',
-  justify = 'start',
-  className,
-  ...props
-}: StackProps) {
-  return (
-    <div
-      className={cn(
-        'flex',
-        direction === 'horizontal' ? 'flex-row' : 'flex-col',
-        spacing === 'none' && 'gap-0',
-        spacing === 'sm' && 'gap-2',
-        spacing === 'md' && 'gap-4',
-        spacing === 'lg' && 'gap-6',
-        spacing === 'xl' && 'gap-8',
-        align === 'start' && 'items-start',
-        align === 'center' && 'items-center',
-        align === 'end' && 'items-end',
-        align === 'stretch' && 'items-stretch',
-        justify === 'start' && 'justify-start',
-        justify === 'center' && 'justify-center',
-        justify === 'end' && 'justify-end',
-        justify === 'between' && 'justify-between',
-        justify === 'around' && 'justify-around',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  )
-}
+const Stack = React.forwardRef<HTMLDivElement, StackProps>(
+  ({ 
+    className, 
+    direction = 'vertical', 
+    spacing = 4, 
+    align = 'stretch',
+    justify = 'start',
+    wrap = false,
+    children, 
+    ...props 
+  }, ref) => {
+    const isHorizontal = direction === 'horizontal'
+    
+    const alignmentClass = {
+      start: 'items-start',
+      center: 'items-center',
+      end: 'items-end',
+      stretch: 'items-stretch',
+      baseline: 'items-baseline'
+    }[align]
+
+    const justifyClass = {
+      start: 'justify-start',
+      center: 'justify-center',
+      end: 'justify-end',
+      between: 'justify-between',
+      around: 'justify-around',
+      evenly: 'justify-evenly'
+    }[justify]
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'flex',
+          isHorizontal ? 'flex-row' : 'flex-col',
+          `gap-${spacing}`,
+          alignmentClass,
+          justifyClass,
+          wrap && 'flex-wrap',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+Stack.displayName = 'Stack'
+
+export { Stack }

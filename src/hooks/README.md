@@ -1,24 +1,29 @@
 # Custom Hook Library
 
-A comprehensive collection of React hooks for the WorkForce Pro platform.
+A comprehensive collection of 40+ React hooks for the WorkForce Pro platform.
 
 ## Available Hooks
 
-### State Management
+### State Management (7 hooks)
 - **useToggle** - Boolean state toggle with setter
 - **usePrevious** - Access previous value of state
 - **useLocalStorage** - Persist state in localStorage
 - **useDisclosure** - Modal/drawer open/close state
-- **useUndo** - Undo/redo state management
+- **useUndo** - Undo/redo state management with history
 - **useFormState** - Form state with validation and dirty tracking
+- **useArray** - Array manipulation (push, filter, update, remove, move, swap)
+- **useMap** - Map data structure with reactive updates
+- **useSet** - Set data structure with reactive updates
 
-### Async Operations
+### Async Operations (4 hooks)
 - **useAsync** - Handle async operations with loading/error states
 - **useDebounce** - Debounce rapidly changing values
 - **useThrottle** - Throttle function calls
 - **useInterval** - Declarative setInterval hook
+- **useTimeout** - Declarative setTimeout hook
+- **useCountdown** - Countdown timer with start/pause/reset
 
-### UI & Interaction
+### UI & Interaction (10 hooks)
 - **useMediaQuery** - Responsive media query matching
 - **useIsMobile** - Mobile device detection
 - **useWindowSize** - Track window dimensions
@@ -31,20 +36,21 @@ A comprehensive collection of React hooks for the WorkForce Pro platform.
 - **useClipboard** - Enhanced clipboard with timeout
 - **useFocusTrap** - Trap focus within element
 
-### Data Management
+### Data Management (5 hooks)
 - **useFilter** - Filter arrays with debouncing
 - **useSort** - Sort arrays by key and direction
 - **usePagination** - Paginate large datasets
 - **useSelection** - Multi-select management
 - **useTable** - Complete table with sort/filter/pagination
 
-### Forms & Validation
+### Forms & Validation (5 hooks)
 - **useFormValidation** - Form validation with error handling
 - **useWizard** - Multi-step form/wizard state
 - **useMultiStepForm** - Advanced multi-step form with validation
 - **useConfirmation** - Confirmation dialog state
+- **useSteps** - Step navigation with progress tracking
 
-### Browser & Navigation
+### Browser & Navigation (3 hooks)
 - **useQueryParams** - URL query parameter management
 - **useDownload** - File download utilities (JSON, CSV, etc.)
 
@@ -283,5 +289,122 @@ import { useInterval } from '@/hooks'
 
 useInterval(() => {
   checkForUpdates()
-}, 5000)
+}, 5000, { enabled: true, immediate: false })
 ```
+
+### useCountdown
+```tsx
+import { useCountdown } from '@/hooks'
+
+const { seconds, minutes, remainingSeconds, start, pause, reset, isFinished } = useCountdown(60)
+
+<div>
+  <p>{minutes}:{remainingSeconds.toString().padStart(2, '0')}</p>
+  <Button onClick={start}>Start</Button>
+  <Button onClick={pause}>Pause</Button>
+  <Button onClick={() => reset(30)}>Reset to 30s</Button>
+</div>
+```
+
+### useTimeout
+```tsx
+import { useTimeout } from '@/hooks'
+
+useTimeout(() => {
+  showNotification()
+}, 3000)
+```
+
+### useArray
+```tsx
+import { useArray } from '@/hooks'
+
+const { array, push, remove, update, filter, clear, move, swap } = useArray([1, 2, 3])
+
+push(4)
+remove(0)
+update(1, 99)
+filter((item) => item > 2)
+move(0, 2)
+swap(0, 1)
+```
+
+### useMap
+```tsx
+import { useMap } from '@/hooks'
+
+const { map, set, remove, clear, has, get, values, keys } = useMap<string, User>()
+
+set('user-1', { id: '1', name: 'John' })
+const user = get('user-1')
+remove('user-1')
+```
+
+### useSet
+```tsx
+import { useSet } from '@/hooks'
+
+const { set, add, remove, toggle, has, clear, values, size } = useSet<string>()
+
+add('item-1')
+toggle('item-2')
+has('item-1')
+```
+
+### useSteps
+```tsx
+import { useSteps } from '@/hooks'
+
+const {
+  currentStep,
+  nextStep,
+  previousStep,
+  goToStep,
+  canGoNext,
+  canGoPrevious,
+  isFirstStep,
+  isLastStep,
+  progress
+} = useSteps(5, 0)
+
+<div>
+  <Progress value={progress} />
+  <Button onClick={previousStep} disabled={!canGoPrevious}>Back</Button>
+  <Button onClick={nextStep} disabled={!canGoNext}>Next</Button>
+</div>
+```
+
+## Composing Hooks
+
+Hooks are designed to work together for complex functionality:
+
+```tsx
+// Full-featured data table
+const [search, setSearch] = useState('')
+const debouncedSearch = useDebounce(search, 300)
+
+const filtered = useFilter(items, debouncedSearch, (item, query) =>
+  item.name.toLowerCase().includes(query.toLowerCase())
+)
+
+const { sortedItems, sortKey, sortDirection, toggleSort } = useSort(
+  filtered,
+  'date',
+  'desc'
+)
+
+const { paginatedItems, currentPage, totalPages, nextPage, previousPage } =
+  usePagination(sortedItems, 10)
+
+const { selectedIds, toggleSelection, selectAll, clearSelection } =
+  useSelection(paginatedItems)
+```
+
+## Best Practices
+
+1. **Performance**: Use `useDebounce` for search inputs and expensive operations
+2. **Data Management**: Combine `useFilter`, `useSort`, and `usePagination` for tables
+3. **Forms**: Use `useFormValidation` or `useFormState` for form management
+4. **Workflows**: Use `useWizard` or `useSteps` for multi-step processes
+5. **State Persistence**: Use `useLocalStorage` for data that should survive page refreshes
+6. **Complex State**: Use `useArray`, `useMap`, or `useSet` for advanced data structures

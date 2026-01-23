@@ -1,77 +1,205 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './table'
+import { Button } from './button'
+import { EmptyState } from './empty-state'
+import { LoadingSpinner } from './loading-spinner'
+import { QuickPagination } from './quick-pagination'
+import { SortableHeader } from './sortable-header'
+import { Checkbox } from './checkbox'
 
-export interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
-  columns: Array<{
-    key: keyof T
-    header: string
-    width?: string
-    sortable?: boolean
-    render?: (value: any, row: T) => React.ReactNode
-  }>
-  data: T[]
-  onRowClick?: (row: T) => void
-  emptyMessage?: string
+export interface Column<T> {
+  key: string
+  header: string
+  sortable?: boolean
+  render?: (item: T) => React.ReactNode
+  accessor?: (item: T) => any
+  className?: string
+  headerClassName?: string
 }
 
-export function DataTable<T extends Record<string, any>>({
-  columns,
+export interface DataTableProps<T> {
+  data: T[]
+  columns: Column<T>[]
+  loading?: boolean
+  emptyMessage?: string
+  emptyIcon?: React.ReactNode
+  onSort?: (key: string, direction: 'asc' | 'desc') => void
+  sortKey?: string
+  sortDirection?: 'asc' | 'desc'
+  selectable?: boolean
+  selectedIds?: string[]
+  onSelectionChange?: (ids: string[]) => void
+  getRowId?: (item: T) => string
+  onRowClick?: (item: T) => void
+  pagination?: {
+    currentPage: number
+    totalPages: number
+    onPageChange: (page: number) => void
+    itemsPerPage?: number
+    totalItems?: number
+  }
+  className?: string
+}
+
+function DataTable<T>({
   data,
-  onRowClick,
+  columns,
+  loading = false,
   emptyMessage = 'No data available',
-  className,
-  ...props
+  emptyIcon,
+  onSort,
+  sortKey,
+  sortDirection,
+  selectable = false,
+  selectedIds = [],
+  onSelectionChange,
+  getRowId,
+  onRowClick,
+  pagination,
+  className
 }: DataTableProps<T>) {
-  return (
-    <div className={cn('rounded-md border border-border overflow-hidden', className)} {...props}>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-muted">
-            <tr>
-              {columns.map((column) => (
-                <th
-                  key={String(column.key)}
-                  className="px-4 py-3 text-left text-sm font-medium text-muted-foreground"
-                  style={{ width: column.width }}
-                >
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {data.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="px-4 py-8 text-center text-sm text-muted-foreground"
-                >
-                  {emptyMessage}
-                </td>
-              </tr>
-            ) : (
-              data.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  onClick={() => onRowClick?.(row)}
-                  className={cn(
-                    'bg-card hover:bg-muted/50 transition-colors',
-                    onRowClick && 'cursor-pointer'
-                  )}
-                >
-                  {columns.map((column) => (
-                    <td key={String(column.key)} className="px-4 py-3 text-sm">
-                      {column.render
-                        ? column.render(row[column.key], row)
-                        : String(row[column.key] ?? '')}
-                    </td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+  const allSelected = data.length > 0 && selectedIds.length === data.length
+  const someSelected = selectedIds.length > 0 && selectedIds.length < data.length
+
+  const handleSelectAll = () => {
+    if (!onSelectionChange || !getRowId) return
+    
+    if (allSelected) {
+      onSelectionChange([])
+    } else {
+      onSelectionChange(data.map(getRowId))
+    }
+  }
+
+  const handleSelectRow = (id: string) => {
+    if (!onSelectionChange) return
+    
+    if (selectedIds.includes(id)) {
+      onSelectionChange(selectedIds.filter(selectedId => selectedId !== id))
+    } else {
+      onSelectionChange([...selectedIds, id])
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <LoadingSpinner size="lg" />
       </div>
+    )
+  }
+
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        icon={emptyIcon}
+        title={emptyMessage}
+        description="Try adjusting your search or filters"
+      />
+    )
+  }
+
+  return (
+    <div className={cn('space-y-4', className)}>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {selectable && (
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Select all"
+                    className={someSelected ? 'opacity-50' : ''}
+                  />
+                </TableHead>
+              )}
+              {columns.map((column) => (
+                <TableHead
+                  key={column.key}
+                  className={cn(column.headerClassName)}
+                >
+                  {column.sortable && onSort ? (
+                    <SortableHeader
+                      label={column.header}
+                      active={sortKey === column.key}
+                      direction={sortKey === column.key ? sortDirection : undefined}
+                      onClick={() => {
+                        const newDirection = sortKey === column.key && sortDirection === 'asc' ? 'desc' : 'asc'
+                        onSort(column.key, newDirection)
+                      }}
+                    />
+                  ) : (
+                    column.header
+                  )}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item, index) => {
+              const rowId = getRowId ? getRowId(item) : String(index)
+              const isSelected = selectedIds.includes(rowId)
+
+              return (
+                <TableRow
+                  key={rowId}
+                  className={cn(
+                    onRowClick && 'cursor-pointer',
+                    isSelected && 'bg-muted/50'
+                  )}
+                  onClick={() => onRowClick?.(item)}
+                >
+                  {selectable && (
+                    <TableCell>
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => handleSelectRow(rowId)}
+                        aria-label={`Select row ${rowId}`}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </TableCell>
+                  )}
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.key}
+                      className={cn(column.className)}
+                    >
+                      {column.render
+                        ? column.render(item)
+                        : column.accessor
+                          ? column.accessor(item)
+                          : (item as any)[column.key]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+
+      {pagination && (
+        <QuickPagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.onPageChange}
+          itemsPerPage={pagination.itemsPerPage}
+          totalItems={pagination.totalItems}
+          showInfo
+        />
+      )}
     </div>
   )
 }
+
+export { DataTable }

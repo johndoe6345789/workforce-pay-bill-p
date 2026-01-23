@@ -1,20 +1,28 @@
-import { useCallback, useState } from 'react'
+import { useState, useCallback } from 'react'
 
-export function useDownload() {
+export type DownloadFormat = 'csv' | 'json' | 'txt'
+
+export interface UseDownloadReturn {
+  download: (data: string, filename: string, format?: DownloadFormat) => void
+  downloadJSON: (data: any, filename: string) => void
+  downloadCSV: (data: any[], filename: string) => void
+  isDownloading: boolean
+}
+
+export function useDownload(): UseDownloadReturn {
   const [isDownloading, setIsDownloading] = useState(false)
 
-  const downloadFile = useCallback(async (
-    data: string | Blob,
-    filename: string,
-    type?: string
-  ) => {
+  const download = useCallback((data: string, filename: string, format: DownloadFormat = 'txt') => {
     setIsDownloading(true)
-    
-    try {
-      const blob = typeof data === 'string' 
-        ? new Blob([data], { type: type || 'text/plain' })
-        : data
 
+    try {
+      const mimeTypes = {
+        csv: 'text/csv',
+        json: 'application/json',
+        txt: 'text/plain'
+      }
+
+      const blob = new Blob([data], { type: mimeTypes[format] })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -23,43 +31,39 @@ export function useDownload() {
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
-      
-      return true
-    } catch (error) {
-      console.error('Download failed:', error)
-      return false
     } finally {
       setIsDownloading(false)
     }
   }, [])
 
   const downloadJSON = useCallback((data: any, filename: string) => {
-    const json = JSON.stringify(data, null, 2)
-    return downloadFile(json, filename, 'application/json')
-  }, [downloadFile])
+    const jsonString = JSON.stringify(data, null, 2)
+    download(jsonString, `${filename}.json`, 'json')
+  }, [download])
 
   const downloadCSV = useCallback((data: any[], filename: string) => {
-    if (data.length === 0) return Promise.resolve(false)
-    
+    if (data.length === 0) return
+
     const headers = Object.keys(data[0])
-    const csv = [
+    const csvRows = [
       headers.join(','),
-      ...data.map(row => 
+      ...data.map(row =>
         headers.map(header => {
           const value = row[header]
-          const stringValue = String(value ?? '')
-          return stringValue.includes(',') ? `"${stringValue}"` : stringValue
+          const escaped = String(value).replace(/"/g, '""')
+          return `"${escaped}"`
         }).join(',')
       )
-    ].join('\n')
-    
-    return downloadFile(csv, filename, 'text/csv')
-  }, [downloadFile])
+    ]
+
+    const csvString = csvRows.join('\n')
+    download(csvString, `${filename}.csv`, 'csv')
+  }, [download])
 
   return {
-    isDownloading,
-    downloadFile,
+    download,
     downloadJSON,
-    downloadCSV
+    downloadCSV,
+    isDownloading
   }
 }
