@@ -2801,8 +2801,9 @@ function RoadmapView() {
         listItems.push(
           <li key={i} className="flex items-start gap-2 text-sm">
             <span className="mt-0.5">
+              {isCompleted && <span className="text-success">✅</span>}
               {isInProgress && <span className="text-warning">🔄</span>}
-            </span>
+              {isPlanned && <span className="text-muted-foreground">📋</span>}
               {!isCompleted && !isInProgress && !isPlanned && <span className="text-muted-foreground">•</span>}
             </span>
             <span className={cn(
