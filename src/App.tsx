@@ -380,7 +380,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar 
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -389,8 +389,8 @@ function App() {
         metrics={metrics}
       />
 
-      <main className="flex-1 overflow-auto">
-        <div className="border-b border-border bg-card sticky top-0 z-10">
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="border-b border-border bg-card flex-shrink-0 z-10">
           <div className="flex items-center justify-between px-6 py-3">
             <div className="flex-1" />
             <NotificationCenter 
@@ -403,7 +403,7 @@ function App() {
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {currentView === 'dashboard' && (
             <DashboardView metrics={metrics} />
           )}
