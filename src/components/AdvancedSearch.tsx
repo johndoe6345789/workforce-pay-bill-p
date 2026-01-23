@@ -29,7 +29,7 @@ export function AdvancedSearch<T extends Record<string, any>>({
   items,
   fields,
   onResultsChange,
-  placeholder = 'Search or use query language...',
+  placeholder = 'Search by any field or use query language (e.g., status = pending)...',
   className
 }: AdvancedSearchProps<T>) {
   const [query, setQuery] = useState('')
@@ -47,6 +47,15 @@ export function AdvancedSearch<T extends Record<string, any>>({
 
     if (parsed.filters.length > 0) {
       results = applyFilters(results, parsed.filters)
+    } else if (query.trim()) {
+      const searchTerm = query.toLowerCase().trim()
+      results = items.filter(item => {
+        return fields.some(field => {
+          const value = item[field.name]
+          if (value === undefined || value === null) return false
+          return String(value).toLowerCase().includes(searchTerm)
+        })
+      })
     }
 
     if (parsed.sortBy && parsed.sortOrder) {
@@ -54,7 +63,7 @@ export function AdvancedSearch<T extends Record<string, any>>({
     }
 
     return results
-  }, [items, parsed])
+  }, [items, parsed, query, fields])
 
   useEffect(() => {
     onResultsChange(filteredItems)
