@@ -1,14 +1,28 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { Download, Funnel, ChartBar, Warning } from '@phosphor-icons/react'
+import { 
+  Download, 
+  Funnel, 
+  ChartBar, 
+  Warning, 
+  Clock, 
+  CheckCircle,
+  XCircle,
+  FileText,
+  CalendarBlank,
+  CurrencyDollar,
+  TrendUp
+} from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/ui/page-header'
 import { MetricCard } from '@/components/ui/metric-card'
 import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
 import { EmptyState } from '@/components/ui/empty-state'
+import { Separator } from '@/components/ui/separator'
+import { Progress } from '@/components/ui/progress'
 import { TimesheetAdjustmentWizard } from '@/components/TimesheetAdjustmentWizard'
 import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
@@ -130,6 +144,14 @@ export function TimesheetsView({
     { name: 'weekEnding', label: 'Week Ending', type: 'date' }
   ]
 
+  const pendingCount = filteredTimesheets.filter(ts => ts.status === 'pending').length
+  const approvedCount = filteredTimesheets.filter(ts => ts.status === 'approved').length
+  const totalHours = filteredTimesheets.reduce((sum, ts) => sum + ts.hours, 0)
+  const totalValue = filteredTimesheets.reduce((sum, ts) => sum + ts.amount, 0)
+  const approvalRate = filteredTimesheets.length > 0 
+    ? (approvedCount / filteredTimesheets.length) * 100 
+    : 0
+
   return (
     <Stack spacing={6}>
       <PageHeader
@@ -162,52 +184,146 @@ export function TimesheetsView({
       />
 
       {showAnalytics && (
-        <Grid cols={4} gap={4} responsive>
-          <MetricCard
-            label="Total Timesheets"
-            value={filteredTimesheets.length}
-          />
-          <MetricCard
-            label="Total Hours"
-            value={`${filteredTimesheets.reduce((sum, ts) => sum + ts.hours, 0).toFixed(1)}h`}
-          />
-          <MetricCard
-            label="Validation Issues"
-            value={validationStats.invalid}
-            description={validationStats.invalid > 0 ? 'Errors found' : 'All valid'}
-          />
-          <MetricCard
-            label="Total Value"
-            value={`£${filteredTimesheets.reduce((sum, ts) => sum + ts.amount, 0).toLocaleString()}`}
-          />
-        </Grid>
+        <>
+          <Grid cols={4} gap={4} responsive>
+            <MetricCard
+              label="Total Timesheets"
+              value={filteredTimesheets.length}
+              icon={<FileText size={24} />}
+              description={`${pendingCount} pending review`}
+            />
+            <MetricCard
+              label="Total Hours"
+              value={`${totalHours.toFixed(1)}h`}
+              icon={<Clock size={24} />}
+              description="This period"
+            />
+            <MetricCard
+              label="Validation Issues"
+              value={validationStats.invalid}
+              icon={<Warning size={24} />}
+              description={validationStats.invalid > 0 ? 'Errors found' : 'All valid'}
+            />
+            <MetricCard
+              label="Total Value"
+              value={`£${totalValue.toLocaleString()}`}
+              icon={<CurrencyDollar size={24} />}
+              description="Pending invoicing"
+            />
+          </Grid>
+
+          <Grid cols={3} gap={4} responsive>
+            <Card className="border-l-4 border-l-warning">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-medium">Pending</CardTitle>
+                  <Badge variant="outline" className="text-warning border-warning/30 bg-warning/10">
+                    {pendingCount}
+                  </Badge>
+                </div>
+                <CardDescription className="text-xs">Awaiting approval</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-warning">
+                  {pendingCount}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-success">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-medium">Approved</CardTitle>
+                  <Badge variant="outline" className="text-success border-success/30 bg-success/10">
+                    <CheckCircle size={12} weight="bold" className="mr-1" />
+                    {approvedCount}
+                  </Badge>
+                </div>
+                <CardDescription className="text-xs">Ready for billing</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-success">
+                  {approvedCount}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-l-accent">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-medium">Approval Rate</CardTitle>
+                  <Badge variant="outline" className="text-accent border-accent/30 bg-accent/10">
+                    <TrendUp size={12} weight="bold" className="mr-1" />
+                    {approvalRate.toFixed(0)}%
+                  </Badge>
+                </div>
+                <CardDescription className="text-xs">This period</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-accent">
+                  {approvalRate.toFixed(0)}%
+                </div>
+                <Progress value={approvalRate} className="mt-3 h-2" />
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Separator />
+        </>
       )}
 
-      <AdvancedSearch
-        items={timesheetsToFilter}
-        fields={timesheetFields}
-        onResultsChange={handleResultsChange}
-        placeholder="Search timesheets..."
-      />
-
-      <Stack direction="horizontal" spacing={4}>
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-          <SelectTrigger className="w-40">
-            <div className="flex items-center gap-2">
-              <Funnel size={16} />
-              <SelectValue />
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">Search & Filter</CardTitle>
+              <CardDescription className="text-xs mt-1">
+                Find timesheets using advanced search
+              </CardDescription>
             </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
+            <Badge variant="secondary" className="font-mono">
+              {filteredTimesheets.length} results
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <AdvancedSearch
+            items={timesheetsToFilter}
+            fields={timesheetFields}
+            onResultsChange={handleResultsChange}
+            placeholder="Search by worker, client, or status..."
+          />
+        </CardContent>
+      </Card>
+
+      <Stack direction="horizontal" spacing={3} align="center" justify="between">
+        <Stack direction="horizontal" spacing={3}>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+            <SelectTrigger className="w-48">
+              <div className="flex items-center gap-2">
+                <Funnel size={16} />
+                <SelectValue />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {validationStats.invalid > 0 && (
+            <Badge variant="destructive" className="px-3 py-1.5">
+              <Warning size={14} weight="bold" className="mr-1" />
+              {validationStats.invalid} validation {validationStats.invalid === 1 ? 'error' : 'errors'}
+            </Badge>
+          )}
+        </Stack>
+
         <Button variant="outline">
           <Download size={18} className="mr-2" />
-          Export
+          Export CSV
         </Button>
       </Stack>
 
