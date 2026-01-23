@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { parseQuery, applyFilters, applySorting, type ParsedQuery } from '@/lib/query-parser'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -56,7 +56,7 @@ export function AdvancedSearch<T extends Record<string, any>>({
     return results
   }, [items, parsed])
 
-  useMemo(() => {
+  useEffect(() => {
     onResultsChange(filteredItems)
   }, [filteredItems, onResultsChange])
 
