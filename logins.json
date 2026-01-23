@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": "user-001",
+      "email": "admin@workforce.com",
+      "password": "admin123",
+      "name": "Admin User",
+      "role": "admin",
+      "entity": "agency",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
+    },
+    {
+      "id": "user-002",
+      "email": "manager@workforce.com",
+      "password": "manager123",
+      "name": "Manager User",
+      "role": "manager",
+      "entity": "agency",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=manager"
+    },
+    {
+      "id": "user-003",
+      "email": "user@workforce.com",
+      "password": "user123",
+      "name": "Regular User",
+      "role": "user",
+      "entity": "agency",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=user"
+    },
+    {
+      "id": "user-004",
+      "email": "client@company.com",
+      "password": "client123",
+      "name": "Client User",
+      "role": "client",
+      "entity": "client",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=client"
+    }
+  ]
+}
