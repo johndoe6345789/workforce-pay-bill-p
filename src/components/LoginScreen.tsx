@@ -55,6 +55,32 @@ export default function LoginScreen() {
     }, 800)
   }
 
+  const handleExpressAdminLogin = () => {
+    const adminUser = loginsData.users.find(u => u.role === 'System Administrator')
+    
+    if (!adminUser) {
+      toast.error('Admin user not found')
+      return
+    }
+
+    const role = rolesData.roles.find(r => r.id === adminUser.roleId)
+    const permissions = role?.permissions || []
+
+    dispatch(login({
+      id: adminUser.id,
+      email: adminUser.email,
+      name: adminUser.name,
+      role: adminUser.role,
+      roleId: adminUser.roleId,
+      avatarUrl: adminUser.avatarUrl || undefined,
+      permissions
+    }))
+    
+    toast.success(`Express login: Welcome ${adminUser.name}!`)
+  }
+
+  const isDevelopment = import.meta.env.DEV
+
   return (
     <div className="min-h-screen w-full flex">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-accent to-primary/80 relative overflow-hidden">
@@ -197,6 +223,17 @@ export default function LoginScreen() {
             >
               {isLoading ? 'Logging in...' : 'Log In'}
             </Button>
+
+            {isDevelopment && (
+              <Button
+                type="button"
+                onClick={handleExpressAdminLogin}
+                variant="outline"
+                className="w-full h-11 text-base font-medium mt-3 border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+              >
+                🚀 Express Admin Login (Dev Only)
+              </Button>
+            )}
           </form>
 
           <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
