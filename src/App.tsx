@@ -11,6 +11,8 @@ import LoginScreen from '@/components/LoginScreen'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { setCurrentView, setSearchQuery } from '@/store/slices/uiSlice'
 import { setCurrentEntity } from '@/store/slices/authSlice'
+import { Badge } from '@/components/ui/badge'
+import { Code } from '@phosphor-icons/react'
 
 export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase' | 'business-logic-demo' | 'data-admin' | 'translation-demo' | 'profile' | 'roles-permissions'
 
@@ -20,6 +22,7 @@ function App() {
   const currentEntity = useAppSelector(state => state.auth.currentEntity)
   const currentView = useAppSelector(state => state.ui.currentView)
   const searchQuery = useAppSelector(state => state.ui.searchQuery)
+  const isDevelopment = import.meta.env.DEV
 
   useSampleData()
   useViewPreload()
@@ -69,7 +72,14 @@ function App() {
       <main className="flex-1 flex flex-col overflow-hidden">
         <div className="border-b border-border bg-card flex-shrink-0 z-10">
           <div className="flex items-center justify-between px-6 py-3">
-            <div className="flex-1" />
+            <div className="flex-1">
+              {isDevelopment && (
+                <Badge variant="outline" className="bg-warning/10 text-warning-foreground border-warning/30 font-mono text-xs">
+                  <Code className="mr-1.5" size={14} />
+                  Development Mode
+                </Badge>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
               <NotificationCenter 
