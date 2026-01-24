@@ -48,6 +48,7 @@ const TranslationDemo = lazy(() => import('@/components/TranslationDemo').then(m
 const ProfileView = lazy(() => import('@/components/views/profile-view').then(m => ({ default: m.ProfileView })))
 const RolesPermissionsView = lazy(() => import('@/components/views/roles-permissions-view').then(m => ({ default: m.RolesPermissionsView })))
 const ApprovalWorkflowTemplateManager = lazy(() => import('@/components/ApprovalWorkflowTemplateManager').then(m => ({ default: m.ApprovalWorkflowTemplateManager })))
+const ParallelApprovalDemo = lazy(() => import('@/components/ParallelApprovalDemo').then(m => ({ default: m.ParallelApprovalDemo })))
 
 interface ViewRouterProps {
   currentView: View
@@ -264,6 +265,9 @@ export function ViewRouter({
 
     case 'workflow-templates':
       return <ApprovalWorkflowTemplateManager />
+
+    case 'parallel-approval-demo':
+      return <ParallelApprovalDemo />
 
     default:
       return <DashboardView metrics={metrics} />

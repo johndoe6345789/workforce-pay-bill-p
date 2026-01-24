@@ -18,7 +18,8 @@ import {
   CalendarBlank,
   Translate,
   Shield,
-  FlowArrow
+  FlowArrow,
+  Users
 } from '@phosphor-icons/react'
 import { NavItem } from './NavItem'
 import { NavGroup } from './NavGroup'
@@ -196,6 +197,14 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         onClick={() => setCurrentView('workflow-templates')}
         view="workflow-templates"
         permission="settings.edit"
+      />
+      <NavItem
+        icon={<Users size={20} />}
+        label="Parallel Approvals"
+        active={currentView === 'parallel-approval-demo'}
+        onClick={() => setCurrentView('parallel-approval-demo')}
+        view="parallel-approval-demo"
+        permission="settings.view"
       />
     </NavGroup>
   )

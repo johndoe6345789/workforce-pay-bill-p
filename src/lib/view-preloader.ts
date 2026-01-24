@@ -32,6 +32,7 @@ const viewPreloadMap: Record<View, () => Promise<any>> = {
   'profile': () => import('@/components/views/profile-view'),
   'roles-permissions': () => import('@/components/views/roles-permissions-view'),
   'workflow-templates': () => import('@/components/ApprovalWorkflowTemplateManager'),
+  'parallel-approval-demo': () => import('@/components/ParallelApprovalDemo'),
 }
 
 const preloadedViews = new Set<View>()

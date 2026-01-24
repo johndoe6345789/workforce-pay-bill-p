@@ -10,6 +10,22 @@ export interface ApprovalStep {
   approvedDate?: string
   rejectedDate?: string
   comments?: string
+  isParallel?: boolean
+  parallelGroup?: string
+  parallelApprovals?: ParallelApproval[]
+  parallelApprovalMode?: 'all' | 'any' | 'majority'
+}
+
+export interface ParallelApproval {
+  id: string
+  approverId: string
+  approverName: string
+  approverRole: string
+  status: 'pending' | 'approved' | 'rejected'
+  approvedDate?: string
+  rejectedDate?: string
+  comments?: string
+  isRequired: boolean
 }
 
 export interface ApprovalWorkflow {
@@ -54,7 +70,7 @@ export function useApprovalWorkflow() {
   )
 
   const approveStep = useCallback(
-    async (workflowId: string, stepId: string, comments?: string) => {
+    async (workflowId: string, stepId: string, comments?: string, approverId?: string) => {
       const user = await window.spark.user()
       if (!user) return
       
@@ -65,12 +81,38 @@ export function useApprovalWorkflow() {
 
           const updatedSteps = wf.steps.map((step) => {
             if (step.id === stepId) {
-              return {
-                ...step,
-                status: 'approved' as const,
-                approverName: user.login,
-                approvedDate: new Date().toISOString(),
-                comments,
+              if (step.isParallel && step.parallelApprovals && approverId) {
+                const updatedParallelApprovals = step.parallelApprovals.map((pa) => {
+                  if (pa.id === approverId) {
+                    return {
+                      ...pa,
+                      status: 'approved' as const,
+                      approvedDate: new Date().toISOString(),
+                      comments,
+                    }
+                  }
+                  return pa
+                })
+
+                const isStepComplete = checkParallelStepCompletion(
+                  updatedParallelApprovals,
+                  step.parallelApprovalMode || 'all'
+                )
+
+                return {
+                  ...step,
+                  parallelApprovals: updatedParallelApprovals,
+                  status: isStepComplete ? ('approved' as const) : ('pending' as const),
+                  approvedDate: isStepComplete ? new Date().toISOString() : undefined,
+                }
+              } else {
+                return {
+                  ...step,
+                  status: 'approved' as const,
+                  approverName: user.login,
+                  approvedDate: new Date().toISOString(),
+                  comments,
+                }
               }
             }
             return step
@@ -96,8 +138,33 @@ export function useApprovalWorkflow() {
     [setWorkflows]
   )
 
+  const checkParallelStepCompletion = (
+    parallelApprovals: ParallelApproval[],
+    mode: 'all' | 'any' | 'majority'
+  ): boolean => {
+    const requiredApprovals = parallelApprovals.filter((pa) => pa.isRequired)
+    const allApprovals = parallelApprovals
+
+    const requiredApproved = requiredApprovals.every((pa) => pa.status === 'approved')
+    if (!requiredApproved) return false
+
+    const approvedCount = allApprovals.filter((pa) => pa.status === 'approved').length
+    const totalCount = allApprovals.length
+
+    switch (mode) {
+      case 'all':
+        return approvedCount === totalCount
+      case 'any':
+        return approvedCount > 0
+      case 'majority':
+        return approvedCount > totalCount / 2
+      default:
+        return false
+    }
+  }
+
   const rejectStep = useCallback(
-    async (workflowId: string, stepId: string, comments?: string) => {
+    async (workflowId: string, stepId: string, comments?: string, approverId?: string) => {
       const user = await window.spark.user()
       if (!user) return
       
@@ -108,22 +175,49 @@ export function useApprovalWorkflow() {
 
           const updatedSteps = wf.steps.map((step) => {
             if (step.id === stepId) {
-              return {
-                ...step,
-                status: 'rejected' as const,
-                approverName: user.login,
-                rejectedDate: new Date().toISOString(),
-                comments,
+              if (step.isParallel && step.parallelApprovals && approverId) {
+                const updatedParallelApprovals = step.parallelApprovals.map((pa) => {
+                  if (pa.id === approverId) {
+                    return {
+                      ...pa,
+                      status: 'rejected' as const,
+                      rejectedDate: new Date().toISOString(),
+                      comments,
+                    }
+                  }
+                  return pa
+                })
+
+                const hasRequiredRejection = updatedParallelApprovals.some(
+                  (pa) => pa.isRequired && pa.status === 'rejected'
+                )
+
+                return {
+                  ...step,
+                  parallelApprovals: updatedParallelApprovals,
+                  status: hasRequiredRejection ? ('rejected' as const) : ('pending' as const),
+                  rejectedDate: hasRequiredRejection ? new Date().toISOString() : undefined,
+                }
+              } else {
+                return {
+                  ...step,
+                  status: 'rejected' as const,
+                  approverName: user.login,
+                  rejectedDate: new Date().toISOString(),
+                  comments,
+                }
               }
             }
             return step
           })
 
+          const hasRejectedStep = updatedSteps.some((s) => s.status === 'rejected')
+
           return {
             ...wf,
             steps: updatedSteps,
-            status: 'rejected' as const,
-            completedDate: new Date().toISOString(),
+            status: hasRejectedStep ? ('rejected' as const) : wf.status,
+            completedDate: hasRejectedStep ? new Date().toISOString() : wf.completedDate,
           }
         })
       })

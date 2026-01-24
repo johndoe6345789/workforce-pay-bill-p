@@ -12,6 +12,18 @@ export interface ApprovalStepTemplate {
   skipConditions?: StepCondition[]
   autoApprovalConditions?: StepCondition[]
   escalationRules?: EscalationRule[]
+  isParallel?: boolean
+  parallelGroup?: string
+  parallelApprovalMode?: 'all' | 'any' | 'majority'
+  parallelApprovers?: ParallelApprover[]
+}
+
+export interface ParallelApprover {
+  id: string
+  name: string
+  role: string
+  email?: string
+  isRequired: boolean
 }
 
 export interface StepCondition {
