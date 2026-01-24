@@ -8,12 +8,15 @@ import {
   Users,
   CalendarBlank,
   ClockCounterClockwise,
-  Trash
+  Trash,
+  Stack as StackIcon,
+  CheckCircle
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PageHeader } from '@/components/ui/page-header'
 import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
@@ -21,8 +24,12 @@ import { MetricCard } from '@/components/ui/metric-card'
 import { PayrollDetailDialog } from '@/components/PayrollDetailDialog'
 import { OneClickPayroll } from '@/components/OneClickPayroll'
 import { CreatePayrollDialog } from '@/components/CreatePayrollDialog'
+import { PayrollBatchProcessor } from '@/components/PayrollBatchProcessor'
+import { PayrollBatchList } from '@/components/PayrollBatchList'
 import { usePayrollCalculations } from '@/hooks/use-payroll-calculations'
 import { usePayrollCrud } from '@/hooks/use-payroll-crud'
+import { usePayrollBatch } from '@/hooks/use-payroll-batch'
+import { useAppSelector } from '@/store/hooks'
 import { toast } from 'sonner'
 import type { Timesheet } from '@/lib/types'
 
@@ -38,6 +45,10 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [calculatorGrossPay, setCalculatorGrossPay] = useState('1000')
   const [calculatorResult, setCalculatorResult] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState('overview')
+  
+  const currentUser = useAppSelector(state => state.auth.user)
+  const currentUserRole = currentUser?.role || 'user'
   
   const {
     payrollRuns,
@@ -45,6 +56,8 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
     updatePayrollRun,
     deletePayrollRun
   } = usePayrollCrud()
+  
+  const { batches } = usePayrollBatch()
   
   const { 
     calculatePayroll, 
@@ -70,6 +83,16 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
   const lastRun = useMemo(() => 
     payrollRuns.length > 0 ? payrollRuns[payrollRuns.length - 1] : null,
     [payrollRuns]
+  )
+  
+  const pendingBatches = useMemo(() => 
+    batches.filter(b => b.status === 'pending-approval'),
+    [batches]
+  )
+  
+  const completedBatches = useMemo(() =>
+    batches.filter(b => b.status === 'completed'),
+    [batches]
   )
 
   const handleCalculate = () => {
@@ -208,129 +231,171 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
         workers={workers}
       />
 
-      <OneClickPayroll 
-        timesheets={timesheets}
-        onPayrollComplete={handlePayrollComplete}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="overview">
+            <CurrencyDollar className="mr-2" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="batch-processing">
+            <StackIcon className="mr-2" />
+            Batch Processing
+            {pendingBatches.length > 0 && (
+              <Badge className="ml-2" variant="destructive">
+                {pendingBatches.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="approval-queue">
+            <CheckCircle className="mr-2" />
+            Approval Queue
+          </TabsTrigger>
+        </TabsList>
 
-      {showAnalytics && (
-        <Grid cols={4} gap={4}>
-          <MetricCard
-            label="Approved Timesheets"
-            value={approvedTimesheets.length}
-            description="Ready for payroll"
-            icon={<Users size={24} />}
+        <TabsContent value="overview" className="space-y-6">
+          <OneClickPayroll 
+            timesheets={timesheets}
+            onPayrollComplete={handlePayrollComplete}
           />
-          <MetricCard
-            label="Pending Approval"
-            value={pendingTimesheets.length}
-            description={`£${totalPendingValue.toLocaleString()} value`}
-            icon={<ClockCounterClockwise size={24} />}
-          />
-          <MetricCard
-            label="Total Payroll Runs"
-            value={payrollRuns.length}
-            icon={<CurrencyDollar size={24} />}
-          />
-          <MetricCard
-            label="Last Run Total"
-            value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
-            description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
-            icon={<Download size={24} />}
-          />
-        </Grid>
-      )}
 
-      <Grid cols={3} gap={4}>
-        <MetricCard
-          label="Next Pay Date"
-          value="22 Jan 2025"
-          description="Weekly run in 3 days"
-          icon={<CalendarBlank size={24} />}
-        />
-        <MetricCard
-          label="Pending Approval"
-          value={`${pendingTimesheets.length} timesheets`}
-          description="Must be approved for payroll"
-          icon={<ClockCounterClockwise size={24} />}
-        />
-        <MetricCard
-          label="Last Run Total"
-          value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
-          description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
-          icon={<CurrencyDollar size={24} />}
-        />
-      </Grid>
+          {showAnalytics && (
+            <Grid cols={4} gap={4}>
+              <MetricCard
+                label="Approved Timesheets"
+                value={approvedTimesheets.length}
+                description="Ready for payroll"
+                icon={<Users size={24} />}
+              />
+              <MetricCard
+                label="Pending Approval"
+                value={pendingTimesheets.length}
+                description={`£${totalPendingValue.toLocaleString()} value`}
+                icon={<ClockCounterClockwise size={24} />}
+              />
+              <MetricCard
+                label="Total Payroll Runs"
+                value={payrollRuns.length}
+                icon={<CurrencyDollar size={24} />}
+              />
+              <MetricCard
+                label="Last Run Total"
+                value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
+                description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
+                icon={<Download size={24} />}
+              />
+            </Grid>
+          )}
 
-      <Stack spacing={3}>
-        {payrollRuns.map(run => (
-          <Card 
-            key={run.id}
-            className="hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => setViewingPayroll(run)}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <Stack spacing={2} className="flex-1">
-                  <Stack direction="horizontal" spacing={3} align="center">
-                    <CurrencyDollar size={20} weight="fill" className="text-primary" />
-                    <h3 className="font-semibold text-lg">Payroll Run</h3>
-                    <Badge variant={run.status === 'completed' ? 'success' : run.status === 'failed' ? 'destructive' : 'warning'}>
-                      {run.status}
-                    </Badge>
-                  </Stack>
-                  <Grid cols={4} gap={4} className="text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Period Ending</p>
-                      <p className="font-medium">{new Date(run.periodEnding).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Workers</p>
-                      <p className="font-medium">{run.workersCount}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Total Amount</p>
-                      <p className="font-semibold font-mono text-lg">£{run.totalAmount.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Processed</p>
-                      <p className="font-medium">
-                        {run.processedDate ? new Date(run.processedDate).toLocaleDateString() : 'Not yet'}
-                      </p>
-                    </div>
-                  </Grid>
-                </Stack>
-                <Stack direction="horizontal" spacing={2} className="ml-4" onClick={(e) => e.stopPropagation()}>
-                  <Button size="sm" variant="outline" onClick={() => setViewingPayroll(run)}>
-                    View Details
-                  </Button>
-                  {run.status === 'completed' && (
-                    <Button size="sm" variant="outline">
-                      <Download size={16} className="mr-2" />
-                      Export
-                    </Button>
-                  )}
-                  <Button 
-                    size="sm" 
-                    variant="destructive"
-                    onClick={() => handleDeletePayrollRun(run.id)}
-                  >
-                    <Trash size={16} />
-                  </Button>
-                </Stack>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+          <Grid cols={3} gap={4}>
+            <MetricCard
+              label="Next Pay Date"
+              value="22 Jan 2025"
+              description="Weekly run in 3 days"
+              icon={<CalendarBlank size={24} />}
+            />
+            <MetricCard
+              label="Pending Approval"
+              value={`${pendingTimesheets.length} timesheets`}
+              description="Must be approved for payroll"
+              icon={<ClockCounterClockwise size={24} />}
+            />
+            <MetricCard
+              label="Last Run Total"
+              value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
+              description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
+              icon={<CurrencyDollar size={24} />}
+            />
+          </Grid>
 
-        {payrollRuns.length === 0 && (
-          <Card className="p-12 text-center">
-            <CurrencyDollar size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No payroll runs yet</h3>
-            <p className="text-muted-foreground">Create your first payroll run to get started</p>
-          </Card>
-        )}
-      </Stack>
+          <Stack spacing={3}>
+            {payrollRuns.map(run => (
+              <Card 
+                key={run.id}
+                className="hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => setViewingPayroll(run)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <Stack spacing={2} className="flex-1">
+                      <Stack direction="horizontal" spacing={3} align="center">
+                        <CurrencyDollar size={20} weight="fill" className="text-primary" />
+                        <h3 className="font-semibold text-lg">Payroll Run</h3>
+                        <Badge variant={run.status === 'completed' ? 'success' : run.status === 'failed' ? 'destructive' : 'warning'}>
+                          {run.status}
+                        </Badge>
+                      </Stack>
+                      <Grid cols={4} gap={4} className="text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Period Ending</p>
+                          <p className="font-medium">{new Date(run.periodEnding).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Workers</p>
+                          <p className="font-medium">{run.workersCount}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Total Amount</p>
+                          <p className="font-semibold font-mono text-lg">£{run.totalAmount.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Processed</p>
+                          <p className="font-medium">
+                            {run.processedDate ? new Date(run.processedDate).toLocaleDateString() : 'Not yet'}
+                          </p>
+                        </div>
+                      </Grid>
+                    </Stack>
+                    <Stack direction="horizontal" spacing={2} className="ml-4" onClick={(e) => e.stopPropagation()}>
+                      <Button size="sm" variant="outline" onClick={() => setViewingPayroll(run)}>
+                        View Details
+                      </Button>
+                      {run.status === 'completed' && (
+                        <Button size="sm" variant="outline">
+                          <Download size={16} className="mr-2" />
+                          Export
+                        </Button>
+                      )}
+                      <Button 
+                        size="sm" 
+                        variant="destructive"
+                        onClick={() => handleDeletePayrollRun(run.id)}
+                      >
+                        <Trash size={16} />
+                      </Button>
+                    </Stack>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {payrollRuns.length === 0 && (
+              <Card className="p-12 text-center">
+                <CurrencyDollar size={48} className="mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No payroll runs yet</h3>
+                <p className="text-muted-foreground">Create your first payroll run to get started</p>
+              </Card>
+            )}
+          </Stack>
+        </TabsContent>
+
+        <TabsContent value="batch-processing" className="space-y-6">
+          <PayrollBatchProcessor
+            timesheets={timesheets}
+            workers={workers}
+            onBatchComplete={() => {
+              toast.success('Batch created and submitted for approval')
+              setActiveTab('approval-queue')
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="approval-queue" className="space-y-6">
+          <PayrollBatchList
+            currentUserRole={currentUserRole}
+            currentUserName={currentUser?.name || 'Unknown User'}
+          />
+        </TabsContent>
+      </Tabs>
 
       <PayrollDetailDialog
         payrollRun={viewingPayroll}
