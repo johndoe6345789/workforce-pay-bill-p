@@ -37,3 +37,10 @@ export function useExpensesCRUD() {
 export function useRateCardsCRUD() {
   return useCRUD<RateCard>(STORES.RATE_CARDS)
 }
+
+export { useTimesheetsCrud } from './use-timesheets-crud'
+export { useInvoicesCrud } from './use-invoices-crud'
+export { usePayrollCrud } from './use-payroll-crud'
+export { useExpensesCrud } from './use-expenses-crud'
+export { useComplianceCrud } from './use-compliance-crud'
+export { useWorkersCrud } from './use-workers-crud'

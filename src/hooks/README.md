@@ -45,6 +45,21 @@ A comprehensive collection of 100+ React hooks for the WorkForce Pro platform.
 - **useSelection** - Multi-select management
 - **useTable** - Complete table with sort/filter/pagination
 
+### IndexedDB CRUD Operations (13 hooks)
+- **useCRUD** - Generic CRUD operations for any entity type
+- **useTimesheetsCRUD** - Generic timesheet CRUD operations
+- **useInvoicesCRUD** - Generic invoice CRUD operations
+- **usePayrollRunsCRUD** - Generic payroll run CRUD operations
+- **useWorkersCRUD** - Generic worker CRUD operations
+- **useComplianceDocsCRUD** - Generic compliance document CRUD operations
+- **useExpensesCRUD** - Generic expense CRUD operations
+- **useTimesheetsCrud** - Enhanced timesheet CRUD with domain methods
+- **useInvoicesCrud** - Enhanced invoice CRUD with domain methods
+- **usePayrollCrud** - Enhanced payroll CRUD with domain methods
+- **useExpensesCrud** - Enhanced expense CRUD with domain methods
+- **useComplianceCrud** - Enhanced compliance CRUD with domain methods
+- **useWorkersCrud** - Enhanced worker CRUD with domain methods
+
 ### Forms & Validation (5 hooks)
 - **useFormValidation** - Form validation with error handling
 - **useWizard** - Multi-step form/wizard state
@@ -230,6 +245,107 @@ const {
   nextPage,
   previousPage
 } = usePagination(allItems, 10)
+```
+
+### useTimesheetsCrud (IndexedDB CRUD)
+```tsx
+import { useTimesheetsCrud } from '@/hooks'
+
+const {
+  timesheets,
+  createTimesheet,
+  updateTimesheet,
+  deleteTimesheet,
+  getTimesheetById,
+  getTimesheetsByWorker,
+  getTimesheetsByStatus,
+  bulkCreateTimesheets,
+  bulkUpdateTimesheets
+} = useTimesheetsCrud()
+
+// Create a new timesheet
+const newTimesheet = await createTimesheet({
+  workerName: 'John Doe',
+  clientName: 'Acme Corp',
+  weekEnding: '2024-01-15',
+  totalHours: 40,
+  status: 'pending'
+})
+
+// Update existing timesheet
+await updateTimesheet('timesheet-123', {
+  status: 'approved',
+  approvedDate: new Date().toISOString()
+})
+
+// Delete timesheet
+await deleteTimesheet('timesheet-123')
+
+// Query by index
+const workerTimesheets = await getTimesheetsByWorker('worker-123')
+const pendingTimesheets = await getTimesheetsByStatus('pending')
+
+// Bulk operations
+await bulkCreateTimesheets([...timesheetData])
+await bulkUpdateTimesheets([
+  { id: 'ts-1', updates: { status: 'approved' } },
+  { id: 'ts-2', updates: { status: 'approved' } }
+])
+```
+
+### useInvoicesCrud (IndexedDB CRUD)
+```tsx
+import { useInvoicesCrud } from '@/hooks'
+
+const {
+  invoices,
+  createInvoice,
+  updateInvoice,
+  deleteInvoice,
+  getInvoiceById,
+  getInvoicesByClient,
+  getInvoicesByStatus
+} = useInvoicesCrud()
+
+// Create invoice
+const newInvoice = await createInvoice({
+  invoiceNumber: 'INV-001',
+  clientName: 'Acme Corp',
+  amount: 5000,
+  status: 'draft'
+})
+
+// Query by client
+const clientInvoices = await getInvoicesByClient('client-123')
+```
+
+### useCRUD (Generic IndexedDB CRUD)
+```tsx
+import { useCRUD } from '@/hooks'
+import { STORES } from '@/lib/indexed-db'
+
+const {
+  entities,
+  create,
+  read,
+  readAll,
+  readByIndex,
+  update,
+  remove,
+  bulkCreate,
+  bulkUpdate,
+  query
+} = useCRUD<MyEntity>(STORES.MY_STORE)
+
+// Generic CRUD operations
+const newEntity = await create({ name: 'New Entity', value: 123 })
+const entity = await read('entity-123')
+const all = await readAll()
+await update('entity-123', { value: 456 })
+await remove('entity-123')
+
+// Custom queries
+const filtered = await query((entity) => entity.value > 100)
 ```
 
 ### useSelection

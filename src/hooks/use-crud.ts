@@ -1,179 +1,149 @@
-import { useState, useCallback } from 'react'
-import { indexedDB, BaseEntity } from '@/lib/indexed-db'
+import { useCallback } from 'react'
+import { indexedDB, type BaseEntity } from '@/lib/indexed-db'
+import { useIndexedDBState } from './use-indexed-db-state'
 
-interface CRUDHookResult<T extends BaseEntity> {
-  data: T[]
-  isLoading: boolean
-  error: Error | null
-  create: (entity: T) => Promise<T>
-  read: (id: string) => Promise<T | null>
-  readAll: () => Promise<T[]>
-  readByIndex: (indexName: string, value: any) => Promise<T[]>
-  update: (entity: T) => Promise<T>
-  remove: (id: string) => Promise<void>
-  removeAll: () => Promise<void>
-  bulkCreate: (entities: T[]) => Promise<T[]>
-  bulkUpdate: (entities: T[]) => Promise<T[]>
-  query: (predicate: (entity: T) => boolean) => Promise<T[]>
-  refresh: () => Promise<void>
-}
+export function useCRUD<T extends BaseEntity>(storeName: string) {
+  const [entities, setEntities] = useIndexedDBState<T[]>(storeName, [])
 
-export function useCRUD<T extends BaseEntity>(storeName: string): CRUDHookResult<T> {
-  const [data, setData] = useState<T[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-
-  const refresh = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
+  const create = useCallback(async (entity: Omit<T, 'id'>) => {
+    const newEntity = {
+      ...entity,
+      id: `${storeName}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+    } as T
+    
     try {
-      const entities = await indexedDB.readAll<T>(storeName)
-      setData(entities)
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to load data')
-      setError(error)
-      throw error
-    } finally {
-      setIsLoading(false)
-    }
-  }, [storeName])
-
-  const create = useCallback(async (entity: T): Promise<T> => {
-    setError(null)
-    try {
-      const created = await indexedDB.create(storeName, entity)
-      await refresh()
-      return created
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to create entity')
-      setError(error)
+      await indexedDB.create(storeName, newEntity)
+      setEntities(current => [...current, newEntity])
+      return newEntity
+    } catch (error) {
+      console.error(`Failed to create entity in ${storeName}:`, error)
       throw error
     }
-  }, [storeName, refresh])
+  }, [storeName, setEntities])
 
-  const read = useCallback(async (id: string): Promise<T | null> => {
-    setError(null)
+  const read = useCallback(async (id: string) => {
     try {
       return await indexedDB.read<T>(storeName, id)
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to read entity')
-      setError(error)
+    } catch (error) {
+      console.error(`Failed to read entity from ${storeName}:`, error)
       throw error
     }
   }, [storeName])
 
-  const readAll = useCallback(async (): Promise<T[]> => {
-    setError(null)
+  const readAll = useCallback(async () => {
     try {
-      const entities = await indexedDB.readAll<T>(storeName)
-      setData(entities)
-      return entities
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to read all entities')
-      setError(error)
+      return await indexedDB.readAll<T>(storeName)
+    } catch (error) {
+      console.error(`Failed to read all entities from ${storeName}:`, error)
       throw error
     }
   }, [storeName])
 
-  const readByIndex = useCallback(async (indexName: string, value: any): Promise<T[]> => {
-    setError(null)
+  const readByIndex = useCallback(async (indexName: string, value: any) => {
     try {
       return await indexedDB.readByIndex<T>(storeName, indexName, value)
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to read entities by index')
-      setError(error)
+    } catch (error) {
+      console.error(`Failed to read entities by index from ${storeName}:`, error)
       throw error
     }
   }, [storeName])
 
-  const update = useCallback(async (entity: T): Promise<T> => {
-    setError(null)
+  const update = useCallback(async (id: string, updates: Partial<T>) => {
     try {
-      const updated = await indexedDB.update(storeName, entity)
-      await refresh()
+      const existing = await indexedDB.read<T>(storeName, id)
+      if (!existing) throw new Error(`Entity not found in ${storeName}`)
+
+      const updated = { ...existing, ...updates }
+      await indexedDB.update(storeName, updated)
+      
+      setEntities(current =>
+        current.map(e => e.id === id ? updated : e)
+      )
       return updated
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to update entity')
-      setError(error)
+    } catch (error) {
+      console.error(`Failed to update entity in ${storeName}:`, error)
       throw error
     }
-  }, [storeName, refresh])
+  }, [storeName, setEntities])
 
-  const remove = useCallback(async (id: string): Promise<void> => {
-    setError(null)
+  const remove = useCallback(async (id: string) => {
     try {
       await indexedDB.delete(storeName, id)
-      await refresh()
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to delete entity')
-      setError(error)
+      setEntities(current => current.filter(e => e.id !== id))
+    } catch (error) {
+      console.error(`Failed to delete entity from ${storeName}:`, error)
       throw error
     }
-  }, [storeName, refresh])
+  }, [storeName, setEntities])
 
-  const removeAll = useCallback(async (): Promise<void> => {
-    setError(null)
+  const bulkCreate = useCallback(async (entitiesData: Omit<T, 'id'>[]) => {
     try {
-      await indexedDB.deleteAll(storeName)
-      setData([])
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to delete all entities')
-      setError(error)
+      const newEntities = entitiesData.map(data => ({
+        ...data,
+        id: `${storeName}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+      })) as T[]
+
+      await indexedDB.bulkCreate(storeName, newEntities)
+      setEntities(current => [...current, ...newEntities])
+      return newEntities
+    } catch (error) {
+      console.error(`Failed to bulk create entities in ${storeName}:`, error)
       throw error
     }
-  }, [storeName])
+  }, [storeName, setEntities])
 
-  const bulkCreate = useCallback(async (entities: T[]): Promise<T[]> => {
-    setError(null)
+  const bulkUpdate = useCallback(async (updates: { id: string; updates: Partial<T> }[]) => {
     try {
-      const created = await indexedDB.bulkCreate(storeName, entities)
-      await refresh()
-      return created
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to bulk create entities')
-      setError(error)
+      const updatedEntities = await Promise.all(
+        updates.map(async ({ id, updates: data }) => {
+          const existing = await indexedDB.read<T>(storeName, id)
+          if (!existing) throw new Error(`Entity ${id} not found in ${storeName}`)
+          return { ...existing, ...data }
+        })
+      )
+
+      await indexedDB.bulkUpdate(storeName, updatedEntities)
+      
+      setEntities(current =>
+        current.map(e => {
+          const updated = updatedEntities.find(u => u.id === e.id)
+          return updated || e
+        })
+      )
+      
+      return updatedEntities
+    } catch (error) {
+      console.error(`Failed to bulk update entities in ${storeName}:`, error)
       throw error
     }
-  }, [storeName, refresh])
+  }, [storeName, setEntities])
 
-  const bulkUpdate = useCallback(async (entities: T[]): Promise<T[]> => {
-    setError(null)
-    try {
-      const updated = await indexedDB.bulkUpdate(storeName, entities)
-      await refresh()
-      return updated
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to bulk update entities')
-      setError(error)
-      throw error
-    }
-  }, [storeName, refresh])
-
-  const query = useCallback(async (predicate: (entity: T) => boolean): Promise<T[]> => {
-    setError(null)
+  const query = useCallback(async (predicate: (entity: T) => boolean) => {
     try {
       return await indexedDB.query<T>(storeName, predicate)
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to query entities')
-      setError(error)
+    } catch (error) {
+      console.error(`Failed to query entities in ${storeName}:`, error)
       throw error
     }
   }, [storeName])
 
   return {
-    data,
-    isLoading,
-    error,
+    entities,
     create,
     read,
     readAll,
     readByIndex,
     update,
     remove,
-    removeAll,
     bulkCreate,
     bulkUpdate,
-    query,
-    refresh,
+    query
   }
 }
+
+export { useTimesheetsCrud } from './use-timesheets-crud'
+export { useInvoicesCrud } from './use-invoices-crud'
+export { usePayrollCrud } from './use-payroll-crud'
+export { useExpensesCrud } from './use-expenses-crud'
+export { useComplianceCrud } from './use-compliance-crud'
+export { useWorkersCrud } from './use-workers-crud'

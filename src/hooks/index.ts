@@ -114,7 +114,13 @@ export {
   useWorkersCRUD,
   useComplianceDocsCRUD,
   useExpensesCRUD,
-  useRateCardsCRUD
+  useRateCardsCRUD,
+  useTimesheetsCrud,
+  useInvoicesCrud,
+  usePayrollCrud,
+  useExpensesCrud,
+  useComplianceCrud,
+  useWorkersCrud
 } from './use-entity-crud'
 
 export type { AsyncState } from './use-async'
