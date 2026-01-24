@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 import type { 
   Timesheet, 
@@ -19,47 +20,49 @@ export function useAppActions(
   setExpenses: (updater: (current: Expense[]) => Expense[]) => void,
   addNotification: (notification: any) => void
 ) {
-  const handleApproveTimesheet = (id: string) => {
-    setTimesheets(current => 
-      current.map(t => 
+  const handleApproveTimesheet = useCallback((id: string) => {
+    setTimesheets(current => {
+      const updated = current.map(t => 
         t.id === id 
-          ? { ...t, status: 'approved', approvedDate: new Date().toISOString() }
+          ? { ...t, status: 'approved' as const, approvedDate: new Date().toISOString() }
           : t
       )
-    )
-    const timesheet = timesheets.find(t => t.id === id)
-    if (timesheet) {
-      addNotification({
-        type: 'timesheet',
-        priority: 'medium',
-        title: 'Timesheet Approved',
-        message: `${timesheet.workerName}'s timesheet for ${new Date(timesheet.weekEnding).toLocaleDateString()} has been approved`,
-        relatedId: id
-      })
-    }
+      const timesheet = updated.find(t => t.id === id)
+      if (timesheet) {
+        addNotification({
+          type: 'timesheet',
+          priority: 'medium',
+          title: 'Timesheet Approved',
+          message: `${timesheet.workerName}'s timesheet for ${new Date(timesheet.weekEnding).toLocaleDateString()} has been approved`,
+          relatedId: id
+        })
+      }
+      return updated
+    })
     toast.success('Timesheet approved successfully')
-  }
+  }, [setTimesheets, addNotification])
 
-  const handleRejectTimesheet = (id: string) => {
-    setTimesheets(current => 
-      current.map(t => 
+  const handleRejectTimesheet = useCallback((id: string) => {
+    setTimesheets(current => {
+      const updated = current.map(t => 
         t.id === id 
-          ? { ...t, status: 'rejected' }
+          ? { ...t, status: 'rejected' as const }
           : t
       )
-    )
-    const timesheet = timesheets.find(t => t.id === id)
-    if (timesheet) {
-      addNotification({
-        type: 'timesheet',
-        priority: 'medium',
-        title: 'Timesheet Rejected',
-        message: `${timesheet.workerName}'s timesheet for ${new Date(timesheet.weekEnding).toLocaleDateString()} has been rejected`,
-        relatedId: id
-      })
-    }
+      const timesheet = updated.find(t => t.id === id)
+      if (timesheet) {
+        addNotification({
+          type: 'timesheet',
+          priority: 'medium',
+          title: 'Timesheet Rejected',
+          message: `${timesheet.workerName}'s timesheet for ${new Date(timesheet.weekEnding).toLocaleDateString()} has been rejected`,
+          relatedId: id
+        })
+      }
+      return updated
+    })
     toast.error('Timesheet rejected')
-  }
+  }, [setTimesheets, addNotification])
 
   const handleAdjustTimesheet = (timesheetId: string, adjustment: any) => {
     setTimesheets(current => 
@@ -84,22 +87,28 @@ export function useAppActions(
   }
 
   const handleCreateInvoice = (timesheetId: string) => {
-    const timesheet = timesheets.find(t => t.id === timesheetId)
-    if (!timesheet) return
+    setTimesheets(current => {
+      const timesheet = current.find(t => t.id === timesheetId)
+      if (!timesheet) return current
 
-    const newInvoice: Invoice = {
-      id: `INV-${Date.now()}`,
-      invoiceNumber: `INV-${String(invoices.length + 1).padStart(5, '0')}`,
-      clientName: timesheet.clientName,
-      issueDate: new Date().toISOString().split('T')[0],
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      amount: timesheet.amount,
-      status: 'draft',
-      currency: 'GBP'
-    }
+      setInvoices(currentInvoices => {
+        const newInvoice: Invoice = {
+          id: `INV-${Date.now()}`,
+          invoiceNumber: `INV-${String(currentInvoices.length + 1).padStart(5, '0')}`,
+          clientName: timesheet.clientName,
+          issueDate: new Date().toISOString().split('T')[0],
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          amount: timesheet.amount,
+          status: 'draft',
+          currency: 'GBP'
+        }
 
-    setInvoices(current => [...current, newInvoice])
-    toast.success(`Invoice ${newInvoice.invoiceNumber} created`)
+        toast.success(`Invoice ${newInvoice.invoiceNumber} created`)
+        return [...currentInvoices, newInvoice]
+      })
+      
+      return current
+    })
   }
 
   const handleCreateTimesheet = (data: {

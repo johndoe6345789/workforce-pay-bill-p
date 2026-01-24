@@ -57,11 +57,12 @@ export default function LoginScreen() {
 
   const handleExpressAdminLogin = () => {
     const adminUser = loginsData.users.find(u => 
-      u.role === 'Super Administrator' || u.role === 'Administrator' || u.roleId === 'super-admin' || u.roleId === 'admin'
+      u.roleId === 'super-admin' || u.roleId === 'admin'
     )
     
     if (!adminUser) {
-      toast.error('Admin user not found')
+      toast.error('Admin user not found in system')
+      console.error('Available users:', loginsData.users.map(u => ({ email: u.email, roleId: u.roleId })))
       return
     }
 

@@ -5,9 +5,9 @@
       "email": "admin@workforce.com",
       "password": "admin123",
       "name": "Sarah Admin",
-      "roleId": "admin",
-      "role": "Administrator",
-      "avatarUrl": null
+      "roleId": "super-admin",
+      "role": "Super Administrator",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
     },
     {
       "id": "user-002",
@@ -16,7 +16,7 @@
       "name": "Michael Chen",
       "roleId": "finance-manager",
       "role": "Finance Manager",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=finance"
     },
     {
       "id": "user-003",
@@ -25,7 +25,7 @@
       "name": "Jennifer Williams",
       "roleId": "payroll-manager",
       "role": "Payroll Manager",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=payroll"
     },
     {
       "id": "user-004",
@@ -34,7 +34,7 @@
       "name": "David Thompson",
       "roleId": "compliance-officer",
       "role": "Compliance Officer",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=compliance"
     },
     {
       "id": "user-005",
@@ -43,7 +43,7 @@
       "name": "Emily Rodriguez",
       "roleId": "operations-manager",
       "role": "Operations Manager",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=operations"
     },
     {
       "id": "user-006",
@@ -52,7 +52,7 @@
       "name": "James Patterson",
       "roleId": "recruiter",
       "role": "Recruiter",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=recruiter"
     },
     {
       "id": "user-007",
@@ -61,7 +61,7 @@
       "name": "Lisa Anderson",
       "roleId": "client-manager",
       "role": "Client Manager",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=client"
     },
     {
       "id": "user-008",
@@ -70,7 +70,7 @@
       "name": "Robert Lee",
       "roleId": "auditor",
       "role": "Auditor",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=auditor"
     },
     {
       "id": "user-009",
@@ -79,7 +79,7 @@
       "name": "Alex Mitchell",
       "roleId": "super-admin",
       "role": "Super Administrator",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=superadmin"
     },
     {
       "id": "user-010",
@@ -88,7 +88,7 @@
       "name": "Maria Garcia",
       "roleId": "worker",
       "role": "Worker",
-      "avatarUrl": null
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=worker"
     }
   ]
 }

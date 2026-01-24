@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useKV } from '@github/spark/hooks'
 import type { 
   Timesheet, 
@@ -19,21 +20,24 @@ export function useAppData() {
   const [expenses = [], setExpenses] = useKV<Expense[]>('expenses', [])
   const [rateCards = [], setRateCards] = useKV<RateCard[]>('rate-cards', [])
 
-  const metrics: DashboardMetrics = {
-    pendingTimesheets: timesheets.filter(t => t.status === 'pending').length,
-    pendingApprovals: timesheets.filter(t => t.status === 'pending').length,
-    overdueInvoices: invoices.filter(i => i.status === 'overdue').length,
-    complianceAlerts: complianceDocs.filter(d => d.status === 'expiring' || d.status === 'expired').length,
-    monthlyRevenue: invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0),
-    monthlyPayroll: payrollRuns.reduce((sum, pr) => sum + (pr.totalAmount || (pr as any).totalGross || 0), 0),
-    grossMargin: 0,
-    activeWorkers: workers.filter(w => w.status === 'active').length,
-    pendingExpenses: expenses.filter(e => e.status === 'pending').length
-  }
-
-  metrics.grossMargin = metrics.monthlyRevenue > 0 
-    ? ((metrics.monthlyRevenue - metrics.monthlyPayroll) / metrics.monthlyRevenue) * 100 
-    : 0
+  const metrics: DashboardMetrics = useMemo(() => {
+    const monthlyRevenue = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0)
+    const monthlyPayroll = payrollRuns.reduce((sum, pr) => sum + (pr.totalAmount || (pr as any).totalGross || 0), 0)
+    
+    return {
+      pendingTimesheets: timesheets.filter(t => t.status === 'pending').length,
+      pendingApprovals: timesheets.filter(t => t.status === 'pending').length,
+      overdueInvoices: invoices.filter(i => i.status === 'overdue').length,
+      complianceAlerts: complianceDocs.filter(d => d.status === 'expiring' || d.status === 'expired').length,
+      monthlyRevenue,
+      monthlyPayroll,
+      grossMargin: monthlyRevenue > 0 
+        ? ((monthlyRevenue - monthlyPayroll) / monthlyRevenue) * 100 
+        : 0,
+      activeWorkers: workers.filter(w => w.status === 'active').length,
+      pendingExpenses: expenses.filter(e => e.status === 'pending').length
+    }
+  }, [timesheets, invoices, payrollRuns, workers, complianceDocs, expenses])
 
   return {
     timesheets,
