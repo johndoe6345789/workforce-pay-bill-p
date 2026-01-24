@@ -70,6 +70,7 @@ export { useSortableData } from './use-sortable-data'
 export { useFilterableData } from './use-filterable-data'
 export { useFormatter } from './use-formatter'
 export { useTemplateManager } from './use-template-manager'
+export { useLocaleInit } from './use-locale-init'
 
 export { useFetch } from './use-fetch'
 export { useLocalStorageState } from './use-local-storage-state'
@@ -145,4 +146,3 @@ export type { UseAsyncActionResult } from './use-async-action'
 export type { UseMutationOptions, UseMutationResult } from './use-mutation'
 export type { UseFavoritesOptions, UseFavoritesResult } from './use-favorites'
 export type { UseClipboardResult } from './use-clipboard-copy'
-

@@ -1,5 +1,7 @@
 import { useKV } from '@github/spark/hooks'
 import { useState, useEffect, useCallback } from 'react'
+import { useAppSelector, useAppDispatch } from '@/store/hooks'
+import { setLocale as setReduxLocale } from '@/store/slices/uiSlice'
 
 type Translations = Record<string, any>
 type Locale = 'en' | 'es' | 'fr'
@@ -8,10 +10,20 @@ const AVAILABLE_LOCALES: Locale[] = ['en', 'es', 'fr']
 const DEFAULT_LOCALE: Locale = 'en'
 
 export function useTranslation() {
-  const [locale, setLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
+  const dispatch = useAppDispatch()
+  const reduxLocale = useAppSelector(state => state.ui.locale)
+  const [kvLocale, setKVLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
   const [translations, setTranslations] = useState<Translations>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    if (kvLocale && kvLocale !== reduxLocale) {
+      dispatch(setReduxLocale(kvLocale))
+    }
+  }, [kvLocale, reduxLocale, dispatch])
+
+  const locale = reduxLocale
 
   useEffect(() => {
     const loadTranslations = async () => {
@@ -68,9 +80,10 @@ export function useTranslation() {
 
   const changeLocale = useCallback((newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
-      setLocale(newLocale)
+      dispatch(setReduxLocale(newLocale))
+      setKVLocale(newLocale)
     }
-  }, [setLocale])
+  }, [dispatch, setKVLocale])
 
   return {
     t,
@@ -83,16 +96,18 @@ export function useTranslation() {
 }
 
 export function useLocale() {
-  const [locale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
+  const locale = useAppSelector(state => state.ui.locale)
   return locale
 }
 
 export function useChangeLocale() {
-  const [, setLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
+  const dispatch = useAppDispatch()
+  const [, setKVLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
   
   return useCallback((newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
-      setLocale(newLocale)
+      dispatch(setReduxLocale(newLocale))
+      setKVLocale(newLocale)
     }
-  }, [setLocale])
+  }, [dispatch, setKVLocale])
 }

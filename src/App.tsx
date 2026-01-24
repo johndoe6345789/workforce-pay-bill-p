@@ -3,6 +3,7 @@ import { useNotifications } from '@/hooks/use-notifications'
 import { useAppData } from '@/hooks/use-app-data'
 import { useAppActions } from '@/hooks/use-app-actions'
 import { useViewPreload } from '@/hooks/use-view-preload'
+import { useLocaleInit } from '@/hooks/use-locale-init'
 import { Sidebar } from '@/components/navigation'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { ViewRouter } from '@/components/ViewRouter'
@@ -26,6 +27,7 @@ function App() {
 
   useSampleData()
   useViewPreload()
+  useLocaleInit()
   
   const { notifications, addNotification, markAsRead, markAllAsRead, deleteNotification, unreadCount } = useNotifications()
   
