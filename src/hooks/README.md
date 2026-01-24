@@ -1,10 +1,10 @@
 # Custom Hook Library
 
-A comprehensive collection of 40+ React hooks for the WorkForce Pro platform.
+A comprehensive collection of 100+ React hooks for the WorkForce Pro platform.
 
 ## Available Hooks
 
-### State Management (7 hooks)
+### State Management (9 hooks)
 - **useToggle** - Boolean state toggle with setter
 - **usePrevious** - Access previous value of state
 - **useLocalStorage** - Persist state in localStorage
@@ -14,6 +14,8 @@ A comprehensive collection of 40+ React hooks for the WorkForce Pro platform.
 - **useArray** - Array manipulation (push, filter, update, remove, move, swap)
 - **useMap** - Map data structure with reactive updates
 - **useSet** - Set data structure with reactive updates
+- **useIndexedDBState** - React state with IndexedDB persistence
+- **useIndexedDBCache** - Cached data fetching with TTL support
 
 ### Async Operations (4 hooks)
 - **useAsync** - Handle async operations with loading/error states
@@ -406,5 +408,78 @@ const { selectedIds, toggleSelection, selectAll, clearSelection } =
 2. **Data Management**: Combine `useFilter`, `useSort`, and `usePagination` for tables
 3. **Forms**: Use `useFormValidation` or `useFormState` for form management
 4. **Workflows**: Use `useWizard` or `useSteps` for multi-step processes
-5. **State Persistence**: Use `useLocalStorage` for data that should survive page refreshes
+5. **State Persistence**: Use `useLocalStorage` for simple data, `useIndexedDBState` for larger data
 6. **Complex State**: Use `useArray`, `useMap`, or `useSet` for advanced data structures
+7. **Session Management**: Use `useSessionStorage` for authentication and user session tracking
+
+## Session & Storage Hooks
+
+### useSessionStorage
+
+Manages user sessions with IndexedDB persistence and automatic activity tracking.
+
+```tsx
+import { useSessionStorage } from '@/hooks'
+
+const {
+  sessionId,           // Current session ID
+  isLoading,           // Loading state
+  createSession,       // Create new session
+  destroySession,      // End current session
+  getAllSessions,      // Get all sessions
+  clearAllSessions,    // Clear all sessions
+  updateSession,       // Update activity
+  restoreSession       // Restore from storage
+} = useSessionStorage()
+
+// Sessions automatically:
+// - Restore on page load
+// - Update activity every 60 seconds
+// - Expire after 24 hours
+// - Integrate with Redux auth state
+```
+
+### useIndexedDBState
+
+React state hook with IndexedDB persistence - like `useState` but data survives page refreshes.
+
+```tsx
+import { useIndexedDBState } from '@/hooks'
+
+const [preferences, setPreferences, deletePreferences] = useIndexedDBState(
+  'userPreferences',
+  { theme: 'light', language: 'en' }
+)
+
+// Use like useState
+setPreferences({ theme: 'dark', language: 'en' })
+
+// Functional updates
+setPreferences(prev => ({ ...prev, theme: 'dark' }))
+
+// Delete and reset to default
+deletePreferences()
+```
+
+### useIndexedDBCache
+
+Cached data fetching with automatic TTL-based refresh and IndexedDB persistence.
+
+```tsx
+import { useIndexedDBCache } from '@/hooks'
+
+const { data, isLoading, error, refresh } = useIndexedDBCache(
+  'apiData',
+  async () => {
+    const response = await fetch('/api/data')
+    return response.json()
+  },
+  5 * 60 * 1000 // Cache for 5 minutes
+)
+
+// Data cached in IndexedDB
+// Refetches if cache older than TTL
+// Call refresh() to force fetch
+```
+
+See [INDEXED_DB.md](../lib/INDEXED_DB.md) for complete IndexedDB documentation.

@@ -7,6 +7,7 @@ import { useLocaleInit } from '@/hooks/use-locale-init'
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useSkipLink } from '@/hooks/use-skip-link'
 import { useAnnounce } from '@/hooks/use-announce'
+import { useSessionStorage } from '@/hooks/use-session-storage'
 import { Sidebar } from '@/components/navigation'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { ViewRouter } from '@/components/ViewRouter'
@@ -37,6 +38,7 @@ function App() {
   useViewPreload()
   useLocaleInit()
   useSkipLink(mainContentRef, 'Skip to main content')
+  useSessionStorage()
   
   const { notifications, addNotification, markAsRead, markAllAsRead, deleteNotification, unreadCount } = useNotifications()
   

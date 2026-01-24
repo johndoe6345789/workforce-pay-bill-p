@@ -6,6 +6,7 @@ import { Database, Download, ArrowClockwise, FileJs } from '@phosphor-icons/reac
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { PermissionGate } from '@/components/PermissionGate'
+import { IndexedDBDemo } from '@/components/IndexedDBDemo'
 
 export function DataAdminView() {
   const resetAllData = async () => {
@@ -243,6 +244,8 @@ export function DataAdminView() {
           </div>
         </CardContent>
       </Card>
+
+      <IndexedDBDemo />
       </div>
     </PermissionGate>
   )

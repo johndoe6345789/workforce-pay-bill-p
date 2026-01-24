@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { SessionManager } from '@/components/SessionManager'
 import { useAuth } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 import {
@@ -496,32 +497,7 @@ export function ProfileView() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Sessions</CardTitle>
-              <CardDescription>Manage your active login sessions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 border border-border rounded-lg bg-secondary/50">
-                  <div>
-                    <p className="font-medium text-sm">Current Session</p>
-                    <p className="text-xs text-muted-foreground">Chrome on Windows • London, UK</p>
-                    <p className="text-xs text-muted-foreground mt-1">Last active: Just now</p>
-                  </div>
-                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">Active</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">Mobile App</p>
-                    <p className="text-xs text-muted-foreground">iOS • London, UK</p>
-                    <p className="text-xs text-muted-foreground mt-1">Last active: 2 hours ago</p>
-                  </div>
-                  <Button variant="outline" size="sm">Revoke</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <SessionManager />
         </TabsContent>
       </Tabs>
     </div>

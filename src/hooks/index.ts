@@ -102,6 +102,9 @@ export { useAriaLive } from './use-aria-live'
 export { useKeyboardShortcuts } from './use-keyboard-shortcuts'
 export { useSkipLink } from './use-skip-link'
 
+export { useSessionStorage } from './use-session-storage'
+export { useIndexedDBState, useIndexedDBCache } from './use-indexed-db-state'
+
 export type { AsyncState } from './use-async'
 export type { FormErrors } from './use-form-validation'
 export type { IntersectionObserverOptions } from './use-intersection-observer'
