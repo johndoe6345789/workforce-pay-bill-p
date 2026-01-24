@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
+import { STORES } from '@/lib/indexed-db'
 import type { 
   Timesheet, 
   Invoice, 
@@ -12,13 +13,13 @@ import type {
 } from '@/lib/types'
 
 export function useAppData() {
-  const [timesheets = [], setTimesheets] = useKV<Timesheet[]>('timesheets', [])
-  const [invoices = [], setInvoices] = useKV<Invoice[]>('invoices', [])
-  const [payrollRuns = [], setPayrollRuns] = useKV<PayrollRun[]>('payroll-runs', [])
-  const [workers = [], setWorkers] = useKV<Worker[]>('workers', [])
-  const [complianceDocs = [], setComplianceDocs] = useKV<ComplianceDocument[]>('compliance-docs', [])
-  const [expenses = [], setExpenses] = useKV<Expense[]>('expenses', [])
-  const [rateCards = [], setRateCards] = useKV<RateCard[]>('rate-cards', [])
+  const [timesheets = [], setTimesheets] = useIndexedDBState<Timesheet[]>(STORES.TIMESHEETS, [])
+  const [invoices = [], setInvoices] = useIndexedDBState<Invoice[]>(STORES.INVOICES, [])
+  const [payrollRuns = [], setPayrollRuns] = useIndexedDBState<PayrollRun[]>(STORES.PAYROLL_RUNS, [])
+  const [workers = [], setWorkers] = useIndexedDBState<Worker[]>(STORES.WORKERS, [])
+  const [complianceDocs = [], setComplianceDocs] = useIndexedDBState<ComplianceDocument[]>(STORES.COMPLIANCE_DOCS, [])
+  const [expenses = [], setExpenses] = useIndexedDBState<Expense[]>(STORES.EXPENSES, [])
+  const [rateCards = [], setRateCards] = useIndexedDBState<RateCard[]>(STORES.RATE_CARDS, [])
 
   const metrics: DashboardMetrics = useMemo(() => {
     const monthlyRevenue = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0)

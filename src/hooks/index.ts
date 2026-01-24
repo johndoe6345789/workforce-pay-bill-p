@@ -106,6 +106,16 @@ export { useSessionStorage } from './use-session-storage'
 export { useSessionTimeout } from './use-session-timeout'
 export { useSessionTimeoutPreferences } from './use-session-timeout-preferences'
 export { useIndexedDBState, useIndexedDBCache } from './use-indexed-db-state'
+export { useCRUD } from './use-crud'
+export { 
+  useTimesheetsCRUD,
+  useInvoicesCRUD,
+  usePayrollRunsCRUD,
+  useWorkersCRUD,
+  useComplianceDocsCRUD,
+  useExpensesCRUD,
+  useRateCardsCRUD
+} from './use-entity-crud'
 
 export type { AsyncState } from './use-async'
 export type { FormErrors } from './use-form-validation'

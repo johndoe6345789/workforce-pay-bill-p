@@ -1,5 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
-import { indexedDB } from '@/lib/indexed-db'
+import { indexedDB, STORES } from '@/lib/indexed-db'
+
+const ENTITY_STORE_NAMES = [
+  STORES.TIMESHEETS,
+  STORES.INVOICES,
+  STORES.PAYROLL_RUNS,
+  STORES.WORKERS,
+  STORES.COMPLIANCE_DOCS,
+  STORES.EXPENSES,
+  STORES.RATE_CARDS,
+] as string[]
 
 export function useIndexedDBState<T>(
   key: string,
@@ -7,11 +17,25 @@ export function useIndexedDBState<T>(
 ): [T, (value: T | ((prev: T) => T)) => void, () => void] {
   const [state, setState] = useState<T>(defaultValue)
   const [isInitialized, setIsInitialized] = useState(false)
+  const isEntityStore = ENTITY_STORE_NAMES.includes(key)
 
   useEffect(() => {
     const loadState = async () => {
       try {
-        const storedValue = await indexedDB.getAppState<T>(key)
+        let storedValue: T | null = null
+
+        if (isEntityStore) {
+          try {
+            const entities = await indexedDB.readAll(key)
+            storedValue = (entities.length > 0 ? entities : null) as T | null
+          } catch (error) {
+            console.warn(`Store "${key}" not accessible, using default value`, error)
+            storedValue = null
+          }
+        } else {
+          storedValue = await indexedDB.getAppState<T>(key)
+        }
+
         if (storedValue !== null) {
           setState(storedValue)
         }
@@ -23,7 +47,7 @@ export function useIndexedDBState<T>(
     }
 
     loadState()
-  }, [key])
+  }, [key, isEntityStore])
 
   const updateState = useCallback((value: T | ((prev: T) => T)) => {
     setState(prevState => {
@@ -32,21 +56,39 @@ export function useIndexedDBState<T>(
         : value
 
       if (isInitialized) {
-        indexedDB.saveAppState(key, newState).catch(error => {
-          console.error(`Failed to save state for key "${key}":`, error)
-        })
+        if (isEntityStore && Array.isArray(newState)) {
+          indexedDB.deleteAll(key)
+            .then(() => {
+              if (newState.length > 0) {
+                return indexedDB.bulkCreate(key, newState)
+              }
+            })
+            .catch(error => {
+              console.error(`Failed to save entities for store "${key}":`, error)
+            })
+        } else {
+          indexedDB.saveAppState(key, newState).catch(error => {
+            console.error(`Failed to save state for key "${key}":`, error)
+          })
+        }
       }
 
       return newState
     })
-  }, [key, isInitialized])
+  }, [key, isInitialized, isEntityStore])
 
   const deleteState = useCallback(() => {
     setState(defaultValue)
-    indexedDB.deleteAppState(key).catch(error => {
-      console.error(`Failed to delete state for key "${key}":`, error)
-    })
-  }, [key, defaultValue])
+    if (isEntityStore) {
+      indexedDB.deleteAll(key).catch(error => {
+        console.error(`Failed to delete entities from store "${key}":`, error)
+      })
+    } else {
+      indexedDB.deleteAppState(key).catch(error => {
+        console.error(`Failed to delete state for key "${key}":`, error)
+      })
+    }
+  }, [key, defaultValue, isEntityStore])
 
   return [state, updateState, deleteState]
 }
