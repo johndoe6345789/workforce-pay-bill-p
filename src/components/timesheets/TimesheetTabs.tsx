@@ -11,6 +11,7 @@ interface TimesheetTabsProps {
   onCreateInvoice: (id: string) => void
   onAdjust: (timesheet: Timesheet) => void
   onViewDetails: (timesheet: Timesheet) => void
+  onDelete?: (id: string) => void
 }
 
 export function TimesheetTabs({
@@ -19,7 +20,8 @@ export function TimesheetTabs({
   onReject,
   onCreateInvoice,
   onAdjust,
-  onViewDetails
+  onViewDetails,
+  onDelete
 }: TimesheetTabsProps) {
   return (
     <Tabs defaultValue="pending" className="space-y-4">
@@ -47,6 +49,7 @@ export function TimesheetTabs({
               onCreateInvoice={onCreateInvoice}
               onAdjust={onAdjust}
               onViewDetails={onViewDetails}
+              onDelete={onDelete}
             />
           ))}
         {filteredTimesheets.filter(t => t.status === 'pending').length === 0 && (
@@ -70,6 +73,7 @@ export function TimesheetTabs({
               onCreateInvoice={onCreateInvoice}
               onAdjust={onAdjust}
               onViewDetails={onViewDetails}
+              onDelete={onDelete}
             />
           ))}
       </TabsContent>
@@ -86,6 +90,7 @@ export function TimesheetTabs({
               onCreateInvoice={onCreateInvoice}
               onAdjust={onAdjust}
               onViewDetails={onViewDetails}
+              onDelete={onDelete}
             />
           ))}
       </TabsContent>

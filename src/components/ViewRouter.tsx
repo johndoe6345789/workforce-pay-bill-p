@@ -120,16 +120,9 @@ export function ViewRouter({
     case 'timesheets':
       return (
         <TimesheetsView
-          timesheets={timesheets}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          onApprove={actions.handleApproveTimesheet}
-          onReject={actions.handleRejectTimesheet}
           onCreateInvoice={actions.handleCreateInvoice}
-          onCreateTimesheet={actions.handleCreateTimesheet}
-          onCreateDetailedTimesheet={actions.handleCreateDetailedTimesheet}
-          onBulkImport={actions.handleBulkImport}
-          onAdjust={actions.handleAdjustTimesheet}
         />
       )
 

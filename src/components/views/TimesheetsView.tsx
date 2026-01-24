@@ -10,7 +10,8 @@ import {
   FileText,
   CalendarBlank,
   CurrencyDollar,
-  TrendUp
+  TrendUp,
+  Trash
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -29,47 +30,21 @@ import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { TimesheetCreateDialogs } from '@/components/timesheets/TimesheetCreateDialogs'
 import { TimesheetTabs } from '@/components/timesheets/TimesheetTabs'
 import { useTimeTracking } from '@/hooks/use-time-tracking'
+import { useTimesheetsCrud } from '@/hooks/use-timesheets-crud'
+import { usePermissions } from '@/hooks/use-permissions'
 import { toast } from 'sonner'
 import type { Timesheet, TimesheetStatus, ShiftEntry } from '@/lib/types'
 
 interface TimesheetsViewProps {
-  timesheets: Timesheet[]
   searchQuery: string
   setSearchQuery: (query: string) => void
-  onApprove: (id: string) => void
-  onReject: (id: string) => void
   onCreateInvoice: (id: string) => void
-  onCreateTimesheet: (data: {
-    workerName: string
-    clientName: string
-    hours: number
-    rate: number
-    weekEnding: string
-  }) => void
-  onCreateDetailedTimesheet: (data: {
-    workerName: string
-    clientName: string
-    weekEnding: string
-    shifts: ShiftEntry[]
-    totalHours: number
-    totalAmount: number
-    baseRate: number
-  }) => void
-  onBulkImport: (csvData: string) => void
-  onAdjust: (timesheetId: string, adjustment: any) => void
 }
 
 export function TimesheetsView({ 
-  timesheets, 
   searchQuery, 
   setSearchQuery, 
-  onApprove, 
-  onReject,
-  onCreateInvoice,
-  onCreateTimesheet,
-  onCreateDetailedTimesheet,
-  onBulkImport,
-  onAdjust
+  onCreateInvoice
 }: TimesheetsViewProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | TimesheetStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -78,12 +53,182 @@ export function TimesheetsView({
   const [viewingTimesheet, setViewingTimesheet] = useState<Timesheet | null>(null)
   const [showAnalytics, setShowAnalytics] = useState(false)
   
+  const { hasPermission } = usePermissions()
+  
   const { 
     validateTimesheet, 
     analyzeWorkingTime,
     calculateShiftHours,
     determineShiftType
   } = useTimeTracking()
+  
+  const {
+    timesheets,
+    createTimesheet,
+    updateTimesheet,
+    deleteTimesheet,
+    bulkCreateTimesheets
+  } = useTimesheetsCrud()
+  
+  const handleCreateTimesheet = useCallback(async (data: {
+    workerName: string
+    clientName: string
+    hours: number
+    rate: number
+    weekEnding: string
+  }) => {
+    try {
+      await createTimesheet({
+        workerId: `worker-${Date.now()}`,
+        workerName: data.workerName,
+        clientName: data.clientName,
+        hours: data.hours,
+        rate: data.rate,
+        amount: data.hours * data.rate,
+        weekEnding: data.weekEnding,
+        status: 'pending',
+        submittedDate: new Date().toISOString(),
+        shifts: []
+      })
+      toast.success('Timesheet created successfully')
+      setIsCreateDialogOpen(false)
+    } catch (error) {
+      toast.error('Failed to create timesheet')
+      console.error('Error creating timesheet:', error)
+    }
+  }, [createTimesheet])
+
+  const handleCreateDetailedTimesheet = useCallback(async (data: {
+    workerName: string
+    clientName: string
+    weekEnding: string
+    shifts: ShiftEntry[]
+    totalHours: number
+    totalAmount: number
+    baseRate: number
+  }) => {
+    try {
+      await createTimesheet({
+        workerId: `worker-${Date.now()}`,
+        workerName: data.workerName,
+        clientName: data.clientName,
+        hours: data.totalHours,
+        rate: data.baseRate,
+        amount: data.totalAmount,
+        weekEnding: data.weekEnding,
+        status: 'pending',
+        submittedDate: new Date().toISOString(),
+        shifts: data.shifts
+      })
+      toast.success('Detailed timesheet created successfully')
+      setIsCreateDialogOpen(false)
+    } catch (error) {
+      toast.error('Failed to create detailed timesheet')
+      console.error('Error creating detailed timesheet:', error)
+    }
+  }, [createTimesheet])
+
+  const handleBulkImport = useCallback(async (csvData: string) => {
+    try {
+      const lines = csvData.trim().split('\n')
+      const headers = lines[0].split(',').map(h => h.trim())
+      
+      const timesheetsData = lines.slice(1).map(line => {
+        const values = line.split(',').map(v => v.trim())
+        const timesheet: any = {}
+        
+        headers.forEach((header, index) => {
+          timesheet[header] = values[index]
+        })
+        
+        return {
+          workerId: timesheet.workerId || `worker-${Date.now()}-${Math.random()}`,
+          workerName: timesheet.workerName || timesheet.worker,
+          clientName: timesheet.clientName || timesheet.client,
+          hours: parseFloat(timesheet.hours) || 0,
+          rate: parseFloat(timesheet.rate) || 0,
+          amount: parseFloat(timesheet.amount) || (parseFloat(timesheet.hours) * parseFloat(timesheet.rate)),
+          weekEnding: timesheet.weekEnding,
+          status: 'pending' as TimesheetStatus,
+          submittedDate: new Date().toISOString(),
+          shifts: []
+        }
+      })
+      
+      await bulkCreateTimesheets(timesheetsData)
+      toast.success(`${timesheetsData.length} timesheets imported successfully`)
+      setIsBulkImportOpen(false)
+    } catch (error) {
+      toast.error('Failed to import timesheets')
+      console.error('Error importing timesheets:', error)
+    }
+  }, [bulkCreateTimesheets])
+
+  const handleApprove = useCallback(async (id: string) => {
+    if (!hasPermission('timesheets.approve')) {
+      toast.error('You do not have permission to approve timesheets')
+      return
+    }
+    
+    try {
+      await updateTimesheet(id, {
+        status: 'approved',
+        approvedDate: new Date().toISOString()
+      })
+      toast.success('Timesheet approved')
+    } catch (error) {
+      toast.error('Failed to approve timesheet')
+      console.error('Error approving timesheet:', error)
+    }
+  }, [updateTimesheet, hasPermission])
+
+  const handleReject = useCallback(async (id: string) => {
+    if (!hasPermission('timesheets.approve')) {
+      toast.error('You do not have permission to reject timesheets')
+      return
+    }
+    
+    try {
+      await updateTimesheet(id, {
+        status: 'rejected'
+      })
+      toast.error('Timesheet rejected')
+    } catch (error) {
+      toast.error('Failed to reject timesheet')
+      console.error('Error rejecting timesheet:', error)
+    }
+  }, [updateTimesheet, hasPermission])
+
+  const handleAdjust = useCallback(async (timesheetId: string, adjustment: any) => {
+    if (!hasPermission('timesheets.edit')) {
+      toast.error('You do not have permission to adjust timesheets')
+      return
+    }
+    
+    try {
+      await updateTimesheet(timesheetId, adjustment)
+      toast.success('Timesheet adjusted')
+      setSelectedTimesheet(null)
+    } catch (error) {
+      toast.error('Failed to adjust timesheet')
+      console.error('Error adjusting timesheet:', error)
+    }
+  }, [updateTimesheet, hasPermission])
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (!hasPermission('timesheets.delete')) {
+      toast.error('You do not have permission to delete timesheets')
+      return
+    }
+    
+    try {
+      await deleteTimesheet(id)
+      toast.success('Timesheet deleted')
+    } catch (error) {
+      toast.error('Failed to delete timesheet')
+      console.error('Error deleting timesheet:', error)
+    }
+  }, [deleteTimesheet, hasPermission])
   
   const timesheetsToFilter = useMemo(() => {
     return timesheets.filter(t => {
@@ -175,9 +320,9 @@ export function TimesheetsView({
               setFormData={setFormData}
               csvData={csvData}
               setCsvData={setCsvData}
-              onCreateTimesheet={onCreateTimesheet}
-              onCreateDetailedTimesheet={onCreateDetailedTimesheet}
-              onBulkImport={onBulkImport}
+              onCreateTimesheet={handleCreateTimesheet}
+              onCreateDetailedTimesheet={handleCreateDetailedTimesheet}
+              onBulkImport={handleBulkImport}
             />
           </Stack>
         }
@@ -329,11 +474,12 @@ export function TimesheetsView({
 
       <TimesheetTabs
         filteredTimesheets={timesheetsWithValidation}
-        onApprove={onApprove}
-        onReject={onReject}
+        onApprove={handleApprove}
+        onReject={handleReject}
         onCreateInvoice={onCreateInvoice}
         onAdjust={setSelectedTimesheet}
         onViewDetails={setViewingTimesheet}
+        onDelete={handleDelete}
       />
 
       <TimesheetDetailDialog
@@ -351,7 +497,7 @@ export function TimesheetsView({
           onOpenChange={(open) => {
             if (!open) setSelectedTimesheet(null)
           }}
-          onAdjust={onAdjust}
+          onAdjust={(id, adjustment) => handleAdjust(id, adjustment)}
         />
       )}
     </Stack>

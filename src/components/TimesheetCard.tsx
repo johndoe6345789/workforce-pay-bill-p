@@ -5,13 +5,24 @@ import {
   CheckCircle,
   XCircle,
   Receipt,
-  CaretDown
+  CaretDown,
+  Trash
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { usePermissions } from '@/hooks/use-permissions'
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import type { Timesheet } from '@/lib/types'
 
 interface TimesheetCardProps {
@@ -21,6 +32,7 @@ interface TimesheetCardProps {
   onCreateInvoice: (id: string) => void
   onAdjust?: (timesheet: Timesheet) => void
   onViewDetails?: (timesheet: Timesheet) => void
+  onDelete?: (id: string) => void
 }
 
 export function TimesheetCard({ 
@@ -29,10 +41,12 @@ export function TimesheetCard({
   onReject, 
   onCreateInvoice, 
   onAdjust, 
-  onViewDetails 
+  onViewDetails,
+  onDelete 
 }: TimesheetCardProps) {
   const { hasPermission } = usePermissions()
   const [showShifts, setShowShifts] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   
   const statusConfig = {
     pending: { icon: ClockCounterClockwise, color: 'text-warning' },
@@ -197,9 +211,44 @@ export function TimesheetCard({
                 Create Invoice
               </Button>
             )}
+            {onDelete && hasPermission('timesheets.delete') && (
+              <Button 
+                size="sm" 
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowDeleteDialog(true)
+                }}
+              >
+                <Trash size={16} className="text-destructive" />
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Timesheet</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this timesheet for {timesheet.workerName}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onDelete?.(timesheet.id)
+                setShowDeleteDialog(false)
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }
