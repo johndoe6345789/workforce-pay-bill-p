@@ -17,7 +17,8 @@ import {
   UserPlus,
   CalendarBlank,
   Translate,
-  Shield
+  Shield,
+  FlowArrow
 } from '@phosphor-icons/react'
 import { NavItem } from './NavItem'
 import { NavGroup } from './NavGroup'
@@ -187,6 +188,14 @@ export function ConfigurationNav({ currentView, setCurrentView, expandedGroups, 
         onClick={() => setCurrentView('roles-permissions')}
         view="roles-permissions"
         permission="users.edit"
+      />
+      <NavItem
+        icon={<FlowArrow size={20} />}
+        label="Workflow Templates"
+        active={currentView === 'workflow-templates'}
+        onClick={() => setCurrentView('workflow-templates')}
+        view="workflow-templates"
+        permission="settings.edit"
       />
     </NavGroup>
   )

@@ -47,6 +47,7 @@ const DataAdminView = lazy(() => import('@/components/views/data-admin-view').th
 const TranslationDemo = lazy(() => import('@/components/TranslationDemo').then(m => ({ default: m.TranslationDemo })))
 const ProfileView = lazy(() => import('@/components/views/profile-view').then(m => ({ default: m.ProfileView })))
 const RolesPermissionsView = lazy(() => import('@/components/views/roles-permissions-view').then(m => ({ default: m.RolesPermissionsView })))
+const ApprovalWorkflowTemplateManager = lazy(() => import('@/components/ApprovalWorkflowTemplateManager').then(m => ({ default: m.ApprovalWorkflowTemplateManager })))
 
 interface ViewRouterProps {
   currentView: View
@@ -260,6 +261,9 @@ export function ViewRouter({
 
     case 'roles-permissions':
       return <RolesPermissionsView />
+
+    case 'workflow-templates':
+      return <ApprovalWorkflowTemplateManager />
 
     default:
       return <DashboardView metrics={metrics} />

@@ -98,6 +98,10 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Event-driven processing updates
 - ✅ Email notification templates
 - ✅ Configurable notification rules
+- ✅ Configurable approval workflow templates for different batch types
+- ✅ Multi-step approval workflows with escalation rules
+- ✅ Conditional approval step skipping
+- ✅ Template management for payroll, invoices, timesheets, expenses, compliance, and purchase orders
 - 📋 Automated follow-up reminders
 
 ---

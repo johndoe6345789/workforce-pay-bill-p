@@ -1,4 +1,5 @@
 import { useSampleData } from '@/hooks/use-sample-data'
+import { useSampleWorkflowTemplates } from '@/hooks/use-sample-workflow-templates'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useAppData } from '@/hooks/use-app-data'
 import { useAppActions } from '@/hooks/use-app-actions'
@@ -24,7 +25,7 @@ import { Badge } from '@/components/ui/badge'
 import { Code } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
 
-export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase' | 'business-logic-demo' | 'data-admin' | 'translation-demo' | 'profile' | 'roles-permissions'
+export type View = 'dashboard' | 'timesheets' | 'billing' | 'payroll' | 'compliance' | 'expenses' | 'roadmap' | 'reports' | 'currency' | 'email-templates' | 'invoice-templates' | 'qr-scanner' | 'missing-timesheets' | 'purchase-orders' | 'onboarding' | 'audit-trail' | 'notification-rules' | 'batch-import' | 'rate-templates' | 'custom-reports' | 'holiday-pay' | 'contract-validation' | 'shift-patterns' | 'query-guide' | 'component-showcase' | 'business-logic-demo' | 'data-admin' | 'translation-demo' | 'profile' | 'roles-permissions' | 'workflow-templates'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -38,6 +39,7 @@ function App() {
   const announce = useAnnounce()
 
   useSampleData()
+  useSampleWorkflowTemplates()
   useViewPreload()
   useLocaleInit()
   useSkipLink(mainContentRef, 'Skip to main content')
