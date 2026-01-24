@@ -12,16 +12,10 @@ const DEFAULT_LOCALE: Locale = 'en'
 export function useTranslation() {
   const dispatch = useAppDispatch()
   const reduxLocale = useAppSelector(state => state.ui.locale)
-  const [kvLocale, setKVLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
+  const [, setKVLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
   const [translations, setTranslations] = useState<Translations>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    if (kvLocale && kvLocale !== reduxLocale) {
-      dispatch(setReduxLocale(kvLocale))
-    }
-  }, [kvLocale, reduxLocale, dispatch])
 
   const locale = reduxLocale
 

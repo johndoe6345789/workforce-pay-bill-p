@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useKV } from '@github/spark/hooks'
 import appData from '@/data/app-data.json'
 
@@ -12,10 +12,13 @@ export function useSampleData() {
   const [, setWorkers] = useKV<any[]>('workers', [])
   const [, setRateCards] = useKV<any[]>('rate-cards', [])
   const [, setClients] = useKV<any[]>('clients', [])
+  const isInitializing = useRef(false)
 
   useEffect(() => {
-    if (hasInitialized) return
+    if (hasInitialized || isInitializing.current) return
 
+    isInitializing.current = true
+    
     const initializeData = async () => {
       const transformedTimesheets = appData.timesheets.map((ts: any) => ({
         ...ts,
