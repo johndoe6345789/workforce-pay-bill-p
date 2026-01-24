@@ -9,6 +9,10 @@ import { login } from '@/store/slices/authSlice'
 import { toast } from 'sonner'
 import loginsData from '@/data/logins.json'
 import rolesData from '@/data/roles-permissions.json'
+import { TIMEOUTS } from '@/lib/constants'
+import { sanitizeEmail } from '@/lib/sanitize'
+import { isValidEmail } from '@/lib/type-guards'
+import { handleError } from '@/lib/error-handler'
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
@@ -21,38 +25,50 @@ export default function LoginScreen() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!email || !password) {
+    const sanitizedEmail = sanitizeEmail(email)
+    
+    if (!sanitizedEmail || !password) {
       toast.error('Please enter your email and password')
+      return
+    }
+
+    if (!isValidEmail(sanitizedEmail)) {
+      toast.error('Please enter a valid email address')
       return
     }
 
     setIsLoading(true)
     
-    setTimeout(() => {
-      const user = loginsData.users.find(u => u.email === email && u.password === password)
-      
-      if (!user) {
-        toast.error('Invalid credentials')
+    try {
+      setTimeout(() => {
+        const user = loginsData.users.find(u => u.email === sanitizedEmail && u.password === password)
+        
+        if (!user) {
+          toast.error('Invalid credentials')
+          setIsLoading(false)
+          return
+        }
+
+        const role = rolesData.roles.find(r => r.id === user.roleId)
+        const permissions = role?.permissions || []
+
+        dispatch(login({
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          roleId: user.roleId,
+          avatarUrl: user.avatarUrl || undefined,
+          permissions
+        }))
+        
+        toast.success(`Welcome back, ${user.name}!`)
         setIsLoading(false)
-        return
-      }
-
-      const role = rolesData.roles.find(r => r.id === user.roleId)
-      const permissions = role?.permissions || []
-
-      dispatch(login({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        roleId: user.roleId,
-        avatarUrl: user.avatarUrl || undefined,
-        permissions
-      }))
-      
-      toast.success(`Welcome back, ${user.name}!`)
+      }, TIMEOUTS.LOGIN_DELAY)
+    } catch (error) {
+      handleError(error, 'Login')
       setIsLoading(false)
-    }, 800)
+    }
   }
 
   const handleExpressAdminLogin = () => {
