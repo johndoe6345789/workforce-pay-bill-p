@@ -5,7 +5,8 @@ import {
   Receipt,
   Envelope,
   ChartLine,
-  Warning
+  Warning,
+  Trash
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,31 +20,31 @@ import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
 import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { useInvoicing } from '@/hooks/use-invoicing'
+import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
 import { toast } from 'sonner'
 import type { Invoice, RateCard } from '@/lib/types'
 
 interface BillingViewProps {
-  invoices: Invoice[]
   searchQuery: string
   setSearchQuery: (query: string) => void
-  onSendInvoice: (invoiceId: string) => void
-  onCreatePlacementInvoice: (invoice: Invoice) => void
-  onCreateCreditNote: (creditNote: any, creditInvoice: Invoice) => void
   rateCards: RateCard[]
 }
 
 export function BillingView({ 
-  invoices, 
   searchQuery, 
-  setSearchQuery, 
-  onSendInvoice, 
-  onCreatePlacementInvoice, 
-  onCreateCreditNote, 
+  setSearchQuery,
   rateCards 
 }: BillingViewProps) {
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   const [showAnalytics, setShowAnalytics] = useState(false)
+  
+  const {
+    invoices,
+    createInvoice,
+    updateInvoice,
+    deleteInvoice
+  } = useInvoicesCrud()
   
   const {
     calculateInvoiceAging,
@@ -59,6 +60,49 @@ export function BillingView({
   const handleResultsChange = useCallback((results: Invoice[]) => {
     setFilteredInvoices(results)
   }, [])
+
+  const handleSendInvoice = useCallback(async (invoiceId: string) => {
+    try {
+      await updateInvoice(invoiceId, { status: 'sent' })
+      toast.success('Invoice sent successfully')
+    } catch (error) {
+      toast.error('Failed to send invoice')
+    }
+  }, [updateInvoice])
+
+  const handleCreatePlacementInvoice = useCallback(async (invoice: Omit<Invoice, 'id'>) => {
+    try {
+      await createInvoice(invoice)
+      toast.success('Placement invoice created successfully')
+    } catch (error) {
+      toast.error('Failed to create placement invoice')
+    }
+  }, [createInvoice])
+
+  const handleCreateCreditNote = useCallback(async (creditNote: any, creditInvoice: Invoice) => {
+    try {
+      await createInvoice({
+        ...creditNote,
+        type: 'credit',
+        relatedInvoiceId: creditInvoice.id
+      })
+      toast.success('Credit note created successfully')
+    } catch (error) {
+      toast.error('Failed to create credit note')
+    }
+  }, [createInvoice])
+
+  const handleDeleteInvoice = useCallback(async (invoiceId: string) => {
+    try {
+      await deleteInvoice(invoiceId)
+      toast.success('Invoice deleted successfully')
+      if (viewingInvoice?.id === invoiceId) {
+        setViewingInvoice(null)
+      }
+    } catch (error) {
+      toast.error('Failed to delete invoice')
+    }
+  }, [deleteInvoice, viewingInvoice])
 
   const agingData = useMemo(() => calculateInvoiceAging(), [calculateInvoiceAging])
   const overdueInvoices = useMemo(() => getOverdueInvoices(), [getOverdueInvoices])
@@ -98,8 +142,8 @@ export function BillingView({
               <ChartLine size={18} className="mr-2" />
               {showAnalytics ? 'Hide' : 'Show'} Analytics
             </Button>
-            <PermanentPlacementInvoice onCreateInvoice={onCreatePlacementInvoice} />
-            <CreditNoteGenerator invoices={invoices} onCreateCreditNote={onCreateCreditNote} />
+            <PermanentPlacementInvoice onCreateInvoice={handleCreatePlacementInvoice} />
+            <CreditNoteGenerator invoices={invoices} onCreateCreditNote={handleCreateCreditNote} />
             <Button>
               <Plus size={18} className="mr-2" />
               Create Invoice
@@ -218,7 +262,7 @@ export function BillingView({
                   {invoice.status === 'draft' && (
                     <Button
                       size="sm"
-                      onClick={() => onSendInvoice(invoice.id)}
+                      onClick={() => handleSendInvoice(invoice.id)}
                     >
                       <Envelope size={16} className="mr-2" />
                       Send
@@ -228,6 +272,13 @@ export function BillingView({
                   <Button size="sm" variant="outline">
                     <Download size={16} className="mr-2" />
                     PDF
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handleDeleteInvoice(invoice.id)}
+                  >
+                    <Trash size={16} />
                   </Button>
                 </div>
               </div>
@@ -250,7 +301,7 @@ export function BillingView({
         onOpenChange={(open) => {
           if (!open) setViewingInvoice(null)
         }}
-        onSendInvoice={onSendInvoice}
+        onSendInvoice={handleSendInvoice}
       />
     </Stack>
   )

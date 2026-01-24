@@ -178,14 +178,11 @@ function App() {
             setSearchQuery={(query) => dispatch(setSearchQuery(query))}
             metrics={metrics}
             timesheets={timesheets}
-            invoices={invoices}
-            payrollRuns={payrollRuns}
             workers={workers}
             complianceDocs={complianceDocs}
             expenses={expenses}
             rateCards={rateCards}
             setTimesheets={setTimesheets}
-            setPayrollRuns={setPayrollRuns}
             actions={actions}
           />
         </div>

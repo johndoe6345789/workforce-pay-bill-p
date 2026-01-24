@@ -5,13 +5,13 @@ import { ReportConfigForm } from '@/components/reports/ReportConfigForm'
 import { ReportPreview } from '@/components/reports/ReportPreview'
 import { ReportResultTable } from '@/components/reports/ReportResultTable'
 import { calculateMarginData, filterData, aggregateData } from '@/components/reports/report-utils'
-import type { Invoice, PayrollRun, Timesheet, Expense } from '@/lib/types'
+import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
+import { usePayrollCrud } from '@/hooks/use-payroll-crud'
+import { useExpensesCrud } from '@/hooks/use-expenses-crud'
+import type { Timesheet } from '@/lib/types'
 
 interface CustomReportBuilderProps {
   timesheets: Timesheet[]
-  invoices: Invoice[]
-  payrollRuns: PayrollRun[]
-  expenses: Expense[]
 }
 
 type ReportType = 'timesheet' | 'invoice' | 'payroll' | 'expense' | 'margin'
@@ -36,7 +36,11 @@ interface ReportFilter {
   value: string
 }
 
-export function CustomReportBuilder({ timesheets, invoices, payrollRuns, expenses }: CustomReportBuilderProps) {
+export function CustomReportBuilder({ timesheets }: CustomReportBuilderProps) {
+  const { invoices } = useInvoicesCrud()
+  const { payrollRuns } = usePayrollCrud()
+  const { expenses } = useExpensesCrud()
+  
   const [reportConfig, setReportConfig] = useState<ReportConfig>({
     name: '',
     type: 'timesheet',

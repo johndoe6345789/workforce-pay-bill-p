@@ -54,14 +54,11 @@ interface ViewRouterProps {
   setSearchQuery: (query: string) => void
   metrics: DashboardMetrics
   timesheets: Timesheet[]
-  invoices: Invoice[]
-  payrollRuns: PayrollRun[]
   workers: Worker[]
   complianceDocs: ComplianceDocument[]
   expenses: Expense[]
   rateCards: RateCard[]
   setTimesheets: (updater: (current: Timesheet[]) => Timesheet[]) => void
-  setPayrollRuns: (updater: (current: PayrollRun[]) => PayrollRun[]) => void
   actions: any
 }
 
@@ -102,14 +99,11 @@ export function ViewRouter({
   setSearchQuery,
   metrics,
   timesheets,
-  invoices,
-  payrollRuns,
   workers,
   complianceDocs,
   expenses,
   rateCards,
   setTimesheets,
-  setPayrollRuns,
   actions
 }: ViewRouterProps) {
   const renderView = () => {
@@ -129,12 +123,8 @@ export function ViewRouter({
     case 'billing':
       return (
         <BillingView
-          invoices={invoices}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          onSendInvoice={actions.handleSendInvoice}
-          onCreatePlacementInvoice={actions.handleCreatePlacementInvoice}
-          onCreateCreditNote={actions.handleCreateCreditNote}
           rateCards={rateCards}
         />
       )
@@ -142,11 +132,7 @@ export function ViewRouter({
     case 'payroll':
       return (
         <PayrollView 
-          payrollRuns={payrollRuns}
           timesheets={timesheets}
-          onPayrollComplete={(run) => {
-            setPayrollRuns((current) => [...current, run])
-          }}
         />
       )
 
@@ -171,12 +157,7 @@ export function ViewRouter({
       )
 
     case 'reports':
-      return (
-        <ReportsView
-          invoices={invoices}
-          payrollRuns={payrollRuns}
-        />
-      )
+      return <ReportsView />
 
     case 'missing-timesheets':
       return (
@@ -238,9 +219,6 @@ export function ViewRouter({
       return (
         <CustomReportBuilder
           timesheets={timesheets}
-          invoices={invoices}
-          payrollRuns={payrollRuns}
-          expenses={expenses}
         />
       )
 

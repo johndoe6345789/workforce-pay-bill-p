@@ -15,17 +15,17 @@ import {
   ChartLine,
   Lightning
 } from '@phosphor-icons/react'
-import type { Invoice, PayrollRun, MarginAnalysis, ForecastData } from '@/lib/types'
+import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
+import { usePayrollCrud } from '@/hooks/use-payroll-crud'
+import type { MarginAnalysis, ForecastData } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
-interface ReportsViewProps {
-  invoices: Invoice[]
-  payrollRuns: PayrollRun[]
-}
-
-export function ReportsView({ invoices, payrollRuns }: ReportsViewProps) {
+export function ReportsView() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month')
   const [selectedYear, setSelectedYear] = useState('2025')
+  
+  const { invoices } = useInvoicesCrud()
+  const { payrollRuns } = usePayrollCrud()
 
   const calculateMarginAnalysis = (): MarginAnalysis[] => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']

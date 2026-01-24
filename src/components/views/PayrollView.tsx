@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   Plus,
   CurrencyDollar,
@@ -7,7 +7,8 @@ import {
   Calculator,
   Users,
   CalendarBlank,
-  ClockCounterClockwise
+  ClockCounterClockwise,
+  Trash
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,21 +21,27 @@ import { MetricCard } from '@/components/ui/metric-card'
 import { PayrollDetailDialog } from '@/components/PayrollDetailDialog'
 import { OneClickPayroll } from '@/components/OneClickPayroll'
 import { usePayrollCalculations } from '@/hooks/use-payroll-calculations'
+import { usePayrollCrud } from '@/hooks/use-payroll-crud'
 import { toast } from 'sonner'
-import type { PayrollRun, Timesheet } from '@/lib/types'
+import type { Timesheet } from '@/lib/types'
 
 interface PayrollViewProps {
-  payrollRuns: PayrollRun[]
   timesheets: Timesheet[]
-  onPayrollComplete: (run: PayrollRun) => void
 }
 
-export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: PayrollViewProps) {
-  const [viewingPayroll, setViewingPayroll] = useState<PayrollRun | null>(null)
+export function PayrollView({ timesheets }: PayrollViewProps) {
+  const [viewingPayroll, setViewingPayroll] = useState<any | null>(null)
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [showCalculator, setShowCalculator] = useState(false)
   const [calculatorGrossPay, setCalculatorGrossPay] = useState('1000')
   const [calculatorResult, setCalculatorResult] = useState<any>(null)
+  
+  const {
+    payrollRuns,
+    createPayrollRun,
+    updatePayrollRun,
+    deletePayrollRun
+  } = usePayrollCrud()
   
   const { 
     calculatePayroll, 
@@ -72,6 +79,27 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
     const result = calculatePayroll('CALC-WORKER', grossPay, grossPay * 12, false)
     setCalculatorResult(result)
   }
+
+  const handlePayrollComplete = useCallback(async (run: any) => {
+    try {
+      await createPayrollRun(run)
+      toast.success('Payroll run completed successfully')
+    } catch (error) {
+      toast.error('Failed to complete payroll run')
+    }
+  }, [createPayrollRun])
+
+  const handleDeletePayrollRun = useCallback(async (runId: string) => {
+    try {
+      await deletePayrollRun(runId)
+      toast.success('Payroll run deleted successfully')
+      if (viewingPayroll?.id === runId) {
+        setViewingPayroll(null)
+      }
+    } catch (error) {
+      toast.error('Failed to delete payroll run')
+    }
+  }, [deletePayrollRun, viewingPayroll])
   
   return (
     <Stack spacing={6}>
@@ -169,7 +197,7 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
 
       <OneClickPayroll 
         timesheets={timesheets}
-        onPayrollComplete={onPayrollComplete}
+        onPayrollComplete={handlePayrollComplete}
       />
 
       {showAnalytics && (
@@ -269,6 +297,13 @@ export function PayrollView({ payrollRuns, timesheets, onPayrollComplete }: Payr
                       Export
                     </Button>
                   )}
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handleDeletePayrollRun(run.id)}
+                  >
+                    <Trash size={16} />
+                  </Button>
                 </Stack>
               </div>
             </CardContent>
