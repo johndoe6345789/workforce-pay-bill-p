@@ -1,4 +1,4 @@
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
 
 export interface SessionTimeoutPreferences {
   timeoutMinutes: number
@@ -13,7 +13,7 @@ const DEFAULT_PREFERENCES: SessionTimeoutPreferences = {
 }
 
 export function useSessionTimeoutPreferences() {
-  const [preferences, setPreferences] = useKV<SessionTimeoutPreferences>(
+  const [preferences, setPreferences] = useIndexedDBState<SessionTimeoutPreferences>(
     'session-timeout-preferences',
     DEFAULT_PREFERENCES
   )

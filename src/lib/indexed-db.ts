@@ -1,5 +1,5 @@
 const DB_NAME = 'WorkForceProDB'
-const DB_VERSION = 2
+const DB_VERSION = 3
 const SESSION_STORE = 'sessions'
 const APP_STATE_STORE = 'appState'
 const TIMESHEETS_STORE = 'timesheets'

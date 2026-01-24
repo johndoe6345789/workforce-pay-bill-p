@@ -1,4 +1,4 @@
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
 import { useState, useEffect, useCallback } from 'react'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { setLocale as setReduxLocale } from '@/store/slices/uiSlice'
@@ -12,7 +12,7 @@ const DEFAULT_LOCALE: Locale = 'en'
 export function useTranslation() {
   const dispatch = useAppDispatch()
   const reduxLocale = useAppSelector(state => state.ui.locale)
-  const [, setKVLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
+  const [, setDBLocale] = useIndexedDBState<Locale>('app-locale', DEFAULT_LOCALE)
   const [translations, setTranslations] = useState<Translations>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -75,9 +75,9 @@ export function useTranslation() {
   const changeLocale = useCallback((newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
       dispatch(setReduxLocale(newLocale))
-      setKVLocale(newLocale)
+      setDBLocale(newLocale)
     }
-  }, [dispatch, setKVLocale])
+  }, [dispatch, setDBLocale])
 
   return {
     t,
@@ -96,12 +96,12 @@ export function useLocale() {
 
 export function useChangeLocale() {
   const dispatch = useAppDispatch()
-  const [, setKVLocale] = useKV<Locale>('app-locale', DEFAULT_LOCALE)
+  const [, setDBLocale] = useIndexedDBState<Locale>('app-locale', DEFAULT_LOCALE)
   
   return useCallback((newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
       dispatch(setReduxLocale(newLocale))
-      setKVLocale(newLocale)
+      setDBLocale(newLocale)
     }
-  }, [dispatch, setKVLocale])
+  }, [dispatch, setDBLocale])
 }

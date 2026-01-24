@@ -1,8 +1,8 @@
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
 import type { Notification } from '@/lib/types'
 
 export function useNotifications() {
-  const [notifications = [], setNotifications] = useKV<Notification[]>('notifications', [])
+  const [notifications = [], setNotifications] = useIndexedDBState<Notification[]>('notifications', [])
 
   const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     const newNotification: Notification = {

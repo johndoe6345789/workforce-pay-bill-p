@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
 
 export interface UseFavoritesOptions {
   storageKey?: string
@@ -18,7 +18,7 @@ export function useFavorites<T extends { id: string }>(
   options: UseFavoritesOptions = {}
 ): UseFavoritesResult<T> {
   const { storageKey = 'favorites' } = options
-  const [favorites = [], setFavorites] = useKV<T[]>(storageKey, [])
+  const [favorites = [], setFavorites] = useIndexedDBState<T[]>(storageKey, [])
 
   const isFavorite = useCallback(
     (id: string) => {

@@ -1,17 +1,10 @@
 import { useEffect, useRef } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
+import { STORES, indexedDB } from '@/lib/indexed-db'
 import appData from '@/data/app-data.json'
 
 export function useSampleData() {
-  const [hasInitialized, setHasInitialized] = useKV<boolean>('sample-data-initialized', false)
-  const [, setTimesheets] = useKV<any[]>('timesheets', [])
-  const [, setInvoices] = useKV<any[]>('invoices', [])
-  const [, setExpenses] = useKV<any[]>('expenses', [])
-  const [, setComplianceDocs] = useKV<any[]>('compliance-docs', [])
-  const [, setPayrollRuns] = useKV<any[]>('payroll-runs', [])
-  const [, setWorkers] = useKV<any[]>('workers', [])
-  const [, setRateCards] = useKV<any[]>('rate-cards', [])
-  const [, setClients] = useKV<any[]>('clients', [])
+  const [hasInitialized, setHasInitialized] = useIndexedDBState<boolean>('sample-data-initialized', false)
   const isInitializing = useRef(false)
 
   useEffect(() => {
@@ -20,29 +13,37 @@ export function useSampleData() {
     isInitializing.current = true
     
     const initializeData = async () => {
-      const transformedTimesheets = appData.timesheets.map((ts: any) => ({
-        ...ts,
-        hours: ts.totalHours || ts.hours || 0,
-        amount: ts.total || ts.amount || 0
-      }))
-      
-      const transformedPayrollRuns = appData.payrollRuns.map((pr: any) => ({
-        ...pr,
-        totalAmount: pr.totalGross || pr.totalAmount || 0,
-        workersCount: pr.workerCount || pr.workersCount || 0
-      }))
-      
-      setTimesheets(transformedTimesheets)
-      setInvoices(appData.invoices)
-      setExpenses(appData.expenses)
-      setComplianceDocs(appData.complianceDocs)
-      setPayrollRuns(transformedPayrollRuns)
-      setWorkers(appData.workers)
-      setRateCards(appData.rateCards)
-      setClients(appData.clients)
-      setHasInitialized(true)
+      try {
+        const transformedTimesheets = appData.timesheets.map((ts: any) => ({
+          ...ts,
+          hours: ts.totalHours || ts.hours || 0,
+          amount: ts.total || ts.amount || 0
+        }))
+        
+        const transformedPayrollRuns = appData.payrollRuns.map((pr: any) => ({
+          ...pr,
+          totalAmount: pr.totalGross || pr.totalAmount || 0,
+          workersCount: pr.workerCount || pr.workersCount || 0
+        }))
+        
+        await Promise.all([
+          indexedDB.bulkCreate(STORES.TIMESHEETS, transformedTimesheets),
+          indexedDB.bulkCreate(STORES.INVOICES, appData.invoices),
+          indexedDB.bulkCreate(STORES.EXPENSES, appData.expenses),
+          indexedDB.bulkCreate(STORES.COMPLIANCE_DOCS, appData.complianceDocs),
+          indexedDB.bulkCreate(STORES.PAYROLL_RUNS, transformedPayrollRuns),
+          indexedDB.bulkCreate(STORES.WORKERS, appData.workers),
+          indexedDB.bulkCreate(STORES.RATE_CARDS, appData.rateCards),
+          indexedDB.saveAppState('clients', appData.clients)
+        ])
+        
+        setHasInitialized(true)
+      } catch (error) {
+        console.error('Failed to initialize sample data:', error)
+        isInitializing.current = false
+      }
     }
 
     initializeData()
-  }, [hasInitialized, setTimesheets, setInvoices, setExpenses, setComplianceDocs, setPayrollRuns, setWorkers, setRateCards, setClients, setHasInitialized])
+  }, [hasInitialized, setHasInitialized])
 }
