@@ -8,11 +8,14 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useSkipLink } from '@/hooks/use-skip-link'
 import { useAnnounce } from '@/hooks/use-announce'
 import { useSessionStorage } from '@/hooks/use-session-storage'
+import { useSessionTimeout } from '@/hooks/use-session-timeout'
+import { useSessionTimeoutPreferences } from '@/hooks/use-session-timeout-preferences'
 import { Sidebar } from '@/components/navigation'
 import { NotificationCenter } from '@/components/NotificationCenter'
 import { ViewRouter } from '@/components/ViewRouter'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog'
+import { SessionExpiryDialog } from '@/components/SessionExpiryDialog'
 import LoginScreen from '@/components/LoginScreen'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { setCurrentView, setSearchQuery } from '@/store/slices/uiSlice'
@@ -38,7 +41,19 @@ function App() {
   useViewPreload()
   useLocaleInit()
   useSkipLink(mainContentRef, 'Skip to main content')
-  useSessionStorage()
+  const { destroySession } = useSessionStorage()
+  const { preferences: timeoutPreferences } = useSessionTimeoutPreferences()
+  
+  const { 
+    isWarningShown, 
+    timeRemaining, 
+    extendSession, 
+    config: timeoutConfig 
+  } = useSessionTimeout({
+    timeoutMinutes: timeoutPreferences?.timeoutMinutes ?? 30,
+    warningMinutes: timeoutPreferences?.warningMinutes ?? 5,
+    checkIntervalSeconds: 30,
+  })
   
   const { notifications, addNotification, markAsRead, markAllAsRead, deleteNotification, unreadCount } = useNotifications()
   
@@ -179,6 +194,14 @@ function App() {
       <KeyboardShortcutsDialog 
         open={showShortcuts} 
         onOpenChange={setShowShortcuts}
+      />
+
+      <SessionExpiryDialog
+        open={isWarningShown}
+        timeRemaining={timeRemaining}
+        totalWarningTime={timeoutConfig.warningMinutes * 60}
+        onExtend={extendSession}
+        onLogout={destroySession}
       />
     </div>
   )

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SessionManager } from '@/components/SessionManager'
 import { useAuth } from '@/hooks/use-auth'
+import { useSessionTimeoutPreferences } from '@/hooks/use-session-timeout-preferences'
 import { toast } from 'sonner'
 import {
   User,
@@ -28,6 +29,7 @@ import {
 export function ProfileView() {
   const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
+  const { preferences: timeoutPrefs, updateTimeout } = useSessionTimeoutPreferences()
   
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
@@ -56,6 +58,15 @@ export function ProfileView() {
     sessionTimeout: '30',
     loginAlerts: true,
   })
+
+  useEffect(() => {
+    if (timeoutPrefs) {
+      setSecurity(prev => ({
+        ...prev,
+        sessionTimeout: String(timeoutPrefs.timeoutMinutes)
+      }))
+    }
+  }, [timeoutPrefs])
 
   const getUserInitials = () => {
     if (!user) return 'U'
@@ -89,7 +100,10 @@ export function ProfileView() {
   }
 
   const handleSaveSecurity = () => {
-    toast.success('Security settings updated')
+    updateTimeout(Number(security.sessionTimeout))
+    toast.success('Security settings updated', {
+      description: `Session timeout set to ${security.sessionTimeout} minutes`,
+    })
   }
 
   return (
@@ -459,7 +473,13 @@ export function ProfileView() {
                 </div>
                 <Separator />
                 <div className="space-y-2">
-                  <Label htmlFor="sessionTimeout">Session Timeout (minutes)</Label>
+                  <Label htmlFor="sessionTimeout" className="flex items-center gap-2">
+                    <Clock size={16} />
+                    Session Timeout
+                  </Label>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Automatically log out after this period of inactivity
+                  </p>
                   <Select
                     value={security.sessionTimeout}
                     onValueChange={(value) => setSecurity({ ...security, sessionTimeout: value })}
@@ -469,9 +489,10 @@ export function ProfileView() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="15">15 minutes</SelectItem>
-                      <SelectItem value="30">30 minutes</SelectItem>
+                      <SelectItem value="30">30 minutes (Recommended)</SelectItem>
                       <SelectItem value="60">1 hour</SelectItem>
                       <SelectItem value="120">2 hours</SelectItem>
+                      <SelectItem value="240">4 hours</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

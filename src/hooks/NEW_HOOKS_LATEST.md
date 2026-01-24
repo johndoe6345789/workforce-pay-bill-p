@@ -2,6 +2,56 @@
 
 This document lists all newly added custom hooks to the library.
 
+## Security & Session Management Hooks
+
+### `useSessionTimeout`
+Monitors user activity and automatically logs out users after a period of inactivity with configurable warnings.
+
+```tsx
+const {
+  isWarningShown,
+  timeRemaining,
+  isTimedOut,
+  extendSession,
+  resetActivity,
+  config
+} = useSessionTimeout({
+  timeoutMinutes: 30,
+  warningMinutes: 5,
+  checkIntervalSeconds: 30
+})
+
+// Shows warning dialog when isWarningShown is true
+// timeRemaining counts down in seconds
+// Call extendSession() to reset the timeout
+// Automatically logs out when timeRemaining reaches 0
+```
+
+### `useSessionTimeoutPreferences`
+Manages persistent user preferences for session timeout configuration.
+
+```tsx
+const {
+  preferences,
+  updateTimeout,
+  updateWarning,
+  toggleEnabled,
+  resetToDefaults
+} = useSessionTimeoutPreferences()
+
+// Update timeout duration
+updateTimeout(60) // 60 minutes
+
+// Update warning period
+updateWarning(10) // 10 minutes before timeout
+
+// Enable/disable auto-logout
+toggleEnabled(true)
+
+// Reset to default settings
+resetToDefaults()
+```
+
 ## Business Logic Hooks (Specialized)
 
 ### `useInvoicing`

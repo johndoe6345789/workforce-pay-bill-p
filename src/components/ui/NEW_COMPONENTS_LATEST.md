@@ -2,6 +2,50 @@
 
 This document lists all newly added UI components to the library.
 
+## Security & Session Components
+
+### `SessionExpiryDialog`
+Modal dialog that warns users when their session is about to expire with a countdown timer.
+
+```tsx
+<SessionExpiryDialog
+  open={isWarningShown}
+  timeRemaining={300} // seconds
+  totalWarningTime={300} // total warning period in seconds
+  onExtend={() => extendSession()}
+  onLogout={() => handleLogout()}
+/>
+```
+
+**Props:**
+- `open`: boolean - controls dialog visibility
+- `timeRemaining`: number - seconds until auto-logout
+- `totalWarningTime`: number - total warning period for progress bar
+- `onExtend`: () => void - callback to extend session
+- `onLogout`: () => void - callback for manual logout
+
+**Features:**
+- Live countdown timer with minutes:seconds format
+- Visual progress bar showing time remaining
+- Clear call-to-action buttons
+- Accessible with ARIA live regions
+- Auto-focuses "Stay Logged In" button
+
+### `SessionManager`
+Comprehensive session management interface showing active sessions and security settings.
+
+```tsx
+<SessionManager />
+```
+
+**Features:**
+- List of all active sessions with timestamps
+- Last activity tracking
+- Manual session termination
+- Bulk session management
+- Security information panel
+- Auto-logout configuration details
+
 ## Layout Components
 
 ### `Container`
