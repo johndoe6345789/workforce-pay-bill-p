@@ -18,6 +18,7 @@ import { Stack } from '@/components/ui/stack'
 import { PermanentPlacementInvoice } from '@/components/PermanentPlacementInvoice'
 import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
 import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
+import { CreateInvoiceDialog } from '@/components/CreateInvoiceDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { useInvoicing } from '@/hooks/use-invoicing'
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
@@ -38,6 +39,7 @@ export function BillingView({
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
   
   const {
     invoices,
@@ -144,12 +146,20 @@ export function BillingView({
             </Button>
             <PermanentPlacementInvoice onCreateInvoice={handleCreatePlacementInvoice} />
             <CreditNoteGenerator invoices={invoices} onCreateCreditNote={handleCreateCreditNote} />
-            <Button>
+            <Button onClick={() => setShowCreateDialog(true)}>
               <Plus size={18} className="mr-2" />
               Create Invoice
             </Button>
           </Stack>
         }
+      />
+
+      <CreateInvoiceDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onCreateInvoice={async (invoice) => {
+          await createInvoice(invoice)
+        }}
       />
 
       {showAnalytics && (

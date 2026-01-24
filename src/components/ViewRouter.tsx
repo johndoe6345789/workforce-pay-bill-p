@@ -133,6 +133,7 @@ export function ViewRouter({
       return (
         <PayrollView 
           timesheets={timesheets}
+          workers={workers}
         />
       )
 

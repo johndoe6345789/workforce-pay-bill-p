@@ -20,6 +20,7 @@ import { Stack } from '@/components/ui/stack'
 import { MetricCard } from '@/components/ui/metric-card'
 import { PayrollDetailDialog } from '@/components/PayrollDetailDialog'
 import { OneClickPayroll } from '@/components/OneClickPayroll'
+import { CreatePayrollDialog } from '@/components/CreatePayrollDialog'
 import { usePayrollCalculations } from '@/hooks/use-payroll-calculations'
 import { usePayrollCrud } from '@/hooks/use-payroll-crud'
 import { toast } from 'sonner'
@@ -27,12 +28,14 @@ import type { Timesheet } from '@/lib/types'
 
 interface PayrollViewProps {
   timesheets: Timesheet[]
+  workers: any[]
 }
 
-export function PayrollView({ timesheets }: PayrollViewProps) {
+export function PayrollView({ timesheets, workers }: PayrollViewProps) {
   const [viewingPayroll, setViewingPayroll] = useState<any | null>(null)
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [showCalculator, setShowCalculator] = useState(false)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [calculatorGrossPay, setCalculatorGrossPay] = useState('1000')
   const [calculatorResult, setCalculatorResult] = useState<any>(null)
   
@@ -187,12 +190,22 @@ export function PayrollView({ timesheets }: PayrollViewProps) {
                 </Stack>
               </DialogContent>
             </Dialog>
-            <Button>
+            <Button onClick={() => setShowCreateDialog(true)}>
               <Plus size={18} className="mr-2" />
               Run Payroll
             </Button>
           </Stack>
         }
+      />
+
+      <CreatePayrollDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onCreatePayroll={async (payroll) => {
+          await createPayrollRun(payroll)
+        }}
+        timesheets={timesheets}
+        workers={workers}
       />
 
       <OneClickPayroll 
