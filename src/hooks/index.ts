@@ -95,6 +95,13 @@ export { useTimeTracking } from './use-time-tracking'
 export { useMarginAnalysis } from './use-margin-analysis'
 export { useComplianceTracking } from './use-compliance-tracking'
 
+export { useFocusReturn } from './use-focus-return'
+export { useAnnounce } from './use-announce'
+export { useReducedMotion } from './use-reduced-motion'
+export { useAriaLive } from './use-aria-live'
+export { useKeyboardShortcuts } from './use-keyboard-shortcuts'
+export { useSkipLink } from './use-skip-link'
+
 export type { AsyncState } from './use-async'
 export type { FormErrors } from './use-form-validation'
 export type { IntersectionObserverOptions } from './use-intersection-observer'

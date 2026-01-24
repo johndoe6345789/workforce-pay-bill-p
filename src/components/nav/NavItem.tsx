@@ -32,18 +32,20 @@ export function NavItem({ icon, label, active, onClick, badge, view, permission 
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       className={cn(
-        'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+        'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         active 
           ? 'bg-accent text-accent-foreground' 
           : 'text-foreground hover:bg-muted'
       )}
+      aria-current={active ? 'page' : undefined}
+      aria-label={badge ? `${label}, ${badge} notifications` : label}
     >
-      <span className={active ? 'text-accent-foreground' : 'text-muted-foreground'}>
+      <span className={active ? 'text-accent-foreground' : 'text-muted-foreground'} aria-hidden="true">
         {icon}
       </span>
       <span className="flex-1 text-left">{label}</span>
       {badge !== undefined && badge > 0 && (
-        <Badge variant="destructive" className="ml-auto h-5 px-1.5 text-xs">
+        <Badge variant="destructive" className="ml-auto h-5 px-1.5 text-xs" aria-label={`${badge} notifications`}>
           {badge}
         </Badge>
       )}

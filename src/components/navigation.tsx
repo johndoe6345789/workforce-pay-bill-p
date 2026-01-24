@@ -53,7 +53,7 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
   }
 
   return (
-    <aside className="w-64 border-r border-border bg-card flex flex-col">
+    <aside className="w-64 border-r border-border bg-card flex flex-col" role="navigation" aria-label="Main navigation">
       <div className="p-6 border-b border-border">
         <h1 className="text-xl font-semibold tracking-tight">WorkForce Pro</h1>
         <p className="text-xs text-muted-foreground mt-1">Back Office Platform</p>
@@ -61,9 +61,9 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
 
       <div className="p-4 border-b border-border">
         <Select value={currentEntity} onValueChange={setCurrentEntity}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full" aria-label="Select entity">
             <div className="flex items-center gap-2">
-              <Buildings size={16} weight="fill" className="text-primary" />
+              <Buildings size={16} weight="fill" className="text-primary" aria-hidden="true" />
               <SelectValue />
             </div>
           </SelectTrigger>
@@ -75,7 +75,7 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
         </Select>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto" aria-label="Application sections">
         <NavItem
           icon={<ChartBar size={20} />}
           label="Dashboard"
@@ -113,7 +113,7 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           toggleGroup={toggleGroup}
         />
 
-        <Separator className="my-2" />
+        <Separator className="my-2" role="separator" />
         <NavItem
           icon={<PuzzlePiece size={20} />}
           label="Component Library"
@@ -155,9 +155,10 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
       <div className="p-4 border-t border-border space-y-3">
         <button
           onClick={() => setCurrentView('profile')}
-          className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-secondary/50 transition-colors"
+          className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-secondary/50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          aria-label={`View profile for ${user?.name || 'User'}`}
         >
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium" aria-hidden="true">
             {getUserInitials()}
           </div>
           <div className="flex-1 min-w-0 text-left">
@@ -170,8 +171,9 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           size="sm" 
           className="w-full justify-start gap-2"
           onClick={logout}
+          aria-label="Log out of application"
         >
-          <SignOut size={16} />
+          <SignOut size={16} aria-hidden="true" />
           Log Out
         </Button>
       </div>
