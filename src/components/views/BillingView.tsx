@@ -22,6 +22,7 @@ import { CreateInvoiceDialog } from '@/components/CreateInvoiceDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { useInvoicing } from '@/hooks/use-invoicing'
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
+import { useTranslation } from '@/hooks/use-translation'
 import { toast } from 'sonner'
 import type { Invoice, RateCard } from '@/lib/types'
 
@@ -36,6 +37,7 @@ export function BillingView({
   setSearchQuery,
   rateCards 
 }: BillingViewProps) {
+  const { t } = useTranslation()
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -66,20 +68,20 @@ export function BillingView({
   const handleSendInvoice = useCallback(async (invoiceId: string) => {
     try {
       await updateInvoice(invoiceId, { status: 'sent' })
-      toast.success('Invoice sent successfully')
+      toast.success(t('billing.invoiceSentSuccess'))
     } catch (error) {
-      toast.error('Failed to send invoice')
+      toast.error(t('billing.invoiceSentError'))
     }
-  }, [updateInvoice])
+  }, [updateInvoice, t])
 
   const handleCreatePlacementInvoice = useCallback(async (invoice: Omit<Invoice, 'id'>) => {
     try {
       await createInvoice(invoice)
-      toast.success('Placement invoice created successfully')
+      toast.success(t('billing.placementInvoiceCreatedSuccess'))
     } catch (error) {
-      toast.error('Failed to create placement invoice')
+      toast.error(t('billing.placementInvoiceCreatedError'))
     }
-  }, [createInvoice])
+  }, [createInvoice, t])
 
   const handleCreateCreditNote = useCallback(async (creditNote: any, creditInvoice: Invoice) => {
     try {
@@ -88,23 +90,23 @@ export function BillingView({
         type: 'credit',
         relatedInvoiceId: creditInvoice.id
       })
-      toast.success('Credit note created successfully')
+      toast.success(t('billing.creditNoteCreatedSuccess'))
     } catch (error) {
-      toast.error('Failed to create credit note')
+      toast.error(t('billing.creditNoteCreatedError'))
     }
-  }, [createInvoice])
+  }, [createInvoice, t])
 
   const handleDeleteInvoice = useCallback(async (invoiceId: string) => {
     try {
       await deleteInvoice(invoiceId)
-      toast.success('Invoice deleted successfully')
+      toast.success(t('billing.invoiceDeletedSuccess'))
       if (viewingInvoice?.id === invoiceId) {
         setViewingInvoice(null)
       }
     } catch (error) {
-      toast.error('Failed to delete invoice')
+      toast.error(t('billing.invoiceDeletedError'))
     }
-  }, [deleteInvoice, viewingInvoice])
+  }, [deleteInvoice, viewingInvoice, t])
 
   const agingData = useMemo(() => calculateInvoiceAging(), [calculateInvoiceAging])
   const overdueInvoices = useMemo(() => getOverdueInvoices(), [getOverdueInvoices])
@@ -112,29 +114,29 @@ export function BillingView({
   const draftInvoices = useMemo(() => getInvoicesByStatus('draft'), [getInvoicesByStatus])
   
   const invoiceFields: FilterField[] = [
-    { name: 'invoiceNumber', label: 'Invoice Number', type: 'text' },
-    { name: 'clientName', label: 'Client Name', type: 'text' },
-    { name: 'status', label: 'Status', type: 'select', options: [
-      { value: 'draft', label: 'Draft' },
-      { value: 'sent', label: 'Sent' },
-      { value: 'paid', label: 'Paid' },
-      { value: 'overdue', label: 'Overdue' }
+    { name: 'invoiceNumber', label: t('billing.invoiceNumber'), type: 'text' },
+    { name: 'clientName', label: t('billing.clientName'), type: 'text' },
+    { name: 'status', label: t('common.status'), type: 'select', options: [
+      { value: 'draft', label: t('billing.status.draft') },
+      { value: 'sent', label: t('billing.status.sent') },
+      { value: 'paid', label: t('billing.status.paid') },
+      { value: 'overdue', label: t('billing.status.overdue') }
     ]},
-    { name: 'amount', label: 'Amount', type: 'number' },
-    { name: 'currency', label: 'Currency', type: 'select', options: [
+    { name: 'amount', label: t('billing.amount'), type: 'number' },
+    { name: 'currency', label: t('billing.currency'), type: 'select', options: [
       { value: 'GBP', label: 'GBP' },
       { value: 'USD', label: 'USD' },
       { value: 'EUR', label: 'EUR' }
     ]},
-    { name: 'issueDate', label: 'Issue Date', type: 'date' },
-    { name: 'dueDate', label: 'Due Date', type: 'date' }
+    { name: 'issueDate', label: t('billing.issueDate'), type: 'date' },
+    { name: 'dueDate', label: t('billing.dueDate'), type: 'date' }
   ]
 
   return (
     <Stack spacing={6}>
       <PageHeader
-        title="Billing & Invoicing"
-        description="Manage invoices and track payments"
+        title={t('billing.title')}
+        description={t('billing.subtitle')}
         actions={
           <Stack direction="horizontal" spacing={2}>
             <Button 
@@ -142,13 +144,13 @@ export function BillingView({
               onClick={() => setShowAnalytics(!showAnalytics)}
             >
               <ChartLine size={18} className="mr-2" />
-              {showAnalytics ? 'Hide' : 'Show'} Analytics
+              {showAnalytics ? t('billing.hideAnalytics') : t('billing.showAnalytics')}
             </Button>
             <PermanentPlacementInvoice onCreateInvoice={handleCreatePlacementInvoice} />
             <CreditNoteGenerator invoices={invoices} onCreateCreditNote={handleCreateCreditNote} />
             <Button onClick={() => setShowCreateDialog(true)}>
               <Plus size={18} className="mr-2" />
-              Create Invoice
+              {t('billing.createInvoice')}
             </Button>
           </Stack>
         }
@@ -166,48 +168,48 @@ export function BillingView({
         <Stack spacing={4}>
           <Grid cols={4} gap={4} responsive>
             <MetricCard
-              label="Total Revenue"
+              label={t('billing.totalRevenue')}
               value={`£${totalRevenue.toLocaleString()}`}
             />
             <MetricCard
-              label="Draft Invoices"
+              label={t('billing.draftInvoices')}
               value={draftInvoices.length}
             />
             <MetricCard
-              label="Overdue"
+              label={t('billing.overdueInvoices')}
               value={overdueInvoices.length}
-              description={overdueInvoices.length > 0 ? 'Action needed' : 'All current'}
+              description={overdueInvoices.length > 0 ? t('billing.actionNeeded') : t('billing.allCurrent')}
             />
             <MetricCard
-              label="Outstanding"
+              label={t('billing.outstanding')}
               value={`£${(agingData.current + agingData.days30 + agingData.days60 + agingData.days90 + agingData.over90).toLocaleString()}`}
             />
           </Grid>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Invoice Aging Analysis</CardTitle>
+              <CardTitle className="text-sm">{t('billing.invoiceAgingAnalysis')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-5 gap-4">
                 <div>
-                  <div className="text-xs text-muted-foreground mb-1">Current</div>
+                  <div className="text-xs text-muted-foreground mb-1">{t('billing.current')}</div>
                   <div className="font-semibold font-mono">£{agingData.current.toLocaleString()}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground mb-1">1-30 Days</div>
+                  <div className="text-xs text-muted-foreground mb-1">{t('billing.days30')}</div>
                   <div className="font-semibold font-mono">£{agingData.days30.toLocaleString()}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground mb-1">31-60 Days</div>
+                  <div className="text-xs text-muted-foreground mb-1">{t('billing.days60')}</div>
                   <div className="font-semibold font-mono text-warning">£{agingData.days60.toLocaleString()}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground mb-1">61-90 Days</div>
+                  <div className="text-xs text-muted-foreground mb-1">{t('billing.days90')}</div>
                   <div className="font-semibold font-mono text-warning">£{agingData.days90.toLocaleString()}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground mb-1">90+ Days</div>
+                  <div className="text-xs text-muted-foreground mb-1">{t('billing.over90')}</div>
                   <div className="font-semibold font-mono text-destructive">£{agingData.over90.toLocaleString()}</div>
                 </div>
               </div>
@@ -220,13 +222,13 @@ export function BillingView({
         items={invoices}
         fields={invoiceFields}
         onResultsChange={handleResultsChange}
-        placeholder="Search invoices or use query language (e.g., status = overdue amount > 1000)"
+        placeholder={t('billing.searchPlaceholder')}
       />
 
       <Stack direction="horizontal" spacing={4}>
         <Button variant="outline">
           <Download size={18} className="mr-2" />
-          Export
+          {t('billing.export')}
         </Button>
       </Stack>
 
@@ -240,30 +242,30 @@ export function BillingView({
                     <Receipt size={20} className="text-primary" />
                     <h3 className="font-semibold text-lg font-mono">{invoice.invoiceNumber}</h3>
                     <Badge variant={invoice.status === 'paid' ? 'success' : invoice.status === 'overdue' ? 'destructive' : 'warning'}>
-                      {invoice.status}
+                      {t(`billing.status.${invoice.status}`)}
                     </Badge>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                     <div>
-                      <p className="text-muted-foreground">Client</p>
+                      <p className="text-muted-foreground">{t('billing.client')}</p>
                       <p className="font-medium">{invoice.clientName}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Issue Date</p>
+                      <p className="text-muted-foreground">{t('billing.issueDate')}</p>
                       <p className="font-medium">{new Date(invoice.issueDate).toLocaleDateString()}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Due Date</p>
+                      <p className="text-muted-foreground">{t('billing.dueDate')}</p>
                       <p className="font-medium">{new Date(invoice.dueDate).toLocaleDateString()}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Amount</p>
+                      <p className="text-muted-foreground">{t('billing.amount')}</p>
                       <p className="font-semibold font-mono text-lg">
                         {invoice.currency === 'GBP' ? '£' : '$'}{invoice.amount.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Currency</p>
+                      <p className="text-muted-foreground">{t('billing.currency')}</p>
                       <p className="font-medium font-mono">{invoice.currency}</p>
                     </div>
                   </div>
@@ -275,13 +277,13 @@ export function BillingView({
                       onClick={() => handleSendInvoice(invoice.id)}
                     >
                       <Envelope size={16} className="mr-2" />
-                      Send
+                      {t('billing.send')}
                     </Button>
                   )}
-                  <Button size="sm" variant="outline">View</Button>
+                  <Button size="sm" variant="outline">{t('billing.view')}</Button>
                   <Button size="sm" variant="outline">
                     <Download size={16} className="mr-2" />
-                    PDF
+                    {t('billing.pdf')}
                   </Button>
                   <Button 
                     size="sm" 
@@ -299,8 +301,8 @@ export function BillingView({
         {filteredInvoices.length === 0 && (
           <Card className="p-12 text-center">
             <Receipt size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No invoices found</h3>
-            <p className="text-muted-foreground">Create your first invoice or adjust your search</p>
+            <h3 className="text-lg font-semibold mb-2">{t('billing.noInvoicesFound')}</h3>
+            <p className="text-muted-foreground">{t('billing.noInvoicesDescription')}</p>
           </Card>
         )}
       </Stack>
