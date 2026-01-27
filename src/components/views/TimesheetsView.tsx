@@ -29,6 +29,7 @@ import { TimeAndRateAdjustmentWizard } from '@/components/TimeAndRateAdjustmentW
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { TimesheetCreateDialogs } from '@/components/timesheets/TimesheetCreateDialogs'
 import { TimesheetTabs } from '@/components/timesheets/TimesheetTabs'
+import { LiveRefreshIndicator } from '@/components/LiveRefreshIndicator'
 import { useTimeTracking } from '@/hooks/use-time-tracking'
 import { useTimesheetsCrud } from '@/hooks/use-timesheets-crud'
 import { usePermissions } from '@/hooks/use-permissions'
@@ -69,8 +70,9 @@ export function TimesheetsView({
     createTimesheet,
     updateTimesheet,
     deleteTimesheet,
-    bulkCreateTimesheets
-  } = useTimesheetsCrud()
+    bulkCreateTimesheets,
+    lastUpdated
+  } = useTimesheetsCrud({ liveRefresh: true, pollingInterval: 1000 })
   
   const handleCreateTimesheet = useCallback(async (data: {
     workerName: string
@@ -372,34 +374,40 @@ export function TimesheetsView({
 
   return (
     <Stack spacing={6}>
-      <PageHeader
-        title={t('timesheets.title')}
-        description={t('timesheets.subtitle')}
-        actions={
-          <Stack direction="horizontal" spacing={2}>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowAnalytics(!showAnalytics)}
-            >
-              <ChartBar size={18} className="mr-2" />
-              {showAnalytics ? t('timesheets.hideAnalytics') : t('timesheets.showAnalytics')}
-            </Button>
-            <TimesheetCreateDialogs
-              isCreateDialogOpen={isCreateDialogOpen}
-              setIsCreateDialogOpen={setIsCreateDialogOpen}
-              isBulkImportOpen={isBulkImportOpen}
-              setIsBulkImportOpen={setIsBulkImportOpen}
-              formData={formData}
-              setFormData={setFormData}
-              csvData={csvData}
-              setCsvData={setCsvData}
-              onCreateTimesheet={handleCreateTimesheet}
-              onCreateDetailedTimesheet={handleCreateDetailedTimesheet}
-              onBulkImport={handleBulkImport}
-            />
-          </Stack>
-        }
-      />
+      <div className="flex items-center justify-between">
+        <PageHeader
+          title={t('timesheets.title')}
+          description={t('timesheets.subtitle')}
+          actions={
+            <Stack direction="horizontal" spacing={2}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAnalytics(!showAnalytics)}
+              >
+                <ChartBar size={18} className="mr-2" />
+                {showAnalytics ? t('timesheets.hideAnalytics') : t('timesheets.showAnalytics')}
+              </Button>
+              <TimesheetCreateDialogs
+                isCreateDialogOpen={isCreateDialogOpen}
+                setIsCreateDialogOpen={setIsCreateDialogOpen}
+                isBulkImportOpen={isBulkImportOpen}
+                setIsBulkImportOpen={setIsBulkImportOpen}
+                formData={formData}
+                setFormData={setFormData}
+                csvData={csvData}
+                setCsvData={setCsvData}
+                onCreateTimesheet={handleCreateTimesheet}
+                onCreateDetailedTimesheet={handleCreateDetailedTimesheet}
+                onBulkImport={handleBulkImport}
+              />
+            </Stack>
+          }
+        />
+        <LiveRefreshIndicator 
+          lastUpdated={lastUpdated} 
+          pollingInterval={1000}
+        />
+      </div>
 
       {showAnalytics && (
         <>

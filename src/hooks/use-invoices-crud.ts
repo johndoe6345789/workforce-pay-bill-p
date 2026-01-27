@@ -1,10 +1,22 @@
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { indexedDB, STORES } from '@/lib/indexed-db'
-import { useIndexedDBState } from './use-indexed-db-state'
+import { useIndexedDBLive } from './use-indexed-db-live'
 import type { Invoice } from '@/lib/types'
 
-export function useInvoicesCrud() {
-  const [invoices, setInvoices] = useIndexedDBState<Invoice[]>(STORES.INVOICES, [])
+export function useInvoicesCrud(options?: { liveRefresh?: boolean; pollingInterval?: number }) {
+  const liveRefreshEnabled = options?.liveRefresh !== false
+  const pollingInterval = options?.pollingInterval || 1000
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  
+  const [invoices, setInvoices] = useIndexedDBLive<Invoice[]>(
+    STORES.INVOICES, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  
+  useEffect(() => {
+    setLastUpdated(new Date())
+  }, [invoices])
 
   const createInvoice = useCallback(async (invoice: Omit<Invoice, 'id'>) => {
     const newInvoice: Invoice = {
@@ -128,6 +140,7 @@ export function useInvoicesCrud() {
     getInvoicesByClient,
     getInvoicesByStatus,
     bulkCreateInvoices,
-    bulkUpdateInvoices
+    bulkUpdateInvoices,
+    lastUpdated
   }
 }

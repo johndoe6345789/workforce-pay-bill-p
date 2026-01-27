@@ -20,6 +20,7 @@ import { CreditNoteGenerator } from '@/components/CreditNoteGenerator'
 import { InvoiceDetailDialog } from '@/components/InvoiceDetailDialog'
 import { CreateInvoiceDialog } from '@/components/CreateInvoiceDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
+import { LiveRefreshIndicator } from '@/components/LiveRefreshIndicator'
 import { useInvoicing } from '@/hooks/use-invoicing'
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
 import { useTranslation } from '@/hooks/use-translation'
@@ -47,8 +48,9 @@ export function BillingView({
     invoices,
     createInvoice,
     updateInvoice,
-    deleteInvoice
-  } = useInvoicesCrud()
+    deleteInvoice,
+    lastUpdated
+  } = useInvoicesCrud({ liveRefresh: true, pollingInterval: 1000 })
   
   const {
     calculateInvoiceAging,
@@ -134,27 +136,33 @@ export function BillingView({
 
   return (
     <Stack spacing={6}>
-      <PageHeader
-        title={t('billing.title')}
-        description={t('billing.subtitle')}
-        actions={
-          <Stack direction="horizontal" spacing={2}>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowAnalytics(!showAnalytics)}
-            >
-              <ChartLine size={18} className="mr-2" />
-              {showAnalytics ? t('billing.hideAnalytics') : t('billing.showAnalytics')}
-            </Button>
-            <PermanentPlacementInvoice onCreateInvoice={handleCreatePlacementInvoice} />
-            <CreditNoteGenerator invoices={invoices} onCreateCreditNote={handleCreateCreditNote} />
-            <Button onClick={() => setShowCreateDialog(true)}>
-              <Plus size={18} className="mr-2" />
-              {t('billing.createInvoice')}
-            </Button>
-          </Stack>
-        }
-      />
+      <div className="flex items-center justify-between">
+        <PageHeader
+          title={t('billing.title')}
+          description={t('billing.subtitle')}
+          actions={
+            <Stack direction="horizontal" spacing={2}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAnalytics(!showAnalytics)}
+              >
+                <ChartLine size={18} className="mr-2" />
+                {showAnalytics ? t('billing.hideAnalytics') : t('billing.showAnalytics')}
+              </Button>
+              <PermanentPlacementInvoice onCreateInvoice={handleCreatePlacementInvoice} />
+              <CreditNoteGenerator invoices={invoices} onCreateCreditNote={handleCreateCreditNote} />
+              <Button onClick={() => setShowCreateDialog(true)}>
+                <Plus size={18} className="mr-2" />
+                {t('billing.createInvoice')}
+              </Button>
+            </Stack>
+          }
+        />
+        <LiveRefreshIndicator 
+          lastUpdated={lastUpdated} 
+          pollingInterval={1000}
+        />
+      </div>
 
       <CreateInvoiceDialog
         open={showCreateDialog}

@@ -1,10 +1,22 @@
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { indexedDB, STORES } from '@/lib/indexed-db'
-import { useIndexedDBState } from './use-indexed-db-state'
+import { useIndexedDBLive } from './use-indexed-db-live'
 import type { Timesheet } from '@/lib/types'
 
-export function useTimesheetsCrud() {
-  const [timesheets, setTimesheets] = useIndexedDBState<Timesheet[]>(STORES.TIMESHEETS, [])
+export function useTimesheetsCrud(options?: { liveRefresh?: boolean; pollingInterval?: number }) {
+  const liveRefreshEnabled = options?.liveRefresh !== false
+  const pollingInterval = options?.pollingInterval || 1000
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  
+  const [timesheets, setTimesheets] = useIndexedDBLive<Timesheet[]>(
+    STORES.TIMESHEETS, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  
+  useEffect(() => {
+    setLastUpdated(new Date())
+  }, [timesheets])
 
   const createTimesheet = useCallback(async (timesheet: Omit<Timesheet, 'id'>) => {
     const newTimesheet: Timesheet = {
@@ -128,6 +140,7 @@ export function useTimesheetsCrud() {
     getTimesheetsByWorker,
     getTimesheetsByStatus,
     bulkCreateTimesheets,
-    bulkUpdateTimesheets
+    bulkUpdateTimesheets,
+    lastUpdated
   }
 }
