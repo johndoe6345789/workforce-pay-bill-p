@@ -38,8 +38,8 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 ### 1.4 Basic Payroll
 - ✅ Payroll run tracking
 - ✅ Worker payment calculations
-- 📋 One-click payroll processing
-- 📋 PAYE payroll integration
+- ✅ One-click payroll processing
+- ✅ PAYE payroll integration
 - 📋 Limited company contractor payments
 - 📋 Holiday pay calculations
 

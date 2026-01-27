@@ -10,7 +10,8 @@ import {
   ClockCounterClockwise,
   Trash,
   Stack as StackIcon,
-  CheckCircle
+  CheckCircle,
+  FileText
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,9 +27,12 @@ import { OneClickPayroll } from '@/components/OneClickPayroll'
 import { CreatePayrollDialog } from '@/components/CreatePayrollDialog'
 import { PayrollBatchProcessor } from '@/components/PayrollBatchProcessor'
 import { PayrollBatchList } from '@/components/PayrollBatchList'
+import { PAYEManager } from '@/components/PAYEManager'
+import { CreatePAYESubmissionDialog } from '@/components/CreatePAYESubmissionDialog'
 import { usePayrollCalculations } from '@/hooks/use-payroll-calculations'
 import { usePayrollCrud } from '@/hooks/use-payroll-crud'
 import { usePayrollBatch } from '@/hooks/use-payroll-batch'
+import { usePAYEIntegration } from '@/hooks/use-paye-integration'
 import { useAppSelector } from '@/store/hooks'
 import { toast } from 'sonner'
 import type { Timesheet } from '@/lib/types'
@@ -43,6 +47,9 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [showCalculator, setShowCalculator] = useState(false)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showPAYEManager, setShowPAYEManager] = useState(false)
+  const [showCreatePAYE, setShowCreatePAYE] = useState(false)
+  const [selectedPayrollForPAYE, setSelectedPayrollForPAYE] = useState<string | null>(null)
   const [calculatorGrossPay, setCalculatorGrossPay] = useState('1000')
   const [calculatorResult, setCalculatorResult] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('overview')
@@ -64,6 +71,8 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
     calculateBatchPayroll,
     payrollConfig 
   } = usePayrollCalculations()
+
+  const { getPendingSubmissions, getSubmittedSubmissions } = usePAYEIntegration()
 
   const approvedTimesheets = useMemo(() => 
     timesheets.filter(ts => ts.status === 'approved'),
@@ -93,6 +102,16 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
   const completedBatches = useMemo(() =>
     batches.filter(b => b.status === 'completed'),
     [batches]
+  )
+
+  const pendingPAYESubmissions = useMemo(
+    () => getPendingSubmissions(),
+    [getPendingSubmissions]
+  )
+
+  const submittedPAYESubmissions = useMemo(
+    () => getSubmittedSubmissions(),
+    [getSubmittedSubmissions]
   )
 
   const handleCalculate = () => {
@@ -134,6 +153,13 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
         description="Manage payroll runs and worker payments"
         actions={
           <Stack direction="horizontal" spacing={2}>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowPAYEManager(true)}
+            >
+              <FileText size={18} className="mr-2" />
+              PAYE RTI Manager
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => setShowAnalytics(!showAnalytics)}
@@ -286,7 +312,7 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
             </Grid>
           )}
 
-          <Grid cols={3} gap={4}>
+          <Grid cols={4} gap={4}>
             <MetricCard
               label="Next Pay Date"
               value="22 Jan 2025"
@@ -299,6 +325,25 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
               description="Must be approved for payroll"
               icon={<ClockCounterClockwise size={24} />}
             />
+            <MetricCard
+              label="PAYE Pending"
+              value={pendingPAYESubmissions.length}
+              description="RTI submissions ready"
+              icon={<FileText size={24} />}
+              onClick={() => setShowPAYEManager(true)}
+              className="cursor-pointer hover:bg-muted/50 transition-colors"
+            />
+            <MetricCard
+              label="PAYE Submitted"
+              value={submittedPAYESubmissions.length}
+              description="Sent to HMRC"
+              icon={<CheckCircle size={24} />}
+              onClick={() => setShowPAYEManager(true)}
+              className="cursor-pointer hover:bg-muted/50 transition-colors"
+            />
+          </Grid>
+
+          <Grid cols={3} gap={4}>
             <MetricCard
               label="Last Run Total"
               value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
@@ -350,10 +395,23 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
                         View Details
                       </Button>
                       {run.status === 'completed' && (
-                        <Button size="sm" variant="outline">
-                          <Download size={16} className="mr-2" />
-                          Export
-                        </Button>
+                        <>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedPayrollForPAYE(run.id)
+                              setShowCreatePAYE(true)
+                            }}
+                          >
+                            <FileText size={16} className="mr-2" />
+                            Create PAYE
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Download size={16} className="mr-2" />
+                            Export
+                          </Button>
+                        </>
                       )}
                       <Button 
                         size="sm" 
@@ -404,6 +462,23 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
           if (!open) setViewingPayroll(null)
         }}
       />
+
+      <PAYEManager
+        payrollRunId={selectedPayrollForPAYE || undefined}
+        open={showPAYEManager}
+        onOpenChange={setShowPAYEManager}
+      />
+
+      {selectedPayrollForPAYE && (
+        <CreatePAYESubmissionDialog
+          payrollRunId={selectedPayrollForPAYE}
+          open={showCreatePAYE}
+          onOpenChange={setShowCreatePAYE}
+          onSuccess={() => {
+            setShowPAYEManager(true)
+          }}
+        />
+      )}
     </Stack>
   )
 }
