@@ -13,8 +13,10 @@ import { Envelope, Plus, Pencil, Trash, Eye } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import type { EmailTemplate, NotificationType } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/hooks/use-translation'
 
 export function EmailTemplateManager() {
+  const { t } = useTranslation()
   const [templates = [], setTemplates] = useKV<EmailTemplate[]>('email-templates', [])
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
@@ -66,7 +68,7 @@ export function EmailTemplateManager() {
   const initializeTemplates = () => {
     if (templates.length === 0) {
       setTemplates(defaultTemplates)
-      toast.success('Default email templates loaded')
+      toast.success(t('emailTemplates.defaultsLoaded'))
     }
   }
 
@@ -81,7 +83,7 @@ export function EmailTemplateManager() {
     }
 
     setTemplates(current => [...(current || []), newTemplate])
-    toast.success('Email template created')
+    toast.success(t('emailTemplates.templateCreated'))
     setIsCreateOpen(false)
     resetForm()
   }
@@ -103,14 +105,14 @@ export function EmailTemplateManager() {
           : t
       )
     )
-    toast.success('Email template updated')
+    toast.success(t('emailTemplates.templateUpdated'))
     setEditingTemplate(null)
     resetForm()
   }
 
   const handleDeleteTemplate = (id: string) => {
     setTemplates(current => (current || []).filter(t => t.id !== id))
-    toast.success('Email template deleted')
+    toast.success(t('emailTemplates.templateDeleted'))
   }
 
   const extractVariables = (text: string): string[] => {
@@ -154,41 +156,41 @@ export function EmailTemplateManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Email Templates</h2>
-          <p className="text-muted-foreground mt-1">Manage automated notification templates</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('emailTemplates.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('emailTemplates.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           {templates.length === 0 && (
             <Button variant="outline" onClick={initializeTemplates}>
-              Load Defaults
+              {t('emailTemplates.loadDefaults')}
             </Button>
           )}
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus size={18} className="mr-2" />
-                New Template
+                {t('emailTemplates.createTemplate')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Create Email Template</DialogTitle>
+                <DialogTitle>{t('emailTemplates.createTemplate')}</DialogTitle>
                 <DialogDescription>
-                  Create a new automated email notification template
+                  {t('emailTemplates.subtitle')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="template-name">Template Name</Label>
+                  <Label htmlFor="template-name">{t('emailTemplates.templateName')}</Label>
                   <Input
                     id="template-name"
-                    placeholder="e.g., Timesheet Approval"
+                    placeholder={t('emailTemplates.templateNamePlaceholder')}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="template-type">Notification Type</Label>
+                  <Label htmlFor="template-type">{t('emailTemplates.templateType')}</Label>
                   <Select
                     value={formData.type}
                     onValueChange={(value) => setFormData({ ...formData, type: value as NotificationType })}

@@ -18,6 +18,7 @@ import {
 import { toast } from 'sonner'
 import type { CurrencyRate } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/hooks/use-translation'
 
 const DEFAULT_CURRENCIES: CurrencyRate[] = [
   { code: 'GBP', name: 'British Pound', symbol: '£', rateToGBP: 1.0, lastUpdated: new Date().toISOString() },
@@ -26,6 +27,7 @@ const DEFAULT_CURRENCIES: CurrencyRate[] = [
 ]
 
 export function CurrencyManagement() {
+  const { t } = useTranslation()
   const [currencies = DEFAULT_CURRENCIES, setCurrencies] = useKV<CurrencyRate[]>('currency-rates', DEFAULT_CURRENCIES)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [newCurrency, setNewCurrency] = useState({
@@ -37,19 +39,19 @@ export function CurrencyManagement() {
 
   const handleAddCurrency = () => {
     if (!newCurrency.code || !newCurrency.name || !newCurrency.symbol || !newCurrency.rateToGBP) {
-      toast.error('Please fill in all fields')
+      toast.error(t('currency.fillAllFields'))
       return
     }
 
     const rate = parseFloat(newCurrency.rateToGBP)
     if (isNaN(rate) || rate <= 0) {
-      toast.error('Please enter a valid exchange rate')
+      toast.error(t('currency.invalidRate'))
       return
     }
 
     const exists = currencies.some(c => c.code.toUpperCase() === newCurrency.code.toUpperCase())
     if (exists) {
-      toast.error('Currency already exists')
+      toast.error(t('currency.currencyExists'))
       return
     }
 
@@ -62,7 +64,7 @@ export function CurrencyManagement() {
     }
 
     setCurrencies(current => [...(current || []), currency])
-    toast.success(`${currency.code} currency added`)
+    toast.success(t('currency.currencyAdded', { code: currency.code }))
 
     setNewCurrency({ code: '', name: '', symbol: '', rateToGBP: '' })
     setIsAddDialogOpen(false)
@@ -79,17 +81,17 @@ export function CurrencyManagement() {
       )
     )
     
-    toast.success(`${code} exchange rate updated`)
+    toast.success(t('currency.rateUpdated', { code }))
   }
 
   const handleRemoveCurrency = (code: string) => {
     if (code === 'GBP') {
-      toast.error('Cannot remove base currency')
+      toast.error(t('currency.cannotRemoveBase'))
       return
     }
 
     setCurrencies(current => (current || []).filter(c => c.code !== code))
-    toast.success(`${code} currency removed`)
+    toast.success(t('currency.currencyRemoved', { code }))
   }
 
   const convertAmount = (amount: number, fromCode: string, toCode: string): number => {
@@ -120,8 +122,8 @@ export function CurrencyManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Currency Management</h2>
-          <p className="text-muted-foreground mt-1">Manage exchange rates and multi-currency billing</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('currency.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('currency.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Button 
@@ -135,71 +137,71 @@ export function CurrencyManagement() {
             }}
           >
             <ArrowsClockwise size={18} className="mr-2" />
-            Update All Rates
+            {t('currency.updateAllRates')}
           </Button>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus size={18} className="mr-2" />
-                Add Currency
+                {t('currency.addCurrency')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Currency</DialogTitle>
+                <DialogTitle>{t('currency.addNewCurrency')}</DialogTitle>
                 <DialogDescription>
-                  Add a new currency with its exchange rate to GBP
+                  {t('currency.addNewCurrencyDescription')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="code">Currency Code</Label>
+                    <Label htmlFor="code">{t('currency.code')}</Label>
                     <Input
                       id="code"
-                      placeholder="USD"
+                      placeholder={t('currency.currencyCodePlaceholder')}
                       value={newCurrency.code}
                       onChange={(e) => setNewCurrency({ ...newCurrency, code: e.target.value.toUpperCase() })}
                       maxLength={3}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="symbol">Symbol</Label>
+                    <Label htmlFor="symbol">{t('currency.symbol')}</Label>
                     <Input
                       id="symbol"
-                      placeholder="$"
+                      placeholder={t('currency.symbolPlaceholder')}
                       value={newCurrency.symbol}
                       onChange={(e) => setNewCurrency({ ...newCurrency, symbol: e.target.value })}
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="name">Currency Name</Label>
+                  <Label htmlFor="name">{t('currency.name')}</Label>
                   <Input
                     id="name"
-                    placeholder="US Dollar"
+                    placeholder={t('currency.namePlaceholder')}
                     value={newCurrency.name}
                     onChange={(e) => setNewCurrency({ ...newCurrency, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="rate">Exchange Rate to GBP</Label>
+                  <Label htmlFor="rate">{t('currency.exchangeRateToGBP')}</Label>
                   <Input
                     id="rate"
                     type="number"
                     step="0.0001"
-                    placeholder="0.7900"
+                    placeholder={t('currency.ratePlaceholder')}
                     value={newCurrency.rateToGBP}
                     onChange={(e) => setNewCurrency({ ...newCurrency, rateToGBP: e.target.value })}
                   />
                   <p className="text-xs text-muted-foreground">
-                    1 {newCurrency.code || 'XXX'} = {newCurrency.rateToGBP || '0'} GBP
+                    {t('currency.rateHint', { code: newCurrency.code || 'XXX', rate: newCurrency.rateToGBP || '0' })}
                   </p>
                 </div>
               </div>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleAddCurrency}>Add Currency</Button>
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>{t('common.cancel')}</Button>
+                <Button onClick={handleAddCurrency}>{t('currency.addCurrency')}</Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -211,42 +213,42 @@ export function CurrencyManagement() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <Globe size={18} className="text-accent" />
-              Active Currencies
+              {t('currency.activeCurrencies')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{currencies.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">Enabled for billing</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('currency.enabledForBilling')}</p>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-success/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Base Currency</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('currency.baseCurrency')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">GBP</div>
-            <p className="text-sm text-muted-foreground mt-1">British Pound (£)</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('currency.britishPound')}</p>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-primary/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Last Updated</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('currency.lastUpdated')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
               {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Today</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('currency.today')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Exchange Rates</CardTitle>
-          <CardDescription>Current exchange rates relative to GBP (base currency)</CardDescription>
+          <CardTitle>{t('currency.exchangeRates')}</CardTitle>
+          <CardDescription>{t('currency.exchangeRatesDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -265,7 +267,7 @@ export function CurrencyManagement() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold text-lg">{currency.code}</h3>
-                            {isBase && <Badge variant="outline">Base Currency</Badge>}
+                            {isBase && <Badge variant="outline">{t('currency.baseCurrency')}</Badge>}
                           </div>
                           <p className="text-sm text-muted-foreground">{currency.name}</p>
                         </div>
@@ -273,7 +275,7 @@ export function CurrencyManagement() {
 
                       <div className="flex items-center gap-6">
                         <div className="text-right">
-                          <div className="text-sm text-muted-foreground mb-1">Exchange Rate</div>
+                          <div className="text-sm text-muted-foreground mb-1">{t('currency.exchangeRate')}</div>
                           <div className="font-mono font-semibold text-lg">
                             1 {currency.code} = {currency.rateToGBP.toFixed(4)} GBP
                           </div>
@@ -287,13 +289,13 @@ export function CurrencyManagement() {
                               ) : (
                                 <TrendDown size={12} weight="bold" />
                               )}
-                              <span>{Math.abs(rateChange).toFixed(2)}% vs yesterday</span>
+                              <span>{Math.abs(rateChange).toFixed(2)}% {t('currency.vsYesterday')}</span>
                             </div>
                           )}
                         </div>
 
                         <div className="text-right">
-                          <div className="text-sm text-muted-foreground mb-1">Symbol</div>
+                          <div className="text-sm text-muted-foreground mb-1">{t('currency.symbol')}</div>
                           <div className="font-semibold text-2xl">{currency.symbol}</div>
                         </div>
 
@@ -312,14 +314,14 @@ export function CurrencyManagement() {
                                 variant="outline"
                                 onClick={() => handleRemoveCurrency(currency.code)}
                               >
-                                Remove
+                                {t('currency.remove')}
                               </Button>
                             </>
                           )}
                           {isBase && (
                             <Button size="sm" variant="outline" disabled>
                               <CheckCircle size={16} className="mr-2" />
-                              Active
+                              {t('currency.active')}
                             </Button>
                           )}
                         </div>
@@ -327,7 +329,7 @@ export function CurrencyManagement() {
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-border">
-                      <div className="text-xs text-muted-foreground mb-2">Quick Conversions:</div>
+                      <div className="text-xs text-muted-foreground mb-2">{t('currency.quickConversions')}</div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">100 {currency.code}</span>
@@ -355,35 +357,35 @@ export function CurrencyManagement() {
         <CardContent className="p-6">
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <Globe size={20} className="text-accent" />
-            Multi-Currency Billing Features
+            {t('currency.multiCurrencyBillingFeatures')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="flex items-start gap-2">
               <CheckCircle size={16} className="text-success mt-0.5" weight="fill" />
               <div>
-                <p className="font-medium">Automatic Conversion</p>
-                <p className="text-muted-foreground">Invoices automatically convert to client's preferred currency</p>
+                <p className="font-medium">{t('currency.automaticConversion')}</p>
+                <p className="text-muted-foreground">{t('currency.automaticConversionDescription')}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle size={16} className="text-success mt-0.5" weight="fill" />
               <div>
-                <p className="font-medium">Real-Time Rates</p>
-                <p className="text-muted-foreground">Exchange rates update automatically throughout the day</p>
+                <p className="font-medium">{t('currency.realTimeRates')}</p>
+                <p className="text-muted-foreground">{t('currency.realTimeRatesDescription')}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle size={16} className="text-success mt-0.5" weight="fill" />
               <div>
-                <p className="font-medium">Rate Locking</p>
-                <p className="text-muted-foreground">Lock rates at invoice creation to protect margins</p>
+                <p className="font-medium">{t('currency.rateLocking')}</p>
+                <p className="text-muted-foreground">{t('currency.rateLockingDescription')}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle size={16} className="text-success mt-0.5" weight="fill" />
               <div>
-                <p className="font-medium">Multi-Currency Reporting</p>
-                <p className="text-muted-foreground">View revenue and margins in any supported currency</p>
+                <p className="font-medium">{t('currency.multiCurrencyReporting')}</p>
+                <p className="text-muted-foreground">{t('currency.multiCurrencyReportingDescription')}</p>
               </div>
             </div>
           </div>

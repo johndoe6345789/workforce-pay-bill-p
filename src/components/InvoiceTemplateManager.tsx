@@ -10,8 +10,10 @@ import { Badge } from '@/components/ui/badge'
 import { Receipt, Plus, Pencil, Trash, Eye, Palette } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import type { InvoiceTemplate } from '@/lib/types'
+import { useTranslation } from '@/hooks/use-translation'
 
 export function InvoiceTemplateManager() {
+  const { t } = useTranslation()
   const [templates = [], setTemplates] = useKV<InvoiceTemplate[]>('invoice-templates', [])
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<InvoiceTemplate | null>(null)
@@ -55,7 +57,7 @@ export function InvoiceTemplateManager() {
   const initializeTemplates = () => {
     if (templates.length === 0) {
       setTemplates(defaultTemplates)
-      toast.success('Default invoice templates loaded')
+      toast.success(t('invoiceTemplates.defaultsLoaded'))
     }
   }
 
@@ -70,7 +72,7 @@ export function InvoiceTemplateManager() {
     }
 
     setTemplates(current => [...(current || []), newTemplate])
-    toast.success('Invoice template created')
+    toast.success(t('invoiceTemplates.templateCreated'))
     setIsCreateOpen(false)
     resetForm()
   }
@@ -92,14 +94,14 @@ export function InvoiceTemplateManager() {
           : t
       )
     )
-    toast.success('Invoice template updated')
+    toast.success(t('invoiceTemplates.templateUpdated'))
     setEditingTemplate(null)
     resetForm()
   }
 
   const handleDeleteTemplate = (id: string) => {
     setTemplates(current => (current || []).filter(t => t.id !== id))
-    toast.success('Invoice template deleted')
+    toast.success(t('invoiceTemplates.templateDeleted'))
   }
 
   const resetForm = () => {
@@ -127,53 +129,53 @@ export function InvoiceTemplateManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Invoice Templates</h2>
-          <p className="text-muted-foreground mt-1">Manage custom invoice designs and branding</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('invoiceTemplates.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('invoiceTemplates.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           {templates.length === 0 && (
             <Button variant="outline" onClick={initializeTemplates}>
-              Load Defaults
+              {t('invoiceTemplates.loadDefaults')}
             </Button>
           )}
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus size={18} className="mr-2" />
-                New Template
+                {t('invoiceTemplates.createTemplate')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Create Invoice Template</DialogTitle>
+                <DialogTitle>{t('invoiceTemplates.createTemplate')}</DialogTitle>
                 <DialogDescription>
-                  Design a custom invoice template with your branding
+                  {t('invoiceTemplates.subtitle')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="template-name">Template Name</Label>
+                  <Label htmlFor="template-name">{t('invoiceTemplates.templateName')}</Label>
                   <Input
                     id="template-name"
-                    placeholder="e.g., Standard Invoice"
+                    placeholder={t('invoiceTemplates.templateNamePlaceholder')}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="header-text">Header Text</Label>
+                  <Label htmlFor="header-text">{t('invoiceTemplates.headerText')}</Label>
                   <Input
                     id="header-text"
-                    placeholder="Appears at the top of the invoice"
+                    placeholder={t('invoiceTemplates.headerTextPlaceholder')}
                     value={formData.headerText}
                     onChange={(e) => setFormData({ ...formData, headerText: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="footer-text">Footer Text</Label>
+                  <Label htmlFor="footer-text">{t('invoiceTemplates.footerText')}</Label>
                   <Textarea
                     id="footer-text"
-                    placeholder="Payment terms, banking details, etc."
+                    placeholder={t('invoiceTemplates.footerTextPlaceholder')}
                     value={formData.footerText}
                     onChange={(e) => setFormData({ ...formData, footerText: e.target.value })}
                     rows={3}
