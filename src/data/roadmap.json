@@ -1,0 +1,634 @@
+{
+  "title": "WorkForce Pro - Development Roadmap",
+  "version": "2.0",
+  "lastUpdated": "January 2025",
+  "overview": "This roadmap outlines the phased development plan for WorkForce Pro, a cloud-based pay, bill, and workforce back-office platform designed to improve operational efficiency, accuracy, compliance, and visibility across recruitment, contracting, and staffing organisations.",
+  "stats": {
+    "completedFeatures": "200+",
+    "completedDescription": "Across Phases 1-5",
+    "componentLibrary": "100+",
+    "componentDescription": "UI Components & Hooks",
+    "currentFocus": "Phase 2-4",
+    "currentDescription": "Advanced automation features",
+    "totalPhases": "6",
+    "phaseDescription": "24 month timeline"
+  },
+  "releaseCadence": {
+    "major": "Quarterly",
+    "minor": "Monthly",
+    "patches": "Weekly",
+    "hotfixes": "As needed"
+  },
+  "phases": [
+    {
+      "id": "phase1",
+      "title": "Phase 1: Foundation & Core Pay/Bill (Quarters 1-2)",
+      "sections": [
+        {
+          "id": "1.1",
+          "title": "Core Platform Infrastructure",
+          "features": [
+            { "status": "completed", "text": "Multi-tenancy architecture" },
+            { "status": "completed", "text": "Entity and division management" },
+            { "status": "completed", "text": "User authentication and role-based access control" },
+            { "status": "completed", "text": "Role-based permissions system with Permission Gates" },
+            { "status": "completed", "text": "Cloud-hosted SaaS deployment" },
+            { "status": "completed", "text": "Basic security and data access controls" },
+            { "status": "completed", "text": "IndexedDB for persistent data storage" },
+            { "status": "completed", "text": "Redux state management across all views" },
+            { "status": "completed", "text": "Session management with auto-expiry" },
+            { "status": "completed", "text": "Session timeout preferences and warnings" },
+            { "status": "completed", "text": "Development mode express admin login" },
+            { "status": "completed", "text": "Lazy loading for optimized performance" },
+            { "status": "completed", "text": "Full accessibility support (WCAG 2.1 AA compliant)" },
+            { "status": "completed", "text": "Keyboard navigation and screen reader support" },
+            { "status": "completed", "text": "Complete audit trail system" }
+          ]
+        },
+        {
+          "id": "1.2",
+          "title": "Timesheet Management - Basic",
+          "features": [
+            { "status": "completed", "text": "Online web portal timesheet entry (worker, client, agency)" },
+            { "status": "completed", "text": "Timesheet approval workflows (client web portal)" },
+            { "status": "completed", "text": "Pending/approved/rejected status tracking" },
+            { "status": "completed", "text": "Agency-initiated timesheet creation" },
+            { "status": "completed", "text": "Bulk entry by administrators" },
+            { "status": "completed", "text": "Mobile timesheet submission" },
+            { "status": "completed", "text": "Batch import from third-party systems" },
+            { "status": "completed", "text": "QR-coded paper timesheet scanning" },
+            { "status": "completed", "text": "Detail dialogs with full timesheet information" },
+            { "status": "completed", "text": "Advanced search and filtering with query language" },
+            { "status": "completed", "text": "Shift pattern templates (night/weekend/custom)" },
+            { "status": "completed", "text": "Fine-grained time tracking (variable shift times)" },
+            { "status": "completed", "text": "Detailed timesheet entry with hour breakdowns" },
+            { "status": "completed", "text": "Missing timesheets reporting" },
+            { "status": "completed", "text": "CRUD operations with IndexedDB integration" },
+            { "status": "planned", "text": "Email-based automated ingestion" }
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Basic Billing & Invoicing",
+          "features": [
+            { "status": "completed", "text": "Invoice generation from approved timesheets" },
+            { "status": "completed", "text": "Invoice tracking (draft, sent, paid, overdue)" },
+            { "status": "completed", "text": "Multi-currency support (GBP, USD, EUR, expanded)" },
+            { "status": "completed", "text": "Electronic invoice delivery" },
+            { "status": "completed", "text": "Sales invoice templates" },
+            { "status": "completed", "text": "Payment terms configuration" },
+            { "status": "completed", "text": "Purchase order tracking and management" },
+            { "status": "completed", "text": "Purchase order enforcement interface" },
+            { "status": "completed", "text": "Invoice detail dialogs" },
+            { "status": "completed", "text": "Create invoice dialog with form validation" },
+            { "status": "completed", "text": "Invoice template manager" },
+            { "status": "completed", "text": "Credit note generator" },
+            { "status": "completed", "text": "Permanent placement invoice support" },
+            { "status": "completed", "text": "Advanced search and filtering" },
+            { "status": "completed", "text": "CRUD operations with IndexedDB integration" },
+            { "status": "planned", "text": "Credit control visibility" }
+          ]
+        },
+        {
+          "id": "1.4",
+          "title": "Basic Payroll",
+          "features": [
+            { "status": "completed", "text": "Payroll run tracking" },
+            { "status": "completed", "text": "Worker payment calculations" },
+            { "status": "completed", "text": "One-click payroll processing" },
+            { "status": "completed", "text": "PAYE payroll integration" },
+            { "status": "completed", "text": "PAYE submission creation dialogs" },
+            { "status": "completed", "text": "Payroll detail dialogs" },
+            { "status": "completed", "text": "Create payroll dialog with validation" },
+            { "status": "completed", "text": "Payroll batch processing" },
+            { "status": "completed", "text": "Payroll approval workflows" },
+            { "status": "completed", "text": "Payroll batch list management" },
+            { "status": "completed", "text": "Holiday pay manager and calculations" },
+            { "status": "completed", "text": "CRUD operations with IndexedDB integration" },
+            { "status": "completed", "text": "Advanced search and filtering" },
+            { "status": "planned", "text": "Limited company contractor payments" }
+          ]
+        },
+        {
+          "id": "1.5",
+          "title": "Dashboard & Core Reporting",
+          "features": [
+            { "status": "completed", "text": "Executive dashboard with key metrics" },
+            { "status": "completed", "text": "Pending approvals tracking" },
+            { "status": "completed", "text": "Overdue invoice monitoring" },
+            { "status": "completed", "text": "Revenue and margin visibility" },
+            { "status": "completed", "text": "Activity feed" },
+            { "status": "completed", "text": "Drill-down capabilities into all entities" },
+            { "status": "completed", "text": "Custom report builder" },
+            { "status": "completed", "text": "Missing timesheets report" },
+            { "status": "completed", "text": "Margin analysis and forecasting" },
+            { "status": "completed", "text": "Advanced reports view with multiple report types" },
+            { "status": "completed", "text": "Data export capabilities" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase2",
+      "title": "Phase 2: Advanced Operations & Automation (Quarters 3-4)",
+      "sections": [
+        {
+          "id": "2.1",
+          "title": "Expense Management",
+          "features": [
+            { "status": "completed", "text": "Worker expense submission (web portal)" },
+            { "status": "completed", "text": "Agency-created expense entries" },
+            { "status": "completed", "text": "Expense approval workflows" },
+            { "status": "completed", "text": "Integration with billing and payroll" },
+            { "status": "completed", "text": "Reimbursable vs billable expense tracking" },
+            { "status": "completed", "text": "Expense detail dialogs with full information" },
+            { "status": "completed", "text": "Advanced search and filtering" },
+            { "status": "completed", "text": "CRUD operations with IndexedDB integration" },
+            { "status": "planned", "text": "Mobile expense capture with receipt photos" }
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Timesheet Management - Advanced",
+          "features": [
+            { "status": "completed", "text": "Multi-step approval routing" },
+            { "status": "completed", "text": "Time and rate adjustment wizard" },
+            { "status": "completed", "text": "Timesheet adjustment wizard" },
+            { "status": "completed", "text": "Full audit trail of all changes" },
+            { "status": "completed", "text": "Shift pattern manager for recurring schedules" },
+            { "status": "completed", "text": "Shift premium calculator" },
+            { "status": "completed", "text": "Contract validator" },
+            { "status": "completed", "text": "Advanced search with query language guide" },
+            { "status": "planned", "text": "Automated credit generation" },
+            { "status": "planned", "text": "Re-invoicing workflows" },
+            { "status": "planned", "text": "Email-based approval workflows" },
+            { "status": "planned", "text": "Configurable validation rules" }
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Advanced Billing",
+          "features": [
+            { "status": "completed", "text": "Permanent placement invoices" },
+            { "status": "completed", "text": "Bespoke invoice templates (Invoice Template Manager)" },
+            { "status": "completed", "text": "Credit note generation" },
+            { "status": "completed", "text": "Purchase order tracking and enforcement" },
+            { "status": "planned", "text": "Contractor self-billing" },
+            { "status": "planned", "text": "Advice notes" },
+            { "status": "planned", "text": "Supplier invoice matching" },
+            { "status": "planned", "text": "Client self-billing support" },
+            { "status": "planned", "text": "On-cost handling and adjustments" },
+            { "status": "planned", "text": "Withholding tax calculations" }
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Contract, Rate & Rule Enforcement",
+          "features": [
+            { "status": "completed", "text": "Rate templates by role, client, placement (Rate Template Manager)" },
+            { "status": "completed", "text": "Automatic shift premium calculations (Shift Premium Calculator)" },
+            { "status": "completed", "text": "Contract validation at submission (Contract Validator)" },
+            { "status": "completed", "text": "Time and rate adjustment tools" },
+            { "status": "planned", "text": "Overtime rate automation" },
+            { "status": "planned", "text": "Time pattern validation rules" },
+            { "status": "planned", "text": "AWR monitoring and alerts" }
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Notifications & Workflow Automation",
+          "features": [
+            { "status": "completed", "text": "In-system alert notifications" },
+            { "status": "completed", "text": "Real-time notification center" },
+            { "status": "completed", "text": "Notification history and tracking" },
+            { "status": "completed", "text": "Event-driven processing updates" },
+            { "status": "completed", "text": "Email notification templates" },
+            { "status": "completed", "text": "Email template manager" },
+            { "status": "completed", "text": "Configurable notification rules" },
+            { "status": "completed", "text": "Notification rules manager" },
+            { "status": "completed", "text": "Configurable approval workflow templates for different batch types" },
+            { "status": "completed", "text": "Approval workflow template manager" },
+            { "status": "completed", "text": "Multi-step approval workflows with escalation rules" },
+            { "status": "completed", "text": "Conditional approval step skipping" },
+            { "status": "completed", "text": "Parallel approval steps for concurrent reviews" },
+            { "status": "completed", "text": "Template management for payroll, invoices, timesheets, expenses, compliance, and purchase orders" },
+            { "status": "planned", "text": "Automated follow-up reminders" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase3",
+      "title": "Phase 3: Compliance & Self-Service (Quarters 5-6)",
+      "sections": [
+        {
+          "id": "3.1",
+          "title": "Compliance Management - Enhanced",
+          "features": [
+            { "status": "completed", "text": "Document tracking and monitoring" },
+            { "status": "completed", "text": "Expiry alerts and notifications" },
+            { "status": "completed", "text": "Document upload and storage" },
+            { "status": "completed", "text": "Digital onboarding workflows (Onboarding Workflow Manager)" },
+            { "status": "completed", "text": "Compliance detail dialogs" },
+            { "status": "completed", "text": "Advanced search and filtering" },
+            { "status": "completed", "text": "CRUD operations with IndexedDB integration" },
+            { "status": "planned", "text": "Automated contract pack generation" },
+            { "status": "planned", "text": "Compliance enforcement rules" },
+            { "status": "planned", "text": "Statutory reporting support" },
+            { "status": "planned", "text": "Auto-enrolment assessment" }
+          ]
+        },
+        {
+          "id": "3.2",
+          "title": "Self-Service Portals",
+          "features": [
+            { "status": "completed", "text": "Worker portal access" },
+            { "status": "completed", "text": "Real-time timesheet visibility" },
+            { "status": "completed", "text": "Real-time expense visibility" },
+            { "status": "completed", "text": "Invoice and payment status" },
+            { "status": "completed", "text": "Mobile-responsive design throughout" },
+            { "status": "planned", "text": "Branded worker portal" },
+            { "status": "planned", "text": "Branded client portal" },
+            { "status": "planned", "text": "Paperless document access" },
+            { "status": "planned", "text": "Custom branding and SSL" }
+          ]
+        },
+        {
+          "id": "3.3",
+          "title": "Advanced Payroll Processing",
+          "features": [
+            { "status": "completed", "text": "PAYE processing with submission management" },
+            { "status": "completed", "text": "Holiday pay automation and manager" },
+            { "status": "completed", "text": "Payroll batch processing" },
+            { "status": "completed", "text": "One-click payroll with approval workflows" },
+            { "status": "planned", "text": "CIS processing" },
+            { "status": "planned", "text": "Agency staff payroll" },
+            { "status": "planned", "text": "Multiple employment model support" },
+            { "status": "planned", "text": "International payroll preparation" },
+            { "status": "planned", "text": "Payroll cost import from overseas" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase4",
+      "title": "Phase 4: Analytics & Integrations (Quarters 7-8)",
+      "sections": [
+        {
+          "id": "4.1",
+          "title": "Advanced Reporting & Analytics",
+          "features": [
+            { "status": "completed", "text": "Real-time gross margin reporting" },
+            { "status": "completed", "text": "Forecasting and predictive analytics" },
+            { "status": "completed", "text": "Missing timesheet reports" },
+            { "status": "completed", "text": "Custom report builder" },
+            { "status": "completed", "text": "Audit trail viewer with full activity history" },
+            { "status": "completed", "text": "Data export capabilities" },
+            { "status": "completed", "text": "Advanced search across all data entities" },
+            { "status": "completed", "text": "Query language for complex filtering" },
+            { "status": "planned", "text": "User and audit activity reports" },
+            { "status": "planned", "text": "Client-level performance dashboards" },
+            { "status": "planned", "text": "Placement-level profitability" },
+            { "status": "planned", "text": "Worker-level activity views" },
+            { "status": "planned", "text": "Bespoke management reports" },
+            { "status": "planned", "text": "Role-based report access" }
+          ]
+        },
+        {
+          "id": "4.2",
+          "title": "System Integrations",
+          "features": [
+            { "status": "completed", "text": "Batch import manager for third-party data" },
+            { "status": "completed", "text": "Data management interface" },
+            { "status": "completed", "text": "JSON-based data loading" },
+            { "status": "planned", "text": "ATS (Applicant Tracking System) integration" },
+            { "status": "planned", "text": "CRM platform integration" },
+            { "status": "planned", "text": "Accounting system integration (Xero, QuickBooks, Sage)" },
+            { "status": "planned", "text": "Automated placement data flow" },
+            { "status": "planned", "text": "Financial data export automation" },
+            { "status": "planned", "text": "RESTful API for third-party integrations" },
+            { "status": "planned", "text": "Webhook support for real-time updates" }
+          ]
+        },
+        {
+          "id": "4.3",
+          "title": "Global & Multi-Currency - Advanced",
+          "features": [
+            { "status": "completed", "text": "Multi-currency billing (expanded)" },
+            { "status": "completed", "text": "Currency rate management interface" },
+            { "status": "completed", "text": "Real-time currency conversion" },
+            { "status": "completed", "text": "Exchange rate tracking and alerts" },
+            { "status": "completed", "text": "Currency management dashboard" },
+            { "status": "planned", "text": "International sales tax handling" },
+            { "status": "planned", "text": "Withholding tax automation" },
+            { "status": "planned", "text": "Local tax compliance" },
+            { "status": "planned", "text": "Cross-border margin calculation" },
+            { "status": "planned", "text": "Overseas billing support" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase5",
+      "title": "Phase 5: Enterprise & Scale (Quarters 9-10)",
+      "sections": [
+        {
+          "id": "5.1",
+          "title": "Multi-Tenancy - Advanced",
+          "features": [
+            { "status": "completed", "text": "Multiple entity support" },
+            { "status": "completed", "text": "Entity switching in navigation" },
+            { "status": "planned", "text": "Franchise management capabilities" },
+            { "status": "planned", "text": "Agency group consolidation" },
+            { "status": "planned", "text": "Cross-entity reporting" },
+            { "status": "planned", "text": "Delegated administration controls" },
+            { "status": "planned", "text": "Logical data ring-fencing" }
+          ]
+        },
+        {
+          "id": "5.2",
+          "title": "Configuration & Customisation",
+          "features": [
+            { "status": "completed", "text": "Editable email templates (Email Template Manager)" },
+            { "status": "completed", "text": "Multi-language support (i18n framework)" },
+            { "status": "completed", "text": "Translation system with JSON-based translations" },
+            { "status": "completed", "text": "Language switcher component" },
+            { "status": "completed", "text": "User profile and settings pages" },
+            { "status": "completed", "text": "Session timeout preferences" },
+            { "status": "completed", "text": "Custom workflow builders (Approval Workflow Templates)" },
+            { "status": "planned", "text": "Custom system labels" },
+            { "status": "planned", "text": "Agency-defined security roles" },
+            { "status": "planned", "text": "Advanced system configuration" },
+            { "status": "planned", "text": "White-label capabilities" }
+          ]
+        },
+        {
+          "id": "5.3",
+          "title": "Performance & Scale",
+          "features": [
+            { "status": "completed", "text": "Lazy loading for view components" },
+            { "status": "completed", "text": "IndexedDB for high-performance local storage" },
+            { "status": "completed", "text": "Redux for optimized state management" },
+            { "status": "completed", "text": "View preloading for instant navigation" },
+            { "status": "completed", "text": "Batch processing optimization" },
+            { "status": "planned", "text": "High-volume processing optimization" },
+            { "status": "planned", "text": "Performance monitoring dashboards" },
+            { "status": "planned", "text": "Load balancing and scaling" },
+            { "status": "planned", "text": "Database optimization" }
+          ]
+        },
+        {
+          "id": "5.4",
+          "title": "Support & Quality",
+          "features": [
+            { "status": "completed", "text": "Component showcase/library (Storybook-style)" },
+            { "status": "completed", "text": "Business logic demo components" },
+            { "status": "completed", "text": "IndexedDB demo for developers" },
+            { "status": "completed", "text": "Translation demo for testing" },
+            { "status": "completed", "text": "Parallel approval demo" },
+            { "status": "completed", "text": "Comprehensive hook library (100+ custom hooks)" },
+            { "status": "completed", "text": "Extensive UI component library (100+ components)" },
+            { "status": "completed", "text": "Complete accessibility documentation" },
+            { "status": "planned", "text": "Dedicated test/demo environments" },
+            { "status": "planned", "text": "Managed development request process" },
+            { "status": "planned", "text": "Phone and online support portal" },
+            { "status": "planned", "text": "Knowledge base and documentation" },
+            { "status": "planned", "text": "Training materials and videos" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase6",
+      "title": "Phase 6: Innovation & AI (Quarters 11-12)",
+      "sections": [
+        {
+          "id": "6.1",
+          "title": "Intelligent Automation",
+          "features": [
+            { "status": "planned", "text": "AI-powered timesheet anomaly detection" },
+            { "status": "planned", "text": "Predictive compliance alerts" },
+            { "status": "planned", "text": "Smart invoice matching" },
+            { "status": "planned", "text": "Automated expense categorization" },
+            { "status": "planned", "text": "Machine learning for margin optimization" }
+          ]
+        },
+        {
+          "id": "6.2",
+          "title": "Advanced Analytics",
+          "features": [
+            { "status": "planned", "text": "Business intelligence dashboards" },
+            { "status": "planned", "text": "Trend analysis and insights" },
+            { "status": "planned", "text": "Benchmarking and KPI tracking" },
+            { "status": "planned", "text": "Predictive workforce planning" },
+            { "status": "planned", "text": "Risk scoring and monitoring" }
+          ]
+        },
+        {
+          "id": "6.3",
+          "title": "Mobile Excellence",
+          "features": [
+            { "status": "planned", "text": "Native mobile apps (iOS/Android)" },
+            { "status": "planned", "text": "Offline capability" },
+            { "status": "planned", "text": "Biometric authentication" },
+            { "status": "planned", "text": "Push notifications" },
+            { "status": "planned", "text": "Geolocation-based features" }
+          ]
+        }
+      ]
+    }
+  ],
+  "technicalInfrastructure": {
+    "title": "Technical Infrastructure & Developer Experience",
+    "sections": [
+      {
+        "id": "architecture",
+        "title": "Architecture & State Management",
+        "features": [
+          { "status": "completed", "text": "Redux Toolkit for global state management" },
+          { "status": "completed", "text": "Redux slices for UI, Auth, Timesheet, Invoice, Payroll, Compliance, Expense" },
+          { "status": "completed", "text": "Redux middleware for notifications" },
+          { "status": "completed", "text": "IndexedDB integration for persistent storage" },
+          { "status": "completed", "text": "Optimistic updates with rollback" },
+          { "status": "completed", "text": "Error boundary with fallback UI" },
+          { "status": "completed", "text": "Minimal App.tsx with component composition" }
+        ]
+      },
+      {
+        "id": "hooks",
+        "title": "Hook Library (100+ Custom Hooks)",
+        "subsections": [
+          {
+            "title": "Business Logic Hooks",
+            "features": [
+              { "status": "completed", "text": "useInvoicing - Invoice calculations and generation" },
+              { "status": "completed", "text": "usePayrollCalculations - Payroll math and deductions" },
+              { "status": "completed", "text": "useTimeTracking - Time calculation utilities" },
+              { "status": "completed", "text": "useMarginAnalysis - Profitability calculations" },
+              { "status": "completed", "text": "useRateCalculator - Rate and pricing logic" },
+              { "status": "completed", "text": "usePAYEIntegration - UK tax system integration" },
+              { "status": "completed", "text": "useComplianceCheck - Compliance validation" },
+              { "status": "completed", "text": "useTimeAndRateAdjustment - Adjustment calculations" }
+            ]
+          },
+          {
+            "title": "CRUD Hooks",
+            "features": [
+              { "status": "completed", "text": "useTimesheetsCRUD" },
+              { "status": "completed", "text": "useInvoicesCRUD" },
+              { "status": "completed", "text": "usePayrollCRUD" },
+              { "status": "completed", "text": "useExpensesCRUD" },
+              { "status": "completed", "text": "useComplianceCRUD" },
+              { "status": "completed", "text": "useWorkersCRUD" },
+              { "status": "completed", "text": "usePurchaseOrdersCRUD" },
+              { "status": "completed", "text": "useEntityCRUD" }
+            ]
+          },
+          {
+            "title": "Workflow & Automation Hooks",
+            "features": [
+              { "status": "completed", "text": "useApprovalWorkflow - Multi-step approval logic" },
+              { "status": "completed", "text": "useApprovalWorkflowTemplates - Template management" },
+              { "status": "completed", "text": "useBatchActions - Bulk operations" },
+              { "status": "completed", "text": "useBulkOperations - Mass updates" },
+              { "status": "completed", "text": "useAutoSave - Automatic data persistence" }
+            ]
+          },
+          {
+            "title": "UI & UX Hooks",
+            "features": [
+              { "status": "completed", "text": "useDataGrid - Advanced table management" },
+              { "status": "completed", "text": "useFilter - Client-side filtering" },
+              { "status": "completed", "text": "useSort - Sorting logic" },
+              { "status": "completed", "text": "usePagination - Page navigation" },
+              { "status": "completed", "text": "useMultiSelect - Bulk selection" },
+              { "status": "completed", "text": "useColumnVisibility - Dynamic columns" },
+              { "status": "completed", "text": "useVirtualScroll - Performance optimization" }
+            ]
+          },
+          {
+            "title": "Accessibility Hooks",
+            "features": [
+              { "status": "completed", "text": "useAnnounce - Screen reader announcements" },
+              { "status": "completed", "text": "useAriaLive - Live region updates" },
+              { "status": "completed", "text": "useFocusTrap - Modal focus management" },
+              { "status": "completed", "text": "useFocusReturn - Return focus after close" },
+              { "status": "completed", "text": "useSkipLink - Skip to content navigation" },
+              { "status": "completed", "text": "useKeyboardShortcuts - Keyboard navigation" },
+              { "status": "completed", "text": "useReducedMotion - Motion preferences" }
+            ]
+          },
+          {
+            "title": "Utility Hooks",
+            "features": [
+              { "status": "completed", "text": "useDebounce, useThrottle, useLocalStorage, useSessionStorage" },
+              { "status": "completed", "text": "useIndexedDBState, useMediaQuery, useBreakpoint, useWindowSize" },
+              { "status": "completed", "text": "useClipboard, useAsync, useCache, useHistory, useUndo" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "components",
+        "title": "UI Component Library (100+ Components)",
+        "subsections": [
+          {
+            "title": "Layout Components",
+            "features": [
+              { "status": "completed", "text": "Stack, Flex, Grid, Box, Container, Center, Section" }
+            ]
+          },
+          {
+            "title": "Data Display",
+            "features": [
+              { "status": "completed", "text": "DataTable, DataGrid, SimpleTable, AdvancedTable" },
+              { "status": "completed", "text": "Card, MetricCard, StatCard, PricingCard" },
+              { "status": "completed", "text": "Timeline, TimelineVertical, TimelineEnhanced" },
+              { "status": "completed", "text": "DescriptionList, DataList, KeyValue" },
+              { "status": "completed", "text": "Badge, StatusBadge, CounterBadge, Chip, Tag" }
+            ]
+          },
+          {
+            "title": "Forms & Inputs",
+            "features": [
+              { "status": "completed", "text": "Input, Textarea, Select, MultiSelect, ComboBox" },
+              { "status": "completed", "text": "Checkbox, Radio, Switch, Slider, Toggle" },
+              { "status": "completed", "text": "DateRangePicker, Calendar" },
+              { "status": "completed", "text": "FileUpload, ImagePreview" },
+              { "status": "completed", "text": "SearchInput, QuickSearch" }
+            ]
+          },
+          {
+            "title": "Navigation",
+            "features": [
+              { "status": "completed", "text": "Sidebar, NavigationMenu, Breadcrumb, Tabs" },
+              { "status": "completed", "text": "Pagination, PaginationButtons, PaginationControls, QuickPagination" },
+              { "status": "completed", "text": "Toolbar, ActionBar" }
+            ]
+          },
+          {
+            "title": "Feedback",
+            "features": [
+              { "status": "completed", "text": "Alert, InlineAlert, ValidationBanner" },
+              { "status": "completed", "text": "Toast (Sonner), NotificationList" },
+              { "status": "completed", "text": "Progress, ProgressBar, Spinner, LoadingSpinner, LoadingOverlay" },
+              { "status": "completed", "text": "Skeleton, Pulse, EmptyState" }
+            ]
+          },
+          {
+            "title": "Overlays",
+            "features": [
+              { "status": "completed", "text": "Dialog, Modal, Sheet, Drawer, SlidePanel" },
+              { "status": "completed", "text": "Popover, HoverCard, Tooltip, ContextMenu, DropdownMenu" }
+            ]
+          },
+          {
+            "title": "Advanced",
+            "features": [
+              { "status": "completed", "text": "Stepper, StepperSimple, StepperEnhanced, Wizard" },
+              { "status": "completed", "text": "TreeView, Accordion, Collapsible" },
+              { "status": "completed", "text": "CodeBlock, CopyButton, ExportButton" },
+              { "status": "completed", "text": "FilterBar, FilterChips, FilterChipsBar" },
+              { "status": "completed", "text": "Chart (Recharts integration)" },
+              { "status": "completed", "text": "Rating, Checklist" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "successMetrics": {
+    "title": "Success Metrics",
+    "categories": [
+      {
+        "title": "Operational Efficiency",
+        "metrics": [
+          "80% reduction in timesheet processing time",
+          "95% straight-through invoice processing",
+          "90% reduction in compliance breach incidents"
+        ]
+      },
+      {
+        "title": "User Adoption",
+        "metrics": [
+          "85%+ worker portal adoption",
+          "75%+ client portal adoption",
+          "<5% support ticket rate per user"
+        ]
+      },
+      {
+        "title": "Financial Impact",
+        "metrics": [
+          "99.5% billing accuracy",
+          "<2% margin leakage",
+          "30% reduction in administrative overhead"
+        ]
+      }
+    ]
+  },
+  "legend": [
+    { "symbol": "✅", "label": "Completed", "description": "Feature is implemented and live" },
+    { "symbol": "🔄", "label": "In Progress", "description": "Currently under development" },
+    { "symbol": "📋", "label": "Planned", "description": "Scheduled for future development" }
+  ]
+}
