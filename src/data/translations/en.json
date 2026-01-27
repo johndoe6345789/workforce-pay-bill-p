@@ -1177,6 +1177,8 @@
     "componentLibrary": "Component Library",
     "currentFocus": "Current Focus",
     "totalPhases": "Total Phases",
+    "translationCoverage": "Translation Coverage",
+    "pagesTranslated": "pages translated",
     "overview": "Overview",
     "legend": "Legend",
     "technicalInfrastructure": "Technical Infrastructure",

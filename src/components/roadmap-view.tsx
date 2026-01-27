@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, ClockCounterClockwise, MapTrifold, Warning, Download } from '@phosphor-icons/react'
+import { CheckCircle, ClockCounterClockwise, MapTrifold, Warning, Download, Translate } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
 import { useTranslation } from '@/hooks/use-translation'
 import { useAppSelector } from '@/store/hooks'
+import { calculateTranslationCoverage } from '@/lib/translation-coverage'
 
 type FeatureStatus = 'completed' | 'inProgress' | 'planned'
 
@@ -76,6 +77,7 @@ export function RoadmapView() {
   const locale = useAppSelector(state => state.ui.locale)
   const [data, setData] = useState<RoadmapData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const translationCoverage = calculateTranslationCoverage()
 
   useEffect(() => {
     const loadRoadmap = async () => {
@@ -188,7 +190,7 @@ export function RoadmapView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="border-l-4 border-success/20">
           <CardHeader>
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
@@ -225,6 +227,21 @@ export function RoadmapView() {
           <CardContent>
             <div className="text-3xl font-semibold">{data.stats.currentFocus}</div>
             <p className="text-sm text-muted-foreground mt-1">{data.stats.currentDescription}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-info/20">
+          <CardHeader>
+            <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
+              <Translate size={18} className="text-info" weight="fill" />
+              {t('roadmap.translationCoverage')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-semibold">{translationCoverage.percentage}%</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              {translationCoverage.translatedPages}/{translationCoverage.totalPages} {t('roadmap.pagesTranslated')}
+            </p>
           </CardContent>
         </Card>
 

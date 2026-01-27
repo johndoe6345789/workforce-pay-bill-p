@@ -1,0 +1,132 @@
+const REACT_PAGES = [
+  'App.tsx',
+  'ErrorFallback.tsx',
+  'components/AdvancedSearch.tsx',
+  'components/ApprovalWorkflowTemplateManager.tsx',
+  'components/AuditTrailViewer.tsx',
+  'components/BatchImportManager.tsx',
+  'components/BusinessLogicDemo.tsx',
+  'components/ComplianceDetailDialog.tsx',
+  'components/ComponentShowcase.tsx',
+  'components/ContractValidator.tsx',
+  'components/CreateInvoiceDialog.tsx',
+  'components/CreatePAYESubmissionDialog.tsx',
+  'components/CreatePayrollDialog.tsx',
+  'components/CreditNoteGenerator.tsx',
+  'components/CurrencyManagement.tsx',
+  'components/CustomReportBuilder.tsx',
+  'components/DataManagement.tsx',
+  'components/DetailedTimesheetEntry.tsx',
+  'components/EmailTemplateManager.tsx',
+  'components/ExpenseDetailDialog.tsx',
+  'components/HolidayPayManager.tsx',
+  'components/IndexedDBDemo.tsx',
+  'components/InvoiceDetailDialog.tsx',
+  'components/InvoiceTemplateManager.tsx',
+  'components/KeyboardShortcutsDialog.tsx',
+  'components/LanguageSwitcher.tsx',
+  'components/LoginScreen.tsx',
+  'components/MissingTimesheetsReport.tsx',
+  'components/NotificationCenter.tsx',
+  'components/NotificationRulesManager.tsx',
+  'components/OnboardingWorkflowManager.tsx',
+  'components/OneClickPayroll.tsx',
+  'components/PAYEManager.tsx',
+  'components/ParallelApprovalDemo.tsx',
+  'components/PayrollApprovalWorkflow.tsx',
+  'components/PayrollBatchList.tsx',
+  'components/PayrollBatchProcessor.tsx',
+  'components/PayrollDetailDialog.tsx',
+  'components/PermanentPlacementInvoice.tsx',
+  'components/PermissionGate.tsx',
+  'components/PurchaseOrderManager.tsx',
+  'components/PurchaseOrderTracking.tsx',
+  'components/QRTimesheetScanner.tsx',
+  'components/QueryLanguageGuide.tsx',
+  'components/RateTemplateManager.tsx',
+  'components/ReportsView.tsx',
+  'components/ScreenReaderOnly.tsx',
+  'components/SessionExpiryDialog.tsx',
+  'components/SessionManager.tsx',
+  'components/ShiftDetailDialog.tsx',
+  'components/ShiftPatternManager.tsx',
+  'components/ShiftPremiumCalculator.tsx',
+  'components/TimeAndRateAdjustmentWizard.tsx',
+  'components/TimesheetAdjustmentWizard.tsx',
+  'components/TimesheetCard.tsx',
+  'components/TimesheetDetailDialog.tsx',
+  'components/TranslationDemo.tsx',
+  'components/ViewRouter.tsx',
+  'components/dashboard-view.tsx',
+  'components/roadmap-view.tsx',
+  'components/views/BillingView.tsx',
+  'components/views/ComplianceView.tsx',
+  'components/views/DashboardView.tsx',
+  'components/views/ExpensesView.tsx',
+  'components/views/PayrollView.tsx',
+  'components/views/TimesheetsView.tsx',
+  'components/views/data-admin-view.tsx',
+  'components/views/profile-view.tsx',
+  'components/views/roles-permissions-view.tsx',
+  'components/nav/sidebar.tsx',
+]
+
+const PAGES_WITH_TRANSLATIONS = [
+  'App.tsx',
+  'components/AdvancedSearch.tsx',
+  'components/AuditTrailViewer.tsx',
+  'components/BatchImportManager.tsx',
+  'components/CurrencyManagement.tsx',
+  'components/CustomReportBuilder.tsx',
+  'components/EmailTemplateManager.tsx',
+  'components/HolidayPayManager.tsx',
+  'components/InvoiceTemplateManager.tsx',
+  'components/KeyboardShortcutsDialog.tsx',
+  'components/LanguageSwitcher.tsx',
+  'components/MissingTimesheetsReport.tsx',
+  'components/NotificationCenter.tsx',
+  'components/NotificationRulesManager.tsx',
+  'components/OnboardingWorkflowManager.tsx',
+  'components/PAYEManager.tsx',
+  'components/PurchaseOrderManager.tsx',
+  'components/PurchaseOrderTracking.tsx',
+  'components/QRTimesheetScanner.tsx',
+  'components/QueryLanguageGuide.tsx',
+  'components/RateTemplateManager.tsx',
+  'components/ReportsView.tsx',
+  'components/SessionExpiryDialog.tsx',
+  'components/ShiftPatternManager.tsx',
+  'components/ViewRouter.tsx',
+  'components/roadmap-view.tsx',
+  'components/views/BillingView.tsx',
+  'components/views/ComplianceView.tsx',
+  'components/views/DashboardView.tsx',
+  'components/views/ExpensesView.tsx',
+  'components/views/PayrollView.tsx',
+  'components/views/TimesheetsView.tsx',
+  'components/nav/sidebar.tsx',
+]
+
+export interface TranslationCoverage {
+  totalPages: number
+  translatedPages: number
+  percentage: number
+  pagesWithoutTranslations: string[]
+}
+
+export function calculateTranslationCoverage(): TranslationCoverage {
+  const totalPages = REACT_PAGES.length
+  const translatedPages = PAGES_WITH_TRANSLATIONS.length
+  const percentage = Math.round((translatedPages / totalPages) * 100)
+  
+  const pagesWithoutTranslations = REACT_PAGES.filter(
+    page => !PAGES_WITH_TRANSLATIONS.includes(page)
+  )
+
+  return {
+    totalPages,
+    translatedPages,
+    percentage,
+    pagesWithoutTranslations,
+  }
+}
