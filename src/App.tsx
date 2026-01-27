@@ -73,7 +73,7 @@ function App() {
     setExpenses,
     rateCards,
     metrics
-  } = useAppData()
+  } = useAppData({ liveRefresh: true, pollingInterval: 2000 })
 
   const actions = useAppActions(
     timesheets,

@@ -27,11 +27,11 @@ This is a multi-module enterprise platform requiring navigation between distinct
 - Success criteria: Profile updates persist, settings apply immediately, password changes require current password, session management visible
 
 **Dashboard Overview**
-- Functionality: Displays real-time KPIs, alerts, and quick actions across all modules
-- Purpose: Provides at-a-glance operational health and reduces time to critical actions
+- Functionality: Displays real-time KPIs, alerts, and quick actions across all modules with live data refresh from IndexedDB
+- Purpose: Provides at-a-glance operational health with automatic updates when data changes, reducing time to critical actions
 - Trigger: Successful user login or navigation to home
-- Progression: Login → Dashboard loads with widgets → User scans metrics → Clicks widget to drill down → Navigates to relevant module
-- Success criteria: All KPIs update in real-time, widgets are interactive, no data older than 5 minutes
+- Progression: Login → Dashboard loads with widgets → Data automatically refreshes every 2 seconds → User scans metrics → Clicks widget to drill down → Navigates to relevant module
+- Success criteria: All KPIs update in real-time via live IndexedDB polling, widgets are interactive, live refresh indicator shows update status, no data older than 2 seconds
 
 **Timesheet Management**
 - Functionality: Multi-channel timesheet capture, approval routing, and adjustment workflows

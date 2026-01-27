@@ -14,8 +14,11 @@ A comprehensive collection of 100+ React hooks for the WorkForce Pro platform.
 - **useArray** - Array manipulation (push, filter, update, remove, move, swap)
 - **useMap** - Map data structure with reactive updates
 - **useSet** - Set data structure with reactive updates
+
+### IndexedDB Persistence (3 hooks)
 - **useIndexedDBState** - React state with IndexedDB persistence
 - **useIndexedDBCache** - Cached data fetching with TTL support
+- **useIndexedDBLive** - Live refresh with automatic change detection and polling
 
 ### Async Operations (4 hooks)
 - **useAsync** - Handle async operations with loading/error states

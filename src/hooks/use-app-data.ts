@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
+import { useIndexedDBLive } from '@/hooks/use-indexed-db-live'
 import { STORES } from '@/lib/indexed-db'
 import type { 
   Timesheet, 
@@ -12,14 +12,45 @@ import type {
   DashboardMetrics
 } from '@/lib/types'
 
-export function useAppData() {
-  const [timesheets = [], setTimesheets] = useIndexedDBState<Timesheet[]>(STORES.TIMESHEETS, [])
-  const [invoices = [], setInvoices] = useIndexedDBState<Invoice[]>(STORES.INVOICES, [])
-  const [payrollRuns = [], setPayrollRuns] = useIndexedDBState<PayrollRun[]>(STORES.PAYROLL_RUNS, [])
-  const [workers = [], setWorkers] = useIndexedDBState<Worker[]>(STORES.WORKERS, [])
-  const [complianceDocs = [], setComplianceDocs] = useIndexedDBState<ComplianceDocument[]>(STORES.COMPLIANCE_DOCS, [])
-  const [expenses = [], setExpenses] = useIndexedDBState<Expense[]>(STORES.EXPENSES, [])
-  const [rateCards = [], setRateCards] = useIndexedDBState<RateCard[]>(STORES.RATE_CARDS, [])
+export function useAppData(options?: { liveRefresh?: boolean; pollingInterval?: number }) {
+  const liveRefreshEnabled = options?.liveRefresh !== false
+  const pollingInterval = options?.pollingInterval || 2000
+
+  const [timesheets = [], setTimesheets] = useIndexedDBLive<Timesheet[]>(
+    STORES.TIMESHEETS, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  const [invoices = [], setInvoices] = useIndexedDBLive<Invoice[]>(
+    STORES.INVOICES, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  const [payrollRuns = [], setPayrollRuns] = useIndexedDBLive<PayrollRun[]>(
+    STORES.PAYROLL_RUNS, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  const [workers = [], setWorkers] = useIndexedDBLive<Worker[]>(
+    STORES.WORKERS, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  const [complianceDocs = [], setComplianceDocs] = useIndexedDBLive<ComplianceDocument[]>(
+    STORES.COMPLIANCE_DOCS, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  const [expenses = [], setExpenses] = useIndexedDBLive<Expense[]>(
+    STORES.EXPENSES, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
+  const [rateCards = [], setRateCards] = useIndexedDBLive<RateCard[]>(
+    STORES.RATE_CARDS, 
+    [], 
+    { enabled: liveRefreshEnabled, pollingInterval }
+  )
 
   const metrics: DashboardMetrics = useMemo(() => {
     const monthlyRevenue = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0)

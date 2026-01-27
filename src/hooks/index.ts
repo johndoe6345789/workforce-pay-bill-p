@@ -110,6 +110,7 @@ export { useSessionStorage } from './use-session-storage'
 export { useSessionTimeout } from './use-session-timeout'
 export { useSessionTimeoutPreferences } from './use-session-timeout-preferences'
 export { useIndexedDBState, useIndexedDBCache } from './use-indexed-db-state'
+export { useIndexedDBLive, useIndexedDBLivePolling, cleanupIndexedDBLiveManager } from './use-indexed-db-live'
 export { useCRUD } from './use-crud'
 export { 
   useTimesheetsCRUD,

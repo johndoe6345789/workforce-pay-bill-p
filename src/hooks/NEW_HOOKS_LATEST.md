@@ -2,6 +2,34 @@
 
 This document lists all newly added custom hooks to the library.
 
+## Live Data Refresh Hooks
+
+### `useIndexedDBLive`
+Provides live refresh functionality for IndexedDB data with automatic change detection and polling.
+
+```tsx
+const [data, setData, deleteData, refresh] = useIndexedDBLive<MyType[]>(
+  STORES.MY_STORE,
+  [],
+  {
+    enabled: true,
+    pollingInterval: 2000
+  }
+)
+
+// Automatically refreshes when IndexedDB data changes
+// Manual refresh also available
+await refresh()
+```
+
+### `useIndexedDBLivePolling`
+Configures the global polling interval for live IndexedDB updates.
+
+```tsx
+// Set polling interval to 1 second
+useIndexedDBLivePolling(1000)
+```
+
 ## Security & Session Management Hooks
 
 ### `useSessionTimeout`

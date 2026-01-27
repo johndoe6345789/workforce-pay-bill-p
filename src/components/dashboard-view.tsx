@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { 
@@ -17,6 +18,7 @@ import type { DashboardMetrics } from '@/lib/types'
 import { useTranslation } from '@/hooks/use-translation'
 import { useDashboardConfig, type DashboardMetric, type DashboardCard, type DashboardActivity, type DashboardAction } from '@/hooks/use-dashboard-config'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { LiveRefreshIndicator } from '@/components/LiveRefreshIndicator'
 
 interface DashboardViewProps {
   metrics: DashboardMetrics
@@ -38,6 +40,11 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 export function DashboardView({ metrics }: DashboardViewProps) {
   const { t } = useTranslation()
   const { config, loading, error, getMetricsSection, getFinancialSection, getRecentActivities, getQuickActions } = useDashboardConfig()
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+
+  useEffect(() => {
+    setLastUpdated(new Date())
+  }, [metrics])
 
   if (loading) {
     return (
@@ -71,9 +78,15 @@ export function DashboardView({ metrics }: DashboardViewProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-semibold tracking-tight">{t('dashboard.title')}</h2>
-        <p className="text-muted-foreground mt-1">{t('dashboard.subtitle')}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('dashboard.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('dashboard.subtitle')}</p>
+        </div>
+        <LiveRefreshIndicator 
+          lastUpdated={lastUpdated}
+          pollingInterval={2000}
+        />
       </div>
 
       {metricsSection && (
