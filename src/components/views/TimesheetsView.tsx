@@ -32,6 +32,7 @@ import { TimesheetTabs } from '@/components/timesheets/TimesheetTabs'
 import { useTimeTracking } from '@/hooks/use-time-tracking'
 import { useTimesheetsCrud } from '@/hooks/use-timesheets-crud'
 import { usePermissions } from '@/hooks/use-permissions'
+import { useTranslation } from '@/hooks/use-translation'
 import { toast } from 'sonner'
 import type { Timesheet, TimesheetStatus, ShiftEntry } from '@/lib/types'
 
@@ -46,6 +47,7 @@ export function TimesheetsView({
   setSearchQuery, 
   onCreateInvoice
 }: TimesheetsViewProps) {
+  const { t } = useTranslation()
   const [statusFilter, setStatusFilter] = useState<'all' | TimesheetStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
@@ -90,13 +92,13 @@ export function TimesheetsView({
         submittedDate: new Date().toISOString(),
         shifts: []
       })
-      toast.success('Timesheet created successfully')
+      toast.success(t('timesheets.createSuccess'))
       setIsCreateDialogOpen(false)
     } catch (error) {
-      toast.error('Failed to create timesheet')
+      toast.error(t('timesheets.createError'))
       console.error('Error creating timesheet:', error)
     }
-  }, [createTimesheet])
+  }, [createTimesheet, t])
 
   const handleCreateDetailedTimesheet = useCallback(async (data: {
     workerName: string
@@ -120,13 +122,13 @@ export function TimesheetsView({
         submittedDate: new Date().toISOString(),
         shifts: data.shifts
       })
-      toast.success('Detailed timesheet created successfully')
+      toast.success(t('timesheets.createDetailedSuccess'))
       setIsCreateDialogOpen(false)
     } catch (error) {
-      toast.error('Failed to create detailed timesheet')
+      toast.error(t('timesheets.createDetailedError'))
       console.error('Error creating detailed timesheet:', error)
     }
-  }, [createTimesheet])
+  }, [createTimesheet, t])
 
   const handleBulkImport = useCallback(async (csvData: string) => {
     try {
@@ -156,17 +158,17 @@ export function TimesheetsView({
       })
       
       await bulkCreateTimesheets(timesheetsData)
-      toast.success(`${timesheetsData.length} timesheets imported successfully`)
+      toast.success(t('timesheets.importSuccess', { count: timesheetsData.length }))
       setIsBulkImportOpen(false)
     } catch (error) {
-      toast.error('Failed to import timesheets')
+      toast.error(t('timesheets.importError'))
       console.error('Error importing timesheets:', error)
     }
-  }, [bulkCreateTimesheets])
+  }, [bulkCreateTimesheets, t])
 
   const handleApprove = useCallback(async (id: string) => {
     if (!hasPermission('timesheets.approve')) {
-      toast.error('You do not have permission to approve timesheets')
+      toast.error(t('timesheets.noPermissionApprove'))
       return
     }
     
@@ -175,16 +177,16 @@ export function TimesheetsView({
         status: 'approved',
         approvedDate: new Date().toISOString()
       })
-      toast.success('Timesheet approved')
+      toast.success(t('timesheets.approveSuccess'))
     } catch (error) {
-      toast.error('Failed to approve timesheet')
+      toast.error(t('timesheets.approveError'))
       console.error('Error approving timesheet:', error)
     }
-  }, [updateTimesheet, hasPermission])
+  }, [updateTimesheet, hasPermission, t])
 
   const handleReject = useCallback(async (id: string) => {
     if (!hasPermission('timesheets.approve')) {
-      toast.error('You do not have permission to reject timesheets')
+      toast.error(t('timesheets.noPermissionReject'))
       return
     }
     
@@ -192,28 +194,28 @@ export function TimesheetsView({
       await updateTimesheet(id, {
         status: 'rejected'
       })
-      toast.error('Timesheet rejected')
+      toast.error(t('timesheets.rejectSuccess'))
     } catch (error) {
-      toast.error('Failed to reject timesheet')
+      toast.error(t('timesheets.rejectError'))
       console.error('Error rejecting timesheet:', error)
     }
-  }, [updateTimesheet, hasPermission])
+  }, [updateTimesheet, hasPermission, t])
 
   const handleAdjust = useCallback(async (timesheetId: string, adjustment: any) => {
     if (!hasPermission('timesheets.edit')) {
-      toast.error('You do not have permission to adjust timesheets')
+      toast.error(t('timesheets.noPermissionEdit'))
       return
     }
     
     try {
       await updateTimesheet(timesheetId, adjustment)
-      toast.success('Timesheet adjusted')
+      toast.success(t('timesheets.adjustSuccess'))
       setSelectedTimesheet(null)
     } catch (error) {
-      toast.error('Failed to adjust timesheet')
+      toast.error(t('timesheets.adjustError'))
       console.error('Error adjusting timesheet:', error)
     }
-  }, [updateTimesheet, hasPermission])
+  }, [updateTimesheet, hasPermission, t])
 
   const handleTimeAndRateAdjustment = useCallback(async (adjustment: {
     timesheetId: string
@@ -230,7 +232,7 @@ export function TimesheetsView({
     notes?: string
   }) => {
     if (!hasPermission('timesheets.edit')) {
-      toast.error('You do not have permission to adjust timesheets')
+      toast.error(t('timesheets.noPermissionEdit'))
       return
     }
     
@@ -276,30 +278,30 @@ export function TimesheetsView({
       await updateTimesheet(adjustment.timesheetId, updates)
       
       if (adjustment.approvalRequired) {
-        toast.success('Adjustment submitted for approval')
+        toast.success(t('timesheets.adjustmentSubmitted'))
       } else {
-        toast.success('Adjustment applied successfully')
+        toast.success(t('timesheets.adjustmentApplied'))
       }
     } catch (error) {
-      toast.error('Failed to apply adjustment')
+      toast.error(t('timesheets.adjustmentError'))
       console.error('Error applying adjustment:', error)
     }
-  }, [updateTimesheet, hasPermission, timesheets])
+  }, [updateTimesheet, hasPermission, timesheets, t])
 
   const handleDelete = useCallback(async (id: string) => {
     if (!hasPermission('timesheets.delete')) {
-      toast.error('You do not have permission to delete timesheets')
+      toast.error(t('timesheets.noPermissionDelete'))
       return
     }
     
     try {
       await deleteTimesheet(id)
-      toast.success('Timesheet deleted')
+      toast.success(t('timesheets.deleteSuccess'))
     } catch (error) {
-      toast.error('Failed to delete timesheet')
+      toast.error(t('timesheets.deleteError'))
       console.error('Error deleting timesheet:', error)
     }
-  }, [deleteTimesheet, hasPermission])
+  }, [deleteTimesheet, hasPermission, t])
   
   const timesheetsToFilter = useMemo(() => {
     return timesheets.filter(t => {
@@ -348,16 +350,16 @@ export function TimesheetsView({
   const [csvData, setCsvData] = useState('')
 
   const timesheetFields: FilterField[] = [
-    { name: 'workerName', label: 'Worker Name', type: 'text' },
-    { name: 'clientName', label: 'Client Name', type: 'text' },
-    { name: 'status', label: 'Status', type: 'select', options: [
-      { value: 'pending', label: 'Pending' },
-      { value: 'approved', label: 'Approved' },
-      { value: 'rejected', label: 'Rejected' }
+    { name: 'workerName', label: t('timesheets.workerName'), type: 'text' },
+    { name: 'clientName', label: t('timesheets.clientName'), type: 'text' },
+    { name: 'status', label: t('timesheets.status.all'), type: 'select', options: [
+      { value: 'pending', label: t('timesheets.status.pending') },
+      { value: 'approved', label: t('timesheets.status.approved') },
+      { value: 'rejected', label: t('timesheets.status.rejected') }
     ]},
-    { name: 'hours', label: 'Hours', type: 'number' },
-    { name: 'amount', label: 'Amount', type: 'number' },
-    { name: 'weekEnding', label: 'Week Ending', type: 'date' }
+    { name: 'hours', label: t('timesheets.hours'), type: 'number' },
+    { name: 'amount', label: t('timesheets.amount'), type: 'number' },
+    { name: 'weekEnding', label: t('timesheets.weekEnding'), type: 'date' }
   ]
 
   const pendingCount = filteredTimesheets.filter(ts => ts.status === 'pending').length
@@ -371,8 +373,8 @@ export function TimesheetsView({
   return (
     <Stack spacing={6}>
       <PageHeader
-        title="Timesheets"
-        description="Manage and approve worker timesheets"
+        title={t('timesheets.title')}
+        description={t('timesheets.subtitle')}
         actions={
           <Stack direction="horizontal" spacing={2}>
             <Button 
@@ -380,7 +382,7 @@ export function TimesheetsView({
               onClick={() => setShowAnalytics(!showAnalytics)}
             >
               <ChartBar size={18} className="mr-2" />
-              {showAnalytics ? 'Hide' : 'Show'} Analytics
+              {showAnalytics ? t('timesheets.hideAnalytics') : t('timesheets.showAnalytics')}
             </Button>
             <TimesheetCreateDialogs
               isCreateDialogOpen={isCreateDialogOpen}
@@ -403,28 +405,28 @@ export function TimesheetsView({
         <>
           <Grid cols={4} gap={4} responsive>
             <MetricCard
-              label="Total Timesheets"
+              label={t('timesheets.totalTimesheets')}
               value={filteredTimesheets.length}
               icon={<FileText size={24} />}
-              description={`${pendingCount} pending review`}
+              description={t('timesheets.pendingReview', { count: pendingCount })}
             />
             <MetricCard
-              label="Total Hours"
+              label={t('timesheets.totalHours')}
               value={`${totalHours.toFixed(1)}h`}
               icon={<Clock size={24} />}
-              description="This period"
+              description={t('timesheets.thisPeriod')}
             />
             <MetricCard
-              label="Validation Issues"
+              label={t('timesheets.validationIssues')}
               value={validationStats.invalid}
               icon={<Warning size={24} />}
-              description={validationStats.invalid > 0 ? 'Errors found' : 'All valid'}
+              description={validationStats.invalid > 0 ? t('timesheets.errorsFound') : t('timesheets.allValid')}
             />
             <MetricCard
-              label="Total Value"
+              label={t('timesheets.totalValue')}
               value={`£${totalValue.toLocaleString()}`}
               icon={<CurrencyDollar size={24} />}
-              description="Pending invoicing"
+              description={t('timesheets.pendingInvoicing')}
             />
           </Grid>
 
@@ -432,12 +434,12 @@ export function TimesheetsView({
             <Card className="border-l-4 border-l-warning">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-medium">Pending</CardTitle>
+                  <CardTitle className="text-base font-medium">{t('timesheets.pending')}</CardTitle>
                   <Badge variant="outline" className="text-warning border-warning/30 bg-warning/10">
                     {pendingCount}
                   </Badge>
                 </div>
-                <CardDescription className="text-xs">Awaiting approval</CardDescription>
+                <CardDescription className="text-xs">{t('timesheets.awaitingApproval')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-warning">
@@ -449,13 +451,13 @@ export function TimesheetsView({
             <Card className="border-l-4 border-l-success">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-medium">Approved</CardTitle>
+                  <CardTitle className="text-base font-medium">{t('timesheets.approved')}</CardTitle>
                   <Badge variant="outline" className="text-success border-success/30 bg-success/10">
                     <CheckCircle size={12} weight="bold" className="mr-1" />
                     {approvedCount}
                   </Badge>
                 </div>
-                <CardDescription className="text-xs">Ready for billing</CardDescription>
+                <CardDescription className="text-xs">{t('timesheets.readyForBilling')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-success">
@@ -467,13 +469,13 @@ export function TimesheetsView({
             <Card className="border-l-4 border-l-accent">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-medium">Approval Rate</CardTitle>
+                  <CardTitle className="text-base font-medium">{t('timesheets.approvalRate')}</CardTitle>
                   <Badge variant="outline" className="text-accent border-accent/30 bg-accent/10">
                     <TrendUp size={12} weight="bold" className="mr-1" />
                     {approvalRate.toFixed(0)}%
                   </Badge>
                 </div>
-                <CardDescription className="text-xs">This period</CardDescription>
+                <CardDescription className="text-xs">{t('timesheets.thisPeriod')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-accent">
@@ -492,13 +494,13 @@ export function TimesheetsView({
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg">Search & Filter</CardTitle>
+              <CardTitle className="text-lg">{t('timesheets.searchAndFilter')}</CardTitle>
               <CardDescription className="text-xs mt-1">
-                Find timesheets using advanced search
+                {t('timesheets.findTimesheetsAdvanced')}
               </CardDescription>
             </div>
             <Badge variant="secondary" className="font-mono">
-              {filteredTimesheets.length} results
+              {t('timesheets.results', { count: filteredTimesheets.length })}
             </Badge>
           </div>
         </CardHeader>
@@ -507,7 +509,7 @@ export function TimesheetsView({
             items={timesheetsToFilter}
             fields={timesheetFields}
             onResultsChange={handleResultsChange}
-            placeholder="Search by worker, client, or status..."
+            placeholder={t('timesheets.searchPlaceholder')}
           />
         </CardContent>
       </Card>
@@ -522,24 +524,27 @@ export function TimesheetsView({
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="all">{t('timesheets.status.all')}</SelectItem>
+              <SelectItem value="pending">{t('timesheets.status.pending')}</SelectItem>
+              <SelectItem value="approved">{t('timesheets.status.approved')}</SelectItem>
+              <SelectItem value="rejected">{t('timesheets.status.rejected')}</SelectItem>
             </SelectContent>
           </Select>
           
           {validationStats.invalid > 0 && (
             <Badge variant="destructive" className="px-3 py-1.5">
               <Warning size={14} weight="bold" className="mr-1" />
-              {validationStats.invalid} validation {validationStats.invalid === 1 ? 'error' : 'errors'}
+              {t('timesheets.validationErrors', { 
+                count: validationStats.invalid,
+                errors: validationStats.invalid === 1 ? t('timesheets.error') : t('timesheets.errors')
+              })}
             </Badge>
           )}
         </Stack>
 
         <Button variant="outline">
           <Download size={18} className="mr-2" />
-          Export CSV
+          {t('timesheets.exportCsv')}
         </Button>
       </Stack>
 
