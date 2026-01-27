@@ -7,12 +7,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { Camera, QrCode, CheckCircle, Warning } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import type { QRTimesheetData, Timesheet } from '@/lib/types'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface QRTimesheetScannerProps {
   onTimesheetScanned: (timesheet: Omit<Timesheet, 'id' | 'status' | 'submittedDate'>) => void
 }
 
 export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerProps) {
+  const { t } = useTranslation()
   const [isScanning, setIsScanning] = useState(false)
   const [qrData, setQrData] = useState<QRTimesheetData | null>(null)
   const [manualQRInput, setManualQRInput] = useState('')
@@ -33,7 +35,7 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
       
       setQrData(mockQRData)
       setIsScanning(false)
-      toast.success('QR code scanned successfully')
+      toast.success(t('qrScanner.scanSuccess'))
     }, 2000)
   }
 
@@ -41,9 +43,9 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
     try {
       const parsed = JSON.parse(manualQRInput) as QRTimesheetData
       setQrData(parsed)
-      toast.success('QR data parsed successfully')
+      toast.success(t('qrScanner.parseSuccess'))
     } catch (error) {
-      toast.error('Invalid QR code data format')
+      toast.error(t('qrScanner.parseError'))
     }
   }
 
@@ -64,7 +66,7 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
     onTimesheetScanned(timesheet)
     setQrData(null)
     setManualQRInput('')
-    toast.success('Timesheet imported from QR code')
+    toast.success(t('qrScanner.importSuccess'))
   }
 
   return (
@@ -73,10 +75,10 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <QrCode size={24} weight="fill" />
-            QR Code Timesheet Scanner
+            {t('qrScanner.title')}
           </CardTitle>
           <CardDescription>
-            Scan paper timesheets with QR codes for instant digital capture
+            {t('qrScanner.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -84,17 +86,17 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
             {isScanning ? (
               <div className="flex flex-col items-center gap-4">
                 <Camera size={64} className="text-accent animate-pulse" />
-                <p className="text-sm text-muted-foreground">Scanning QR code...</p>
+                <p className="text-sm text-muted-foreground">{t('qrScanner.scanning')}</p>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-4">
                 <QrCode size={64} className="text-muted-foreground" />
                 <Button onClick={simulateScan} size="lg">
                   <Camera size={20} className="mr-2" />
-                  Start Camera Scan
+                  {t('qrScanner.startCameraScan')}
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  Position QR code within camera frame
+                  {t('qrScanner.positionQR')}
                 </p>
               </div>
             )}
@@ -103,15 +105,15 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground">OR</span>
+              <span className="text-xs text-muted-foreground">{t('common.or')}</span>
               <div className="flex-1 h-px bg-border" />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="qr-manual">Paste QR Data Manually</Label>
+              <Label htmlFor="qr-manual">{t('qrScanner.pasteManually')}</Label>
               <Textarea
                 id="qr-manual"
-                placeholder='{"workerId":"W-123","workerName":"John Smith",...}'
+                placeholder={t('qrScanner.pasteManuallyPlaceholder')}
                 value={manualQRInput}
                 onChange={(e) => setManualQRInput(e.target.value)}
                 rows={4}
@@ -123,7 +125,7 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
                 className="w-full"
                 disabled={!manualQRInput.trim()}
               >
-                Parse QR Data
+                {t('qrScanner.parseQRData')}
               </Button>
             </div>
           </div>
@@ -133,33 +135,33 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <CheckCircle size={20} weight="fill" className="text-success" />
-                  Scanned Timesheet Data
+                  {t('qrScanner.scannedData')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground">Worker</p>
+                    <p className="text-muted-foreground">{t('qrScanner.worker')}</p>
                     <p className="font-medium">{qrData.workerName}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Client</p>
+                    <p className="text-muted-foreground">{t('qrScanner.client')}</p>
                     <p className="font-medium">{qrData.clientName}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Week Ending</p>
+                    <p className="text-muted-foreground">{t('qrScanner.weekEnding')}</p>
                     <p className="font-medium">{new Date(qrData.weekEnding).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Hours</p>
+                    <p className="text-muted-foreground">{t('qrScanner.hours')}</p>
                     <p className="font-medium font-mono">{qrData.hours}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Rate</p>
+                    <p className="text-muted-foreground">{t('qrScanner.rate')}</p>
                     <p className="font-medium font-mono">£{qrData.rate.toFixed(2)}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Total</p>
+                    <p className="text-muted-foreground">{t('qrScanner.total')}</p>
                     <p className="font-semibold font-mono">£{(qrData.hours * qrData.rate).toFixed(2)}</p>
                   </div>
                 </div>
@@ -167,23 +169,23 @@ export function QRTimesheetScanner({ onTimesheetScanned }: QRTimesheetScannerPro
                 {qrData.signature && (
                   <div className="flex items-center gap-2 text-xs text-success">
                     <CheckCircle size={16} weight="fill" />
-                    <span>Client approval signature verified</span>
+                    <span>{t('qrScanner.clientSignatureVerified')}</span>
                   </div>
                 )}
 
                 {!qrData.signature && (
                   <div className="flex items-center gap-2 text-xs text-warning">
                     <Warning size={16} weight="fill" />
-                    <span>No client signature - will require manual approval</span>
+                    <span>{t('qrScanner.noClientSignature')}</span>
                   </div>
                 )}
 
                 <div className="flex gap-2 pt-2">
                   <Button onClick={handleConfirmTimesheet} className="flex-1">
-                    Import Timesheet
+                    {t('qrScanner.importTimesheet')}
                   </Button>
                   <Button onClick={() => setQrData(null)} variant="outline">
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </CardContent>

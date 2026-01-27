@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator'
 import { PageHeader } from '@/components/ui/page-header'
 import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface ValidationResult {
   valid: boolean
@@ -52,6 +53,7 @@ interface BatchImportManagerProps {
 type ImportType = 'timesheets' | 'expenses' | 'workers'
 
 export function BatchImportManager({ onImportComplete }: BatchImportManagerProps) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<ImportType>('timesheets')
   const [csvData, setCsvData] = useState('')
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
@@ -69,28 +71,28 @@ export function BatchImportManager({ onImportComplete }: BatchImportManagerProps
 
   const fieldDefinitions = {
     timesheets: [
-      { name: 'workerName', label: 'Worker Name', required: true, type: 'text' as const },
-      { name: 'clientName', label: 'Client Name', required: true, type: 'text' as const },
-      { name: 'hours', label: 'Hours', required: true, type: 'number' as const },
-      { name: 'rate', label: 'Rate', required: true, type: 'number' as const },
-      { name: 'weekEnding', label: 'Week Ending', required: true, type: 'date' as const },
-      { name: 'status', label: 'Status', required: false, type: 'text' as const },
+      { name: 'workerName', label: t('batchImport.fields.workerName'), required: true, type: 'text' as const },
+      { name: 'clientName', label: t('batchImport.fields.clientName'), required: true, type: 'text' as const },
+      { name: 'hours', label: t('batchImport.fields.hours'), required: true, type: 'number' as const },
+      { name: 'rate', label: t('batchImport.fields.rate'), required: true, type: 'number' as const },
+      { name: 'weekEnding', label: t('batchImport.fields.weekEnding'), required: true, type: 'date' as const },
+      { name: 'status', label: t('batchImport.fields.status'), required: false, type: 'text' as const },
     ],
     expenses: [
-      { name: 'workerName', label: 'Worker Name', required: true, type: 'text' as const },
-      { name: 'clientName', label: 'Client Name', required: true, type: 'text' as const },
-      { name: 'amount', label: 'Amount', required: true, type: 'number' as const },
-      { name: 'category', label: 'Category', required: true, type: 'text' as const },
-      { name: 'date', label: 'Date', required: true, type: 'date' as const },
-      { name: 'description', label: 'Description', required: false, type: 'text' as const },
-      { name: 'receiptUrl', label: 'Receipt URL', required: false, type: 'text' as const },
+      { name: 'workerName', label: t('batchImport.fields.workerName'), required: true, type: 'text' as const },
+      { name: 'clientName', label: t('batchImport.fields.clientName'), required: true, type: 'text' as const },
+      { name: 'amount', label: t('batchImport.fields.amount'), required: true, type: 'number' as const },
+      { name: 'category', label: t('batchImport.fields.category'), required: true, type: 'text' as const },
+      { name: 'date', label: t('batchImport.fields.date'), required: true, type: 'date' as const },
+      { name: 'description', label: t('batchImport.fields.description'), required: false, type: 'text' as const },
+      { name: 'receiptUrl', label: t('batchImport.fields.receiptUrl'), required: false, type: 'text' as const },
     ],
     workers: [
-      { name: 'name', label: 'Name', required: true, type: 'text' as const },
-      { name: 'email', label: 'Email', required: true, type: 'text' as const },
-      { name: 'type', label: 'Type', required: true, type: 'text' as const },
-      { name: 'role', label: 'Role', required: false, type: 'text' as const },
-      { name: 'status', label: 'Status', required: false, type: 'text' as const },
+      { name: 'name', label: t('batchImport.fields.name'), required: true, type: 'text' as const },
+      { name: 'email', label: t('batchImport.fields.email'), required: true, type: 'text' as const },
+      { name: 'type', label: t('batchImport.fields.type'), required: true, type: 'text' as const },
+      { name: 'role', label: t('batchImport.fields.role'), required: false, type: 'text' as const },
+      { name: 'status', label: t('batchImport.fields.status'), required: false, type: 'text' as const },
     ],
   }
 
@@ -99,7 +101,7 @@ export function BatchImportManager({ onImportComplete }: BatchImportManagerProps
     if (!file) return
 
     if (!file.name.endsWith('.csv')) {
-      toast.error('Please select a CSV file')
+      toast.error(t('batchImport.messages.selectCSV'))
       return
     }
 
@@ -107,10 +109,10 @@ export function BatchImportManager({ onImportComplete }: BatchImportManagerProps
     reader.onload = (e) => {
       const text = e.target?.result as string
       setCsvData(text)
-      toast.success('File loaded successfully')
+      toast.success(t('batchImport.messages.fileLoaded'))
     }
     reader.onerror = () => {
-      toast.error('Failed to read file')
+      toast.error(t('batchImport.messages.fileError'))
     }
     reader.readAsText(file)
   }
@@ -363,7 +365,7 @@ export function BatchImportManager({ onImportComplete }: BatchImportManagerProps
     setIsImporting(false)
     
     if (progress.succeeded > 0) {
-      toast.success(`Successfully imported ${progress.succeeded} of ${progress.total} records`)
+      toast.success(t('batchImport.messages.importSuccess', { count: progress.succeeded, total: progress.total }))
       onImportComplete?.(rows.map((row, i) => {
         const rowData: Record<string, any> = {}
         headers.forEach((header, index) => {
@@ -374,7 +376,7 @@ export function BatchImportManager({ onImportComplete }: BatchImportManagerProps
     }
 
     if (progress.failed > 0) {
-      toast.error(`Failed to import ${progress.failed} records. Check errors below.`)
+      toast.error(t('batchImport.messages.importError', { count: progress.failed }))
     }
   }
 
@@ -406,15 +408,15 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
     <PermissionGate permissions={['timesheets.create', 'expenses.create', 'workers.create']}>
       <div className="space-y-6">
         <PageHeader
-          title="Batch Import Manager"
-          description="Import timesheets, expenses, and workers in bulk via CSV files"
+          title={t('batchImport.title')}
+          description={t('batchImport.subtitle')}
         />
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ImportType)}>
           <TabsList>
-            <TabsTrigger value="timesheets">Timesheets</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="workers">Workers</TabsTrigger>
+            <TabsTrigger value="timesheets">{t('batchImport.tabs.timesheets')}</TabsTrigger>
+            <TabsTrigger value="expenses">{t('batchImport.tabs.expenses')}</TabsTrigger>
+            <TabsTrigger value="workers">{t('batchImport.tabs.workers')}</TabsTrigger>
           </TabsList>
 
           {(['timesheets', 'expenses', 'workers'] as const).map((type) => (
@@ -425,10 +427,10 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Upload size={20} />
-                        Upload Data
+                        {t('batchImport.uploadData')}
                       </CardTitle>
                       <CardDescription>
-                        Upload a CSV file or paste data directly
+                        {t('batchImport.uploadDataDescription')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -448,8 +450,8 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
                           >
                             <FileArrowUp size={32} className="text-muted-foreground" />
                             <div>
-                              <p className="font-medium">Click to upload CSV file</p>
-                              <p className="text-sm text-muted-foreground">or drag and drop</p>
+                              <p className="font-medium">{t('batchImport.clickToUpload')}</p>
+                              <p className="text-sm text-muted-foreground">{t('batchImport.dragAndDrop')}</p>
                             </div>
                           </label>
                         </div>
@@ -457,9 +459,9 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
                         <Separator />
 
                         <div>
-                          <Label>Or paste CSV data</Label>
+                          <Label>{t('batchImport.pasteCSVData')}</Label>
                           <Textarea
-                            placeholder={`Paste CSV data here...\n\nExample:\n${sampleCsv[type]}`}
+                            placeholder={t('batchImport.pasteCSVPlaceholder', { example: sampleCsv[type] })}
                             value={csvData}
                             onChange={(e) => setCsvData(e.target.value)}
                             rows={10}
@@ -474,7 +476,7 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
                             onCheckedChange={(checked) => setSkipFirstRow(checked as boolean)}
                           />
                           <Label htmlFor="skip-header" className="text-sm cursor-pointer">
-                            First row contains headers
+                            {t('batchImport.firstRowHeaders')}
                           </Label>
                         </div>
 
@@ -485,17 +487,17 @@ Jane Doe,jane.doe@example.com,employee,+44 7700 900456`
                             className="flex-1"
                           >
                             <CheckCircle size={18} className="mr-2" />
-                            {isValidating ? 'Validating...' : 'Validate Data'}
+                            {isValidating ? t('batchImport.validating') : t('batchImport.validateData')}
                           </Button>
                           <Button
                             variant="outline"
                             onClick={() => {
                               setCsvData(sampleCsv[type])
-                              toast.info('Sample data loaded')
+                              toast.info(t('batchImport.messages.sampleLoaded'))
                             }}
                           >
                             <FileText size={18} className="mr-2" />
-                            Load Sample
+                            {t('batchImport.loadSample')}
                           </Button>
                         </div>
 

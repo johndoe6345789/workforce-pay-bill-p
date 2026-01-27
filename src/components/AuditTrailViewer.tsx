@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { usePermissions } from '@/hooks/use-permissions'
+import { useTranslation } from '@/hooks/use-translation'
 
 type AuditAction = 'create' | 'update' | 'delete' | 'approve' | 'reject' | 'send' | 'adjust' | 'import'
 type AuditEntity = 'timesheet' | 'invoice' | 'expense' | 'worker' | 'compliance' | 'payroll' | 'po'
@@ -37,6 +38,7 @@ interface AuditTrailViewerProps {
 }
 
 export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps) {
+  const { t } = useTranslation()
   const { hasPermission } = usePermissions()
   const [auditLogs = [], setAuditLogs] = useKV<AuditLogEntry[]>('audit-logs', [])
   const [searchQuery, setSearchQuery] = useState('')
@@ -81,8 +83,8 @@ export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps
     <div className="space-y-6">
       {!entityId && (
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Audit Trail</h2>
-          <p className="text-muted-foreground mt-1">Complete history of system changes and actions</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('auditTrail.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('auditTrail.subtitle')}</p>
         </div>
       )}
 
@@ -93,7 +95,7 @@ export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps
             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
           />
           <Input
-            placeholder="Search audit logs..."
+            placeholder={t('auditTrail.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -107,13 +109,13 @@ export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Actions</SelectItem>
-            <SelectItem value="create">Create</SelectItem>
-            <SelectItem value="update">Update</SelectItem>
-            <SelectItem value="delete">Delete</SelectItem>
-            <SelectItem value="approve">Approve</SelectItem>
-            <SelectItem value="reject">Reject</SelectItem>
-            <SelectItem value="adjust">Adjust</SelectItem>
+            <SelectItem value="all">{t('auditTrail.allActions')}</SelectItem>
+            <SelectItem value="create">{t('auditTrail.actions.create')}</SelectItem>
+            <SelectItem value="update">{t('auditTrail.actions.update')}</SelectItem>
+            <SelectItem value="delete">{t('auditTrail.actions.delete')}</SelectItem>
+            <SelectItem value="approve">{t('auditTrail.actions.approve')}</SelectItem>
+            <SelectItem value="reject">{t('auditTrail.actions.reject')}</SelectItem>
+            <SelectItem value="adjust">{t('auditTrail.actions.adjust')}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={entityFilter} onValueChange={(v: any) => setEntityFilter(v)}>
@@ -124,18 +126,18 @@ export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Entities</SelectItem>
-            <SelectItem value="timesheet">Timesheets</SelectItem>
-            <SelectItem value="invoice">Invoices</SelectItem>
-            <SelectItem value="expense">Expenses</SelectItem>
-            <SelectItem value="worker">Workers</SelectItem>
-            <SelectItem value="compliance">Compliance</SelectItem>
+            <SelectItem value="all">{t('auditTrail.allEntities')}</SelectItem>
+            <SelectItem value="timesheet">{t('auditTrail.entities.timesheets')}</SelectItem>
+            <SelectItem value="invoice">{t('auditTrail.entities.invoices')}</SelectItem>
+            <SelectItem value="expense">{t('auditTrail.entities.expenses')}</SelectItem>
+            <SelectItem value="worker">{t('auditTrail.entities.workers')}</SelectItem>
+            <SelectItem value="compliance">{t('auditTrail.entities.compliance')}</SelectItem>
           </SelectContent>
         </Select>
         {hasPermission('reports.audit') && (
           <Button variant="outline" onClick={exportAuditLog}>
             <Download size={18} className="mr-2" />
-            Export
+            {t('auditTrail.export')}
           </Button>
         )}
       </div>
@@ -146,7 +148,7 @@ export function AuditTrailViewer({ entityId, entityType }: AuditTrailViewerProps
             {filteredLogs.length === 0 ? (
               <div className="text-center py-12">
                 <ClockCounterClockwise size={48} className="mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No audit logs found</p>
+                <p className="text-muted-foreground">{t('auditTrail.noLogsFound')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -168,15 +170,17 @@ interface AuditLogCardProps {
 }
 
 function AuditLogCard({ log, showDate }: AuditLogCardProps) {
+  const { t } = useTranslation()
+  
   const actionConfig: Record<AuditAction, { color: string; label: string }> = {
-    create: { color: 'bg-success/10 text-success border-success/20', label: 'Created' },
-    update: { color: 'bg-info/10 text-info border-info/20', label: 'Updated' },
-    delete: { color: 'bg-destructive/10 text-destructive border-destructive/20', label: 'Deleted' },
-    approve: { color: 'bg-success/10 text-success border-success/20', label: 'Approved' },
-    reject: { color: 'bg-destructive/10 text-destructive border-destructive/20', label: 'Rejected' },
-    send: { color: 'bg-info/10 text-info border-info/20', label: 'Sent' },
-    adjust: { color: 'bg-warning/10 text-warning border-warning/20', label: 'Adjusted' },
-    import: { color: 'bg-accent/10 text-accent border-accent/20', label: 'Imported' }
+    create: { color: 'bg-success/10 text-success border-success/20', label: t('auditTrail.actions.created') },
+    update: { color: 'bg-info/10 text-info border-info/20', label: t('auditTrail.actions.updated') },
+    delete: { color: 'bg-destructive/10 text-destructive border-destructive/20', label: t('auditTrail.actions.deleted') },
+    approve: { color: 'bg-success/10 text-success border-success/20', label: t('auditTrail.actions.approved') },
+    reject: { color: 'bg-destructive/10 text-destructive border-destructive/20', label: t('auditTrail.actions.rejected') },
+    send: { color: 'bg-info/10 text-info border-info/20', label: t('auditTrail.actions.sent') },
+    adjust: { color: 'bg-warning/10 text-warning border-warning/20', label: t('auditTrail.actions.adjusted') },
+    import: { color: 'bg-accent/10 text-accent border-accent/20', label: t('auditTrail.actions.imported') }
   }
 
   const config = actionConfig[log.action]
@@ -230,7 +234,7 @@ function AuditLogCard({ log, showDate }: AuditLogCardProps) {
               {log.changes && log.changes.length > 0 && (
                 <details className="text-sm">
                   <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                    View {log.changes.length} change(s)
+                    {t('auditTrail.viewChanges', { count: log.changes.length })}
                   </summary>
                   <div className="mt-2 space-y-2 pl-4 border-l-2 border-border">
                     {log.changes.map((change, idx) => (
