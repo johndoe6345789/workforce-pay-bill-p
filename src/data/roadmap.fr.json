@@ -1,0 +1,634 @@
+{
+  "title": "WorkForce Pro - Feuille de Route de Développement",
+  "version": "2.0",
+  "lastUpdated": "Janvier 2025",
+  "overview": "Cette feuille de route décrit le plan de développement par phases de WorkForce Pro, une plateforme cloud de gestion des salaires, facturation et back-office RH conçue pour améliorer l'efficacité opérationnelle, la précision, la conformité et la visibilité dans les organisations de recrutement, de sous-traitance et de staffing.",
+  "stats": {
+    "completedFeatures": "200+",
+    "completedDescription": "Dans les Phases 1-5",
+    "componentLibrary": "100+",
+    "componentDescription": "Composants UI & Hooks",
+    "currentFocus": "Phase 2-4",
+    "currentDescription": "Fonctionnalités d'automatisation avancées",
+    "totalPhases": "6",
+    "phaseDescription": "Calendrier de 24 mois"
+  },
+  "releaseCadence": {
+    "major": "Trimestriel",
+    "minor": "Mensuel",
+    "patches": "Hebdomadaire",
+    "hotfixes": "Au besoin"
+  },
+  "phases": [
+    {
+      "id": "phase1",
+      "title": "Phase 1 : Fondation & Salaire/Facturation de Base (Trimestres 1-2)",
+      "sections": [
+        {
+          "id": "1.1",
+          "title": "Infrastructure de Plateforme de Base",
+          "features": [
+            { "status": "completed", "text": "Architecture multi-locataire" },
+            { "status": "completed", "text": "Gestion des entités et divisions" },
+            { "status": "completed", "text": "Authentification utilisateur et contrôle d'accès basé sur les rôles" },
+            { "status": "completed", "text": "Système de permissions basé sur les rôles avec Portails de Permission" },
+            { "status": "completed", "text": "Déploiement SaaS hébergé dans le cloud" },
+            { "status": "completed", "text": "Sécurité de base et contrôles d'accès aux données" },
+            { "status": "completed", "text": "IndexedDB pour le stockage de données persistant" },
+            { "status": "completed", "text": "Gestion d'état Redux dans toutes les vues" },
+            { "status": "completed", "text": "Gestion de session avec expiration automatique" },
+            { "status": "completed", "text": "Préférences de délai d'expiration de session et avertissements" },
+            { "status": "completed", "text": "Connexion admin express en mode développement" },
+            { "status": "completed", "text": "Chargement paresseux pour des performances optimisées" },
+            { "status": "completed", "text": "Support d'accessibilité complet (conforme WCAG 2.1 AA)" },
+            { "status": "completed", "text": "Navigation au clavier et support de lecteur d'écran" },
+            { "status": "completed", "text": "Système de piste d'audit complet" }
+          ]
+        },
+        {
+          "id": "1.2",
+          "title": "Gestion des Feuilles de Temps - Base",
+          "features": [
+            { "status": "completed", "text": "Saisie de feuille de temps sur portail web (travailleur, client, agence)" },
+            { "status": "completed", "text": "Flux d'approbation des feuilles de temps (portail web client)" },
+            { "status": "completed", "text": "Suivi des statuts en attente/approuvé/rejeté" },
+            { "status": "completed", "text": "Création de feuilles de temps initiée par l'agence" },
+            { "status": "completed", "text": "Saisie en masse par les administrateurs" },
+            { "status": "completed", "text": "Soumission de feuille de temps mobile" },
+            { "status": "completed", "text": "Importation par lots depuis des systèmes tiers" },
+            { "status": "completed", "text": "Numérisation de feuilles de temps papier avec QR code" },
+            { "status": "completed", "text": "Boîtes de dialogue de détails avec informations complètes de la feuille de temps" },
+            { "status": "completed", "text": "Recherche avancée et filtrage avec langage de requête" },
+            { "status": "completed", "text": "Modèles de motifs de quarts (nuit/week-end/personnalisé)" },
+            { "status": "completed", "text": "Suivi du temps à grain fin (horaires de quarts variables)" },
+            { "status": "completed", "text": "Saisie de feuille de temps détaillée avec ventilation des heures" },
+            { "status": "completed", "text": "Rapport des feuilles de temps manquantes" },
+            { "status": "completed", "text": "Opérations CRUD avec intégration IndexedDB" },
+            { "status": "planned", "text": "Ingestion automatisée par e-mail" }
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Facturation & Facturation de Base",
+          "features": [
+            { "status": "completed", "text": "Génération de factures à partir des feuilles de temps approuvées" },
+            { "status": "completed", "text": "Suivi des factures (brouillon, envoyé, payé, en retard)" },
+            { "status": "completed", "text": "Support multi-devises (GBP, USD, EUR, étendu)" },
+            { "status": "completed", "text": "Livraison électronique des factures" },
+            { "status": "completed", "text": "Modèles de factures de vente" },
+            { "status": "completed", "text": "Configuration des conditions de paiement" },
+            { "status": "completed", "text": "Suivi et gestion des bons de commande" },
+            { "status": "completed", "text": "Interface d'application des bons de commande" },
+            { "status": "completed", "text": "Boîtes de dialogue de détails de facture" },
+            { "status": "completed", "text": "Boîte de dialogue de création de facture avec validation de formulaire" },
+            { "status": "completed", "text": "Gestionnaire de modèles de factures" },
+            { "status": "completed", "text": "Générateur de notes de crédit" },
+            { "status": "completed", "text": "Support de facture de placement permanent" },
+            { "status": "completed", "text": "Recherche avancée et filtrage" },
+            { "status": "completed", "text": "Opérations CRUD avec intégration IndexedDB" },
+            { "status": "planned", "text": "Visibilité du contrôle de crédit" }
+          ]
+        },
+        {
+          "id": "1.4",
+          "title": "Paie de Base",
+          "features": [
+            { "status": "completed", "text": "Suivi des exécutions de paie" },
+            { "status": "completed", "text": "Calculs des paiements des travailleurs" },
+            { "status": "completed", "text": "Traitement de la paie en un clic" },
+            { "status": "completed", "text": "Intégration de la paie PAYE" },
+            { "status": "completed", "text": "Boîtes de dialogue de création de soumission PAYE" },
+            { "status": "completed", "text": "Boîtes de dialogue de détails de paie" },
+            { "status": "completed", "text": "Boîte de dialogue de création de paie avec validation" },
+            { "status": "completed", "text": "Traitement par lots de la paie" },
+            { "status": "completed", "text": "Flux d'approbation de la paie" },
+            { "status": "completed", "text": "Gestion de la liste des lots de paie" },
+            { "status": "completed", "text": "Gestionnaire et calculs des congés payés" },
+            { "status": "completed", "text": "Opérations CRUD avec intégration IndexedDB" },
+            { "status": "completed", "text": "Recherche avancée et filtrage" },
+            { "status": "planned", "text": "Paiements de sous-traitants de sociétés limitées" }
+          ]
+        },
+        {
+          "id": "1.5",
+          "title": "Tableau de Bord & Rapports de Base",
+          "features": [
+            { "status": "completed", "text": "Tableau de bord exécutif avec métriques clés" },
+            { "status": "completed", "text": "Suivi des approbations en attente" },
+            { "status": "completed", "text": "Surveillance des factures en retard" },
+            { "status": "completed", "text": "Visibilité des revenus et des marges" },
+            { "status": "completed", "text": "Flux d'activité" },
+            { "status": "completed", "text": "Capacités de détail dans toutes les entités" },
+            { "status": "completed", "text": "Constructeur de rapports personnalisés" },
+            { "status": "completed", "text": "Rapport des feuilles de temps manquantes" },
+            { "status": "completed", "text": "Analyse et prévision des marges" },
+            { "status": "completed", "text": "Vue de rapports avancés avec plusieurs types de rapports" },
+            { "status": "completed", "text": "Capacités d'exportation de données" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase2",
+      "title": "Phase 2 : Opérations Avancées & Automatisation (Trimestres 3-4)",
+      "sections": [
+        {
+          "id": "2.1",
+          "title": "Gestion des Dépenses",
+          "features": [
+            { "status": "completed", "text": "Soumission de dépenses par les travailleurs (portail web)" },
+            { "status": "completed", "text": "Saisies de dépenses créées par l'agence" },
+            { "status": "completed", "text": "Flux d'approbation des dépenses" },
+            { "status": "completed", "text": "Intégration avec facturation et paie" },
+            { "status": "completed", "text": "Suivi des dépenses remboursables vs facturables" },
+            { "status": "completed", "text": "Boîtes de dialogue de détails de dépenses avec informations complètes" },
+            { "status": "completed", "text": "Recherche avancée et filtrage" },
+            { "status": "completed", "text": "Opérations CRUD avec intégration IndexedDB" },
+            { "status": "planned", "text": "Capture mobile des dépenses avec photos de reçus" }
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Gestion des Feuilles de Temps - Avancée",
+          "features": [
+            { "status": "completed", "text": "Routage d'approbation en plusieurs étapes" },
+            { "status": "completed", "text": "Assistant d'ajustement de temps et de tarif" },
+            { "status": "completed", "text": "Assistant d'ajustement de feuille de temps" },
+            { "status": "completed", "text": "Piste d'audit complète de tous les changements" },
+            { "status": "completed", "text": "Gestionnaire de motifs de quarts pour les horaires récurrents" },
+            { "status": "completed", "text": "Calculateur de primes de quart" },
+            { "status": "completed", "text": "Validateur de contrat" },
+            { "status": "completed", "text": "Recherche avancée avec guide de langage de requête" },
+            { "status": "planned", "text": "Génération automatisée de crédits" },
+            { "status": "planned", "text": "Flux de refacturation" },
+            { "status": "planned", "text": "Flux d'approbation par e-mail" },
+            { "status": "planned", "text": "Règles de validation configurables" }
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Facturation Avancée",
+          "features": [
+            { "status": "completed", "text": "Factures de placement permanent" },
+            { "status": "completed", "text": "Modèles de factures personnalisés (Gestionnaire de Modèles de Factures)" },
+            { "status": "completed", "text": "Génération de notes de crédit" },
+            { "status": "completed", "text": "Suivi et application des bons de commande" },
+            { "status": "planned", "text": "Auto-facturation des sous-traitants" },
+            { "status": "planned", "text": "Notes de livraison" },
+            { "status": "planned", "text": "Correspondance des factures fournisseurs" },
+            { "status": "planned", "text": "Support d'auto-facturation client" },
+            { "status": "planned", "text": "Gestion et ajustements des frais supplémentaires" },
+            { "status": "planned", "text": "Calculs de retenue à la source" }
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Application des Contrats, Tarifs & Règles",
+          "features": [
+            { "status": "completed", "text": "Modèles de tarifs par rôle, client, placement (Gestionnaire de Modèles de Tarifs)" },
+            { "status": "completed", "text": "Calculs automatiques des primes de quart (Calculateur de Primes de Quart)" },
+            { "status": "completed", "text": "Validation des contrats à la soumission (Validateur de Contrat)" },
+            { "status": "completed", "text": "Outils d'ajustement de temps et de tarif" },
+            { "status": "planned", "text": "Automatisation du tarif des heures supplémentaires" },
+            { "status": "planned", "text": "Règles de validation du motif de temps" },
+            { "status": "planned", "text": "Surveillance et alertes AWR" }
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Notifications & Automatisation du Flux de Travail",
+          "features": [
+            { "status": "completed", "text": "Notifications d'alerte dans le système" },
+            { "status": "completed", "text": "Centre de notifications en temps réel" },
+            { "status": "completed", "text": "Historique et suivi des notifications" },
+            { "status": "completed", "text": "Mises à jour de traitement basées sur les événements" },
+            { "status": "completed", "text": "Modèles de notifications par e-mail" },
+            { "status": "completed", "text": "Gestionnaire de modèles d'e-mails" },
+            { "status": "completed", "text": "Règles de notification configurables" },
+            { "status": "completed", "text": "Gestionnaire de règles de notification" },
+            { "status": "completed", "text": "Modèles de flux d'approbation configurables pour différents types de lots" },
+            { "status": "completed", "text": "Gestionnaire de modèles de flux d'approbation" },
+            { "status": "completed", "text": "Flux d'approbation en plusieurs étapes avec règles d'escalade" },
+            { "status": "completed", "text": "Saut conditionnel d'étapes d'approbation" },
+            { "status": "completed", "text": "Étapes d'approbation parallèles pour examens simultanés" },
+            { "status": "completed", "text": "Gestion de modèles pour paie, factures, feuilles de temps, dépenses, conformité et bons de commande" },
+            { "status": "planned", "text": "Rappels de suivi automatisés" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase3",
+      "title": "Phase 3 : Conformité & Libre-Service (Trimestres 5-6)",
+      "sections": [
+        {
+          "id": "3.1",
+          "title": "Gestion de la Conformité - Améliorée",
+          "features": [
+            { "status": "completed", "text": "Suivi et surveillance des documents" },
+            { "status": "completed", "text": "Alertes et notifications d'expiration" },
+            { "status": "completed", "text": "Téléchargement et stockage de documents" },
+            { "status": "completed", "text": "Flux d'intégration numérique (Gestionnaire de Flux d'Intégration)" },
+            { "status": "completed", "text": "Boîtes de dialogue de détails de conformité" },
+            { "status": "completed", "text": "Recherche avancée et filtrage" },
+            { "status": "completed", "text": "Opérations CRUD avec intégration IndexedDB" },
+            { "status": "planned", "text": "Génération automatisée de packs de contrats" },
+            { "status": "planned", "text": "Règles d'application de la conformité" },
+            { "status": "planned", "text": "Support de rapports statutaires" },
+            { "status": "planned", "text": "Évaluation de l'inscription automatique" }
+          ]
+        },
+        {
+          "id": "3.2",
+          "title": "Portails en Libre-Service",
+          "features": [
+            { "status": "completed", "text": "Accès au portail travailleur" },
+            { "status": "completed", "text": "Visibilité en temps réel des feuilles de temps" },
+            { "status": "completed", "text": "Visibilité en temps réel des dépenses" },
+            { "status": "completed", "text": "Statut des factures et des paiements" },
+            { "status": "completed", "text": "Conception adaptée aux mobiles partout" },
+            { "status": "planned", "text": "Portail travailleur avec marque" },
+            { "status": "planned", "text": "Portail client avec marque" },
+            { "status": "planned", "text": "Accès aux documents sans papier" },
+            { "status": "planned", "text": "Marque personnalisée et SSL" }
+          ]
+        },
+        {
+          "id": "3.3",
+          "title": "Traitement Avancé de la Paie",
+          "features": [
+            { "status": "completed", "text": "Traitement PAYE avec gestion des soumissions" },
+            { "status": "completed", "text": "Automatisation et gestionnaire des congés payés" },
+            { "status": "completed", "text": "Traitement par lots de la paie" },
+            { "status": "completed", "text": "Paie en un clic avec flux d'approbation" },
+            { "status": "planned", "text": "Traitement CIS" },
+            { "status": "planned", "text": "Paie du personnel d'agence" },
+            { "status": "planned", "text": "Support de modèles d'emploi multiples" },
+            { "status": "planned", "text": "Préparation de la paie internationale" },
+            { "status": "planned", "text": "Importation des coûts de paie de l'étranger" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase4",
+      "title": "Phase 4 : Analytique & Intégrations (Trimestres 7-8)",
+      "sections": [
+        {
+          "id": "4.1",
+          "title": "Rapports & Analytique Avancés",
+          "features": [
+            { "status": "completed", "text": "Rapport de marge brute en temps réel" },
+            { "status": "completed", "text": "Prévisions et analyses prédictives" },
+            { "status": "completed", "text": "Rapports des feuilles de temps manquantes" },
+            { "status": "completed", "text": "Constructeur de rapports personnalisés" },
+            { "status": "completed", "text": "Visualiseur de piste d'audit avec historique d'activité complet" },
+            { "status": "completed", "text": "Capacités d'exportation de données" },
+            { "status": "completed", "text": "Recherche avancée dans toutes les entités de données" },
+            { "status": "completed", "text": "Langage de requête pour filtrage complexe" },
+            { "status": "planned", "text": "Rapports d'activité des utilisateurs et d'audit" },
+            { "status": "planned", "text": "Tableaux de bord de performance au niveau client" },
+            { "status": "planned", "text": "Rentabilité au niveau placement" },
+            { "status": "planned", "text": "Vues d'activité au niveau travailleur" },
+            { "status": "planned", "text": "Rapports de gestion personnalisés" },
+            { "status": "planned", "text": "Accès aux rapports basé sur les rôles" }
+          ]
+        },
+        {
+          "id": "4.2",
+          "title": "Intégrations Système",
+          "features": [
+            { "status": "completed", "text": "Gestionnaire d'importation par lots pour données tierces" },
+            { "status": "completed", "text": "Interface de gestion des données" },
+            { "status": "completed", "text": "Chargement de données basé sur JSON" },
+            { "status": "planned", "text": "Intégration ATS (Système de Suivi des Candidatures)" },
+            { "status": "planned", "text": "Intégration de plateforme CRM" },
+            { "status": "planned", "text": "Intégration de système comptable (Xero, QuickBooks, Sage)" },
+            { "status": "planned", "text": "Flux de données de placement automatisé" },
+            { "status": "planned", "text": "Automatisation de l'exportation de données financières" },
+            { "status": "planned", "text": "API RESTful pour intégrations tierces" },
+            { "status": "planned", "text": "Support de webhook pour mises à jour en temps réel" }
+          ]
+        },
+        {
+          "id": "4.3",
+          "title": "Global & Multi-Devises - Avancé",
+          "features": [
+            { "status": "completed", "text": "Facturation multi-devises (étendue)" },
+            { "status": "completed", "text": "Interface de gestion des taux de change" },
+            { "status": "completed", "text": "Conversion de devises en temps réel" },
+            { "status": "completed", "text": "Suivi et alertes des taux de change" },
+            { "status": "completed", "text": "Tableau de bord de gestion des devises" },
+            { "status": "planned", "text": "Gestion de la taxe de vente internationale" },
+            { "status": "planned", "text": "Automatisation de la retenue à la source" },
+            { "status": "planned", "text": "Conformité fiscale locale" },
+            { "status": "planned", "text": "Calcul de marge transfrontalière" },
+            { "status": "planned", "text": "Support de facturation à l'étranger" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase5",
+      "title": "Phase 5 : Entreprise & Échelle (Trimestres 9-10)",
+      "sections": [
+        {
+          "id": "5.1",
+          "title": "Multi-Location - Avancée",
+          "features": [
+            { "status": "completed", "text": "Support de plusieurs entités" },
+            { "status": "completed", "text": "Changement d'entité dans la navigation" },
+            { "status": "planned", "text": "Capacités de gestion de franchise" },
+            { "status": "planned", "text": "Consolidation de groupe d'agences" },
+            { "status": "planned", "text": "Rapports inter-entités" },
+            { "status": "planned", "text": "Contrôles d'administration déléguée" },
+            { "status": "planned", "text": "Cloisonnement logique des données" }
+          ]
+        },
+        {
+          "id": "5.2",
+          "title": "Configuration & Personnalisation",
+          "features": [
+            { "status": "completed", "text": "Modèles d'e-mails modifiables (Gestionnaire de Modèles d'E-mails)" },
+            { "status": "completed", "text": "Support multilingue (framework i18n)" },
+            { "status": "completed", "text": "Système de traduction avec traductions basées sur JSON" },
+            { "status": "completed", "text": "Composant de sélection de langue" },
+            { "status": "completed", "text": "Pages de profil utilisateur et de paramètres" },
+            { "status": "completed", "text": "Préférences de délai d'expiration de session" },
+            { "status": "completed", "text": "Constructeurs de flux de travail personnalisés (Modèles de Flux d'Approbation)" },
+            { "status": "planned", "text": "Étiquettes système personnalisées" },
+            { "status": "planned", "text": "Rôles de sécurité définis par l'agence" },
+            { "status": "planned", "text": "Configuration système avancée" },
+            { "status": "planned", "text": "Capacités de marque blanche" }
+          ]
+        },
+        {
+          "id": "5.3",
+          "title": "Performance & Échelle",
+          "features": [
+            { "status": "completed", "text": "Chargement paresseux pour les composants de vue" },
+            { "status": "completed", "text": "IndexedDB pour stockage local haute performance" },
+            { "status": "completed", "text": "Redux pour gestion d'état optimisée" },
+            { "status": "completed", "text": "Préchargement de vue pour navigation instantanée" },
+            { "status": "completed", "text": "Optimisation du traitement par lots" },
+            { "status": "planned", "text": "Optimisation du traitement de haut volume" },
+            { "status": "planned", "text": "Tableaux de bord de surveillance des performances" },
+            { "status": "planned", "text": "Équilibrage de charge et mise à l'échelle" },
+            { "status": "planned", "text": "Optimisation de la base de données" }
+          ]
+        },
+        {
+          "id": "5.4",
+          "title": "Support & Qualité",
+          "features": [
+            { "status": "completed", "text": "Vitrine/bibliothèque de composants (style Storybook)" },
+            { "status": "completed", "text": "Composants de démonstration de logique métier" },
+            { "status": "completed", "text": "Démonstration IndexedDB pour développeurs" },
+            { "status": "completed", "text": "Démonstration de traduction pour tests" },
+            { "status": "completed", "text": "Démonstration d'approbation parallèle" },
+            { "status": "completed", "text": "Bibliothèque de hooks complète (100+ hooks personnalisés)" },
+            { "status": "completed", "text": "Bibliothèque de composants UI étendue (100+ composants)" },
+            { "status": "completed", "text": "Documentation d'accessibilité complète" },
+            { "status": "planned", "text": "Environnements de test/démonstration dédiés" },
+            { "status": "planned", "text": "Processus de demande de développement géré" },
+            { "status": "planned", "text": "Support téléphonique et portail en ligne" },
+            { "status": "planned", "text": "Base de connaissances et documentation" },
+            { "status": "planned", "text": "Matériels de formation et vidéos" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase6",
+      "title": "Phase 6 : Innovation & IA (Trimestres 11-12)",
+      "sections": [
+        {
+          "id": "6.1",
+          "title": "Automatisation Intelligente",
+          "features": [
+            { "status": "planned", "text": "Détection d'anomalies de feuilles de temps par IA" },
+            { "status": "planned", "text": "Alertes de conformité prédictives" },
+            { "status": "planned", "text": "Correspondance intelligente de factures" },
+            { "status": "planned", "text": "Catégorisation automatisée des dépenses" },
+            { "status": "planned", "text": "Apprentissage automatique pour optimisation des marges" }
+          ]
+        },
+        {
+          "id": "6.2",
+          "title": "Analytique Avancée",
+          "features": [
+            { "status": "planned", "text": "Tableaux de bord d'intelligence d'affaires" },
+            { "status": "planned", "text": "Analyse de tendances et insights" },
+            { "status": "planned", "text": "Benchmarking et suivi des KPI" },
+            { "status": "planned", "text": "Planification prédictive de la main-d'œuvre" },
+            { "status": "planned", "text": "Notation et surveillance des risques" }
+          ]
+        },
+        {
+          "id": "6.3",
+          "title": "Excellence Mobile",
+          "features": [
+            { "status": "planned", "text": "Applications mobiles natives (iOS/Android)" },
+            { "status": "planned", "text": "Capacité hors ligne" },
+            { "status": "planned", "text": "Authentification biométrique" },
+            { "status": "planned", "text": "Notifications push" },
+            { "status": "planned", "text": "Fonctionnalités basées sur la géolocalisation" }
+          ]
+        }
+      ]
+    }
+  ],
+  "technicalInfrastructure": {
+    "title": "Infrastructure Technique & Expérience Développeur",
+    "sections": [
+      {
+        "id": "architecture",
+        "title": "Architecture & Gestion d'État",
+        "features": [
+          { "status": "completed", "text": "Redux Toolkit pour gestion d'état global" },
+          { "status": "completed", "text": "Tranches Redux pour UI, Auth, Feuille de temps, Facture, Paie, Conformité, Dépense" },
+          { "status": "completed", "text": "Middleware Redux pour notifications" },
+          { "status": "completed", "text": "Intégration IndexedDB pour stockage persistant" },
+          { "status": "completed", "text": "Mises à jour optimistes avec rollback" },
+          { "status": "completed", "text": "Frontière d'erreur avec UI de secours" },
+          { "status": "completed", "text": "App.tsx minimal avec composition de composants" }
+        ]
+      },
+      {
+        "id": "hooks",
+        "title": "Bibliothèque de Hooks (100+ Hooks Personnalisés)",
+        "subsections": [
+          {
+            "title": "Hooks de Logique Métier",
+            "features": [
+              { "status": "completed", "text": "useInvoicing - Calculs et génération de factures" },
+              { "status": "completed", "text": "usePayrollCalculations - Mathématiques de paie et déductions" },
+              { "status": "completed", "text": "useTimeTracking - Utilitaires de calcul de temps" },
+              { "status": "completed", "text": "useMarginAnalysis - Calculs de rentabilité" },
+              { "status": "completed", "text": "useRateCalculator - Logique de tarifs et prix" },
+              { "status": "completed", "text": "usePAYEIntegration - Intégration du système fiscal britannique" },
+              { "status": "completed", "text": "useComplianceCheck - Validation de conformité" },
+              { "status": "completed", "text": "useTimeAndRateAdjustment - Calculs d'ajustement" }
+            ]
+          },
+          {
+            "title": "Hooks CRUD",
+            "features": [
+              { "status": "completed", "text": "useTimesheetsCRUD" },
+              { "status": "completed", "text": "useInvoicesCRUD" },
+              { "status": "completed", "text": "usePayrollCRUD" },
+              { "status": "completed", "text": "useExpensesCRUD" },
+              { "status": "completed", "text": "useComplianceCRUD" },
+              { "status": "completed", "text": "useWorkersCRUD" },
+              { "status": "completed", "text": "usePurchaseOrdersCRUD" },
+              { "status": "completed", "text": "useEntityCRUD" }
+            ]
+          },
+          {
+            "title": "Hooks de Flux de Travail & Automatisation",
+            "features": [
+              { "status": "completed", "text": "useApprovalWorkflow - Logique d'approbation en plusieurs étapes" },
+              { "status": "completed", "text": "useApprovalWorkflowTemplates - Gestion de modèles" },
+              { "status": "completed", "text": "useBatchActions - Opérations en masse" },
+              { "status": "completed", "text": "useBulkOperations - Mises à jour massives" },
+              { "status": "completed", "text": "useAutoSave - Persistance automatique des données" }
+            ]
+          },
+          {
+            "title": "Hooks UI & UX",
+            "features": [
+              { "status": "completed", "text": "useDataGrid - Gestion avancée de tableaux" },
+              { "status": "completed", "text": "useFilter - Filtrage côté client" },
+              { "status": "completed", "text": "useSort - Logique de tri" },
+              { "status": "completed", "text": "usePagination - Navigation par pages" },
+              { "status": "completed", "text": "useMultiSelect - Sélection en masse" },
+              { "status": "completed", "text": "useColumnVisibility - Colonnes dynamiques" },
+              { "status": "completed", "text": "useVirtualScroll - Optimisation des performances" }
+            ]
+          },
+          {
+            "title": "Hooks d'Accessibilité",
+            "features": [
+              { "status": "completed", "text": "useAnnounce - Annonces de lecteur d'écran" },
+              { "status": "completed", "text": "useAriaLive - Mises à jour de régions dynamiques" },
+              { "status": "completed", "text": "useFocusTrap - Gestion du focus modal" },
+              { "status": "completed", "text": "useFocusReturn - Retour du focus après fermeture" },
+              { "status": "completed", "text": "useSkipLink - Navigation Aller au contenu" },
+              { "status": "completed", "text": "useKeyboardShortcuts - Navigation au clavier" },
+              { "status": "completed", "text": "useReducedMotion - Préférences de mouvement" }
+            ]
+          },
+          {
+            "title": "Hooks Utilitaires",
+            "features": [
+              { "status": "completed", "text": "useDebounce, useThrottle, useLocalStorage, useSessionStorage" },
+              { "status": "completed", "text": "useIndexedDBState, useMediaQuery, useBreakpoint, useWindowSize" },
+              { "status": "completed", "text": "useClipboard, useAsync, useCache, useHistory, useUndo" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "components",
+        "title": "Bibliothèque de Composants UI (100+ Composants)",
+        "subsections": [
+          {
+            "title": "Composants de Mise en Page",
+            "features": [
+              { "status": "completed", "text": "Stack, Flex, Grid, Box, Container, Center, Section" }
+            ]
+          },
+          {
+            "title": "Affichage de Données",
+            "features": [
+              { "status": "completed", "text": "DataTable, DataGrid, SimpleTable, AdvancedTable" },
+              { "status": "completed", "text": "Card, MetricCard, StatCard, PricingCard" },
+              { "status": "completed", "text": "Timeline, TimelineVertical, TimelineEnhanced" },
+              { "status": "completed", "text": "DescriptionList, DataList, KeyValue" },
+              { "status": "completed", "text": "Badge, StatusBadge, CounterBadge, Chip, Tag" }
+            ]
+          },
+          {
+            "title": "Formulaires & Saisies",
+            "features": [
+              { "status": "completed", "text": "Input, Textarea, Select, MultiSelect, ComboBox" },
+              { "status": "completed", "text": "Checkbox, Radio, Switch, Slider, Toggle" },
+              { "status": "completed", "text": "DateRangePicker, Calendar" },
+              { "status": "completed", "text": "FileUpload, ImagePreview" },
+              { "status": "completed", "text": "SearchInput, QuickSearch" }
+            ]
+          },
+          {
+            "title": "Navigation",
+            "features": [
+              { "status": "completed", "text": "Sidebar, NavigationMenu, Breadcrumb, Tabs" },
+              { "status": "completed", "text": "Pagination, PaginationButtons, PaginationControls, QuickPagination" },
+              { "status": "completed", "text": "Toolbar, ActionBar" }
+            ]
+          },
+          {
+            "title": "Retour d'Information",
+            "features": [
+              { "status": "completed", "text": "Alert, InlineAlert, ValidationBanner" },
+              { "status": "completed", "text": "Toast (Sonner), NotificationList" },
+              { "status": "completed", "text": "Progress, ProgressBar, Spinner, LoadingSpinner, LoadingOverlay" },
+              { "status": "completed", "text": "Skeleton, Pulse, EmptyState" }
+            ]
+          },
+          {
+            "title": "Superpositions",
+            "features": [
+              { "status": "completed", "text": "Dialog, Modal, Sheet, Drawer, SlidePanel" },
+              { "status": "completed", "text": "Popover, HoverCard, Tooltip, ContextMenu, DropdownMenu" }
+            ]
+          },
+          {
+            "title": "Avancés",
+            "features": [
+              { "status": "completed", "text": "Stepper, StepperSimple, StepperEnhanced, Wizard" },
+              { "status": "completed", "text": "TreeView, Accordion, Collapsible" },
+              { "status": "completed", "text": "CodeBlock, CopyButton, ExportButton" },
+              { "status": "completed", "text": "FilterBar, FilterChips, FilterChipsBar" },
+              { "status": "completed", "text": "Chart (intégration Recharts)" },
+              { "status": "completed", "text": "Rating, Checklist" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "successMetrics": {
+    "title": "Métriques de Succès",
+    "categories": [
+      {
+        "title": "Efficacité Opérationnelle",
+        "metrics": [
+          "80% de réduction du temps de traitement des feuilles de temps",
+          "95% de traitement direct des factures",
+          "90% de réduction des incidents de non-conformité"
+        ]
+      },
+      {
+        "title": "Adoption Utilisateur",
+        "metrics": [
+          "85%+ d'adoption du portail travailleur",
+          "75%+ d'adoption du portail client",
+          "<5% de taux de tickets de support par utilisateur"
+        ]
+      },
+      {
+        "title": "Impact Financier",
+        "metrics": [
+          "99,5% de précision de facturation",
+          "<2% de fuite de marge",
+          "30% de réduction des frais administratifs"
+        ]
+      }
+    ]
+  },
+  "legend": [
+    { "symbol": "✅", "label": "Terminé", "description": "La fonctionnalité est implémentée et active" },
+    { "symbol": "🔄", "label": "En Cours", "description": "Actuellement en développement" },
+    { "symbol": "📋", "label": "Planifié", "description": "Prévu pour développement futur" }
+  ]
+}

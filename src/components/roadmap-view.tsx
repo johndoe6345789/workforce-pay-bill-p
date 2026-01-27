@@ -2,9 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, ClockCounterClockwise, MapTrifold, Warning, Download } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
-import roadmapData from '@/data/roadmap.json'
+import { useState, useEffect } from 'react'
 import { useTranslation } from '@/hooks/use-translation'
+import { useAppSelector } from '@/store/hooks'
 
 type FeatureStatus = 'completed' | 'inProgress' | 'planned'
 
@@ -72,8 +72,48 @@ interface RoadmapData {
 }
 
 export function RoadmapView() {
-  const [data] = useState<RoadmapData>(roadmapData as RoadmapData)
   const { t } = useTranslation()
+  const locale = useAppSelector(state => state.ui.locale)
+  const [data, setData] = useState<RoadmapData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadRoadmap = async () => {
+      try {
+        setIsLoading(true)
+        let roadmapModule
+        
+        if (locale === 'fr') {
+          roadmapModule = await import('@/data/roadmap.fr.json')
+        } else if (locale === 'es') {
+          roadmapModule = await import('@/data/roadmap.es.json')
+        } else {
+          roadmapModule = await import('@/data/roadmap.json')
+        }
+        
+        setData((roadmapModule.default || roadmapModule) as RoadmapData)
+      } catch (err) {
+        console.error(`Failed to load roadmap for locale: ${locale}`, err)
+        const fallbackModule = await import('@/data/roadmap.json')
+        setData((fallbackModule.default || fallbackModule) as RoadmapData)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadRoadmap()
+  }, [locale])
+
+  if (isLoading || !data) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <MapTrifold size={48} className="mx-auto mb-4 text-muted-foreground animate-pulse" />
+          <p className="text-muted-foreground">{t('common.loading')}</p>
+        </div>
+      </div>
+    )
+  }
 
   const getStatusIcon = (status: FeatureStatus) => {
     switch (status) {
