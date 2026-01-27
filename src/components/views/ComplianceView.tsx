@@ -23,6 +23,7 @@ import { ComplianceDetailDialog } from '@/components/ComplianceDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { cn } from '@/lib/utils'
 import type { ComplianceDocument } from '@/lib/types'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface ComplianceViewProps {
   complianceDocs: ComplianceDocument[]
@@ -35,6 +36,7 @@ interface ComplianceViewProps {
 }
 
 export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProps) {
+  const { t } = useTranslation()
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
   const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>([])
@@ -59,27 +61,27 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
   })
 
   const complianceFields: FilterField[] = [
-    { name: 'workerName', label: 'Worker Name', type: 'text' },
-    { name: 'documentType', label: 'Document Type', type: 'select', options: [
-      { value: 'DBS Check', label: 'DBS Check' },
-      { value: 'Right to Work', label: 'Right to Work' },
-      { value: 'Professional License', label: 'Professional License' },
-      { value: 'First Aid Certificate', label: 'First Aid Certificate' },
-      { value: 'Driving License', label: 'Driving License' },
-      { value: 'Passport', label: 'Passport' }
+    { name: 'workerName', label: t('compliance.workerName'), type: 'text' },
+    { name: 'documentType', label: t('compliance.documentType'), type: 'select', options: [
+      { value: 'DBS Check', label: t('compliance.documentTypes.dbsCheck') },
+      { value: 'Right to Work', label: t('compliance.documentTypes.rightToWork') },
+      { value: 'Professional License', label: t('compliance.documentTypes.professionalLicense') },
+      { value: 'First Aid Certificate', label: t('compliance.documentTypes.firstAidCertificate') },
+      { value: 'Driving License', label: t('compliance.documentTypes.drivingLicense') },
+      { value: 'Passport', label: t('compliance.documentTypes.passport') }
     ]},
-    { name: 'status', label: 'Status', type: 'select', options: [
-      { value: 'valid', label: 'Valid' },
-      { value: 'expiring', label: 'Expiring' },
-      { value: 'expired', label: 'Expired' }
+    { name: 'status', label: t('common.status'), type: 'select', options: [
+      { value: 'valid', label: t('compliance.status.valid') },
+      { value: 'expiring', label: t('compliance.status.expiring') },
+      { value: 'expired', label: t('compliance.status.expired') }
     ]},
-    { name: 'daysUntilExpiry', label: 'Days Until Expiry', type: 'number' },
-    { name: 'expiryDate', label: 'Expiry Date', type: 'date' }
+    { name: 'daysUntilExpiry', label: t('compliance.daysUntilExpiry'), type: 'number' },
+    { name: 'expiryDate', label: t('compliance.expiryDate'), type: 'date' }
   ]
 
   const handleSubmitUpload = () => {
     if (!uploadFormData.workerName || !uploadFormData.documentType || !uploadFormData.expiryDate) {
-      toast.error('Please fill in all fields')
+      toast.error(t('compliance.uploadDialog.fillAllFields'))
       return
     }
 
@@ -102,54 +104,54 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
   return (
     <Stack spacing={6}>
       <PageHeader
-        title="Compliance Monitoring"
-        description="Track worker documentation and certifications"
+        title={t('compliance.title')}
+        description={t('compliance.subtitle')}
         actions={
           <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
             <DialogTrigger asChild>
               <Button>
                 <UploadSimple size={18} className="mr-2" />
-                Upload Document
+                {t('compliance.uploadDocument')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Upload Compliance Document</DialogTitle>
+                <DialogTitle>{t('compliance.uploadDialog.title')}</DialogTitle>
                 <DialogDescription>
-                  Add a new document for a worker
+                  {t('compliance.uploadDialog.description')}
                 </DialogDescription>
               </DialogHeader>
               <Stack spacing={4} className="py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="workerName">Worker Name</Label>
+                  <Label htmlFor="workerName">{t('compliance.uploadDialog.workerNameLabel')}</Label>
                   <Input
                     id="workerName"
-                    placeholder="Enter worker name"
+                    placeholder={t('compliance.uploadDialog.workerNamePlaceholder')}
                     value={uploadFormData.workerName}
                     onChange={(e) => setUploadFormData({ ...uploadFormData, workerName: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="documentType">Document Type</Label>
+                  <Label htmlFor="documentType">{t('compliance.uploadDialog.documentTypeLabel')}</Label>
                   <Select
                     value={uploadFormData.documentType}
                     onValueChange={(value) => setUploadFormData({ ...uploadFormData, documentType: value })}
                   >
                     <SelectTrigger id="documentType">
-                      <SelectValue placeholder="Select document type" />
+                      <SelectValue placeholder={t('compliance.uploadDialog.documentTypePlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="DBS Check">DBS Check</SelectItem>
-                      <SelectItem value="Right to Work">Right to Work</SelectItem>
-                      <SelectItem value="Professional License">Professional License</SelectItem>
-                      <SelectItem value="First Aid Certificate">First Aid Certificate</SelectItem>
-                      <SelectItem value="Driving License">Driving License</SelectItem>
-                      <SelectItem value="Passport">Passport</SelectItem>
+                      <SelectItem value="DBS Check">{t('compliance.documentTypes.dbsCheck')}</SelectItem>
+                      <SelectItem value="Right to Work">{t('compliance.documentTypes.rightToWork')}</SelectItem>
+                      <SelectItem value="Professional License">{t('compliance.documentTypes.professionalLicense')}</SelectItem>
+                      <SelectItem value="First Aid Certificate">{t('compliance.documentTypes.firstAidCertificate')}</SelectItem>
+                      <SelectItem value="Driving License">{t('compliance.documentTypes.drivingLicense')}</SelectItem>
+                      <SelectItem value="Passport">{t('compliance.documentTypes.passport')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <Label htmlFor="expiryDate">{t('compliance.uploadDialog.expiryDateLabel')}</Label>
                   <Input
                     id="expiryDate"
                     type="date"
@@ -159,13 +161,13 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
                 </div>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                   <UploadSimple size={32} className="mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">Click to upload or drag and drop</p>
-                  <p className="text-xs text-muted-foreground">PDF, JPG, PNG up to 10MB</p>
+                  <p className="text-sm text-muted-foreground mb-2">{t('compliance.uploadDialog.uploadAreaText')}</p>
+                  <p className="text-xs text-muted-foreground">{t('compliance.uploadDialog.uploadAreaSubtext')}</p>
                 </div>
               </Stack>
               <Stack direction="horizontal" spacing={2} justify="end">
-                <Button variant="outline" onClick={() => setIsUploadOpen(false)}>Cancel</Button>
-                <Button onClick={handleSubmitUpload}>Upload Document</Button>
+                <Button variant="outline" onClick={() => setIsUploadOpen(false)}>{t('compliance.uploadDialog.cancel')}</Button>
+                <Button onClick={handleSubmitUpload}>{t('compliance.uploadDialog.upload')}</Button>
               </Stack>
             </DialogContent>
           </Dialog>
@@ -176,26 +178,26 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
         items={complianceDocs}
         fields={complianceFields}
         onResultsChange={handleResultsChange}
-        placeholder="Search documents or use query language (e.g., status = expiring daysUntilExpiry < 30)"
+        placeholder={t('compliance.searchPlaceholder')}
       />
 
       <Grid cols={3} gap={4}>
         <MetricCard
-          label="Valid Documents"
+          label={t('compliance.validDocuments')}
           value={validDocs.length}
-          description="All compliance requirements met"
+          description={t('compliance.validDocumentsDescription')}
           icon={<CheckCircle size={24} className="text-success" />}
         />
         <MetricCard
-          label="Expiring Soon"
+          label={t('compliance.expiringSoon')}
           value={expiringDocs.length}
-          description="Documents expiring within 30 days"
+          description={t('compliance.expiringSoonDescription')}
           icon={<Warning size={24} className="text-warning" />}
         />
         <MetricCard
-          label="Expired"
+          label={t('compliance.expiredDocuments')}
           value={expiredDocs.length}
-          description="Workers blocked from engagement"
+          description={t('compliance.expiredDocumentsDescription')}
           icon={<XCircle size={24} className="text-destructive" />}
         />
       </Grid>
@@ -203,16 +205,16 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
       <Tabs defaultValue="expiring" className="space-y-4">
         <TabsList>
           <TabsTrigger value="expiring">
-            Expiring Soon ({filteredDocs.filter(d => d.status === 'expiring').length})
+            {t('compliance.tabs.expiring')} ({filteredDocs.filter(d => d.status === 'expiring').length})
           </TabsTrigger>
           <TabsTrigger value="expired">
-            Expired ({filteredDocs.filter(d => d.status === 'expired').length})
+            {t('compliance.tabs.expired')} ({filteredDocs.filter(d => d.status === 'expired').length})
           </TabsTrigger>
           <TabsTrigger value="valid">
-            Valid ({filteredDocs.filter(d => d.status === 'valid').length})
+            {t('compliance.tabs.valid')} ({filteredDocs.filter(d => d.status === 'valid').length})
           </TabsTrigger>
           <TabsTrigger value="all">
-            All ({filteredDocs.length})
+            {t('compliance.tabs.all')} ({filteredDocs.length})
           </TabsTrigger>
         </TabsList>
 
@@ -223,8 +225,8 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
           {filteredDocs.filter(d => d.status === 'expiring').length === 0 && (
             <Card className="p-12 text-center">
               <CheckCircle size={48} className="mx-auto text-success mb-4" />
-              <h3 className="text-lg font-semibold mb-2">All documents current</h3>
-              <p className="text-muted-foreground">No documents expiring in the next 30 days</p>
+              <h3 className="text-lg font-semibold mb-2">{t('compliance.emptyStates.allCurrent')}</h3>
+              <p className="text-muted-foreground">{t('compliance.emptyStates.allCurrentDescription')}</p>
             </Card>
           )}
         </TabsContent>
@@ -265,6 +267,7 @@ interface ComplianceCardProps {
 }
 
 function ComplianceCard({ document, onViewDetails }: ComplianceCardProps) {
+  const { t } = useTranslation()
   const statusConfig = {
     valid: { icon: CheckCircle, color: 'text-success', bgColor: 'bg-success/10' },
     expiring: { icon: Warning, color: 'text-warning', bgColor: 'bg-warning/10' },
@@ -286,26 +289,26 @@ function ComplianceCard({ document, onViewDetails }: ComplianceCardProps) {
                 <Stack direction="horizontal" spacing={3} align="center" className="mb-1">
                   <h3 className="font-semibold">{document.workerName}</h3>
                   <Badge variant={document.status === 'valid' ? 'success' : document.status === 'expiring' ? 'warning' : 'destructive'}>
-                    {document.status}
+                    {t(`compliance.status.${document.status}`)}
                   </Badge>
                 </Stack>
                 <Grid cols={3} gap={4} className="text-sm">
                   <div>
-                    <p className="text-muted-foreground">Document Type</p>
+                    <p className="text-muted-foreground">{t('compliance.card.documentType')}</p>
                     <p className="font-medium">{document.documentType}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Expiry Date</p>
+                    <p className="text-muted-foreground">{t('compliance.card.expiryDate')}</p>
                     <p className="font-medium">{new Date(document.expiryDate).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Days Until Expiry</p>
+                    <p className="text-muted-foreground">{t('compliance.card.daysUntilExpiry')}</p>
                     <p className={cn(
                       'font-medium font-mono',
                       document.daysUntilExpiry < 0 ? 'text-destructive' : 
                       document.daysUntilExpiry < 30 ? 'text-warning' : 'text-success'
                     )}>
-                      {document.daysUntilExpiry < 0 ? 'Expired' : `${document.daysUntilExpiry} days`}
+                      {document.daysUntilExpiry < 0 ? t('compliance.card.expired') : t('compliance.card.daysLabel', { days: document.daysUntilExpiry })}
                     </p>
                   </div>
                 </Grid>
@@ -313,8 +316,8 @@ function ComplianceCard({ document, onViewDetails }: ComplianceCardProps) {
             </Stack>
           </Stack>
           <Stack direction="horizontal" spacing={2} className="ml-4" onClick={(e) => e.stopPropagation()}>
-            <Button size="sm" variant="outline">View</Button>
-            <Button size="sm">Upload New</Button>
+            <Button size="sm" variant="outline">{t('compliance.card.view')}</Button>
+            <Button size="sm">{t('compliance.card.uploadNew')}</Button>
           </Stack>
         </div>
       </CardContent>

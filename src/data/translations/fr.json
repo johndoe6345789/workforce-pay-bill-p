@@ -335,10 +335,11 @@
     "batchCreatedSuccess": "Lot créé et soumis pour approbation"
   },
   "compliance": {
-    "title": "Conformité",
-    "subtitle": "Gérer les documents et contrôles de conformité",
+    "title": "Surveillance de la Conformité",
+    "subtitle": "Suivre la documentation et les certifications des travailleurs",
     "document": "Document",
     "expiryDate": "Date d'Expiration",
+    "daysUntilExpiry": "Jours Avant l'Expiration",
     "status": {
       "valid": "Valide",
       "expiring": "Expire Bientôt",
@@ -348,11 +349,63 @@
     "uploadDocument": "Téléverser un Document",
     "reviewDocument": "Examiner un Document",
     "approveDocument": "Approuver un Document",
+    "viewDetails": "Voir les Détails",
+    "uploadNew": "Téléverser Nouveau",
     "rightToWork": "Droit de Travailler",
     "dbsCheck": "Vérification DBS",
     "qualification": "Qualification",
     "insurance": "Assurance",
-    "contract": "Contrat"
+    "contract": "Contrat",
+    "documentType": "Type de Document",
+    "documentTypes": {
+      "dbsCheck": "Vérification DBS",
+      "rightToWork": "Droit de Travailler",
+      "professionalLicense": "Licence Professionnelle",
+      "firstAidCertificate": "Certificat de Premiers Secours",
+      "drivingLicense": "Permis de Conduire",
+      "passport": "Passeport"
+    },
+    "workerName": "Nom du Travailleur",
+    "validDocuments": "Documents Valides",
+    "validDocumentsDescription": "Toutes les exigences de conformité respectées",
+    "expiringSoon": "Expire Bientôt",
+    "expiringSoonDescription": "Documents expirant dans 30 jours",
+    "expiredDocuments": "Expirés",
+    "expiredDocumentsDescription": "Travailleurs bloqués de l'engagement",
+    "tabs": {
+      "expiring": "Expire Bientôt",
+      "expired": "Expirés",
+      "valid": "Valides",
+      "all": "Tous"
+    },
+    "uploadDialog": {
+      "title": "Téléverser un Document de Conformité",
+      "description": "Ajouter un nouveau document pour un travailleur",
+      "workerNameLabel": "Nom du Travailleur",
+      "workerNamePlaceholder": "Entrez le nom du travailleur",
+      "documentTypeLabel": "Type de Document",
+      "documentTypePlaceholder": "Sélectionnez le type de document",
+      "expiryDateLabel": "Date d'Expiration",
+      "uploadAreaText": "Cliquez pour téléverser ou glissez-déposez",
+      "uploadAreaSubtext": "PDF, JPG, PNG jusqu'à 10 Mo",
+      "cancel": "Annuler",
+      "upload": "Téléverser le Document",
+      "fillAllFields": "Veuillez remplir tous les champs"
+    },
+    "searchPlaceholder": "Rechercher des documents ou utiliser le langage de requête (ex., status = expiring daysUntilExpiry < 30)",
+    "emptyStates": {
+      "allCurrent": "Tous les documents à jour",
+      "allCurrentDescription": "Aucun document n'expire dans les 30 prochains jours"
+    },
+    "card": {
+      "view": "Voir",
+      "uploadNew": "Téléverser Nouveau",
+      "documentType": "Type de Document",
+      "expiryDate": "Date d'Expiration",
+      "daysUntilExpiry": "Jours Avant l'Expiration",
+      "expired": "Expiré",
+      "daysLabel": "{{days}} jours"
+    }
   },
   "expenses": {
     "title": "Dépenses",

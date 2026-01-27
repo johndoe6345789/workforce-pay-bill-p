@@ -335,10 +335,11 @@
     "batchCreatedSuccess": "Lote creado y enviado para aprobación"
   },
   "compliance": {
-    "title": "Cumplimiento",
-    "subtitle": "Gestionar documentos y controles de cumplimiento",
+    "title": "Monitoreo de Cumplimiento",
+    "subtitle": "Rastrear documentación y certificaciones de trabajadores",
     "document": "Documento",
     "expiryDate": "Fecha de Vencimiento",
+    "daysUntilExpiry": "Días Hasta el Vencimiento",
     "status": {
       "valid": "Válido",
       "expiring": "Próximo a Vencer",
@@ -348,11 +349,63 @@
     "uploadDocument": "Subir Documento",
     "reviewDocument": "Revisar Documento",
     "approveDocument": "Aprobar Documento",
+    "viewDetails": "Ver Detalles",
+    "uploadNew": "Subir Nuevo",
     "rightToWork": "Derecho a Trabajar",
     "dbsCheck": "Verificación DBS",
     "qualification": "Calificación",
     "insurance": "Seguro",
-    "contract": "Contrato"
+    "contract": "Contrato",
+    "documentType": "Tipo de Documento",
+    "documentTypes": {
+      "dbsCheck": "Verificación DBS",
+      "rightToWork": "Derecho a Trabajar",
+      "professionalLicense": "Licencia Profesional",
+      "firstAidCertificate": "Certificado de Primeros Auxilios",
+      "drivingLicense": "Licencia de Conducir",
+      "passport": "Pasaporte"
+    },
+    "workerName": "Nombre del Trabajador",
+    "validDocuments": "Documentos Válidos",
+    "validDocumentsDescription": "Todos los requisitos de cumplimiento cumplidos",
+    "expiringSoon": "Próximos a Vencer",
+    "expiringSoonDescription": "Documentos que vencen dentro de 30 días",
+    "expiredDocuments": "Vencidos",
+    "expiredDocumentsDescription": "Trabajadores bloqueados de compromiso",
+    "tabs": {
+      "expiring": "Próximos a Vencer",
+      "expired": "Vencidos",
+      "valid": "Válidos",
+      "all": "Todos"
+    },
+    "uploadDialog": {
+      "title": "Subir Documento de Cumplimiento",
+      "description": "Agregar un nuevo documento para un trabajador",
+      "workerNameLabel": "Nombre del Trabajador",
+      "workerNamePlaceholder": "Ingrese el nombre del trabajador",
+      "documentTypeLabel": "Tipo de Documento",
+      "documentTypePlaceholder": "Seleccione el tipo de documento",
+      "expiryDateLabel": "Fecha de Vencimiento",
+      "uploadAreaText": "Haga clic para cargar o arrastre y suelte",
+      "uploadAreaSubtext": "PDF, JPG, PNG hasta 10MB",
+      "cancel": "Cancelar",
+      "upload": "Subir Documento",
+      "fillAllFields": "Por favor complete todos los campos"
+    },
+    "searchPlaceholder": "Buscar documentos o usar lenguaje de consulta (ej., status = expiring daysUntilExpiry < 30)",
+    "emptyStates": {
+      "allCurrent": "Todos los documentos actuales",
+      "allCurrentDescription": "No hay documentos que venzan en los próximos 30 días"
+    },
+    "card": {
+      "view": "Ver",
+      "uploadNew": "Subir Nuevo",
+      "documentType": "Tipo de Documento",
+      "expiryDate": "Fecha de Vencimiento",
+      "daysUntilExpiry": "Días Hasta el Vencimiento",
+      "expired": "Vencido",
+      "daysLabel": "{{days}} días"
+    }
   },
   "expenses": {
     "title": "Gastos",

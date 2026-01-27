@@ -335,10 +335,11 @@
     "batchCreatedSuccess": "Batch created and submitted for approval"
   },
   "compliance": {
-    "title": "Compliance",
-    "subtitle": "Manage compliance documents and checks",
+    "title": "Compliance Monitoring",
+    "subtitle": "Track worker documentation and certifications",
     "document": "Document",
     "expiryDate": "Expiry Date",
+    "daysUntilExpiry": "Days Until Expiry",
     "status": {
       "valid": "Valid",
       "expiring": "Expiring Soon",
@@ -348,11 +349,63 @@
     "uploadDocument": "Upload Document",
     "reviewDocument": "Review Document",
     "approveDocument": "Approve Document",
+    "viewDetails": "View Details",
+    "uploadNew": "Upload New",
     "rightToWork": "Right to Work",
     "dbsCheck": "DBS Check",
     "qualification": "Qualification",
     "insurance": "Insurance",
-    "contract": "Contract"
+    "contract": "Contract",
+    "documentType": "Document Type",
+    "documentTypes": {
+      "dbsCheck": "DBS Check",
+      "rightToWork": "Right to Work",
+      "professionalLicense": "Professional License",
+      "firstAidCertificate": "First Aid Certificate",
+      "drivingLicense": "Driving License",
+      "passport": "Passport"
+    },
+    "workerName": "Worker Name",
+    "validDocuments": "Valid Documents",
+    "validDocumentsDescription": "All compliance requirements met",
+    "expiringSoon": "Expiring Soon",
+    "expiringSoonDescription": "Documents expiring within 30 days",
+    "expiredDocuments": "Expired",
+    "expiredDocumentsDescription": "Workers blocked from engagement",
+    "tabs": {
+      "expiring": "Expiring Soon",
+      "expired": "Expired",
+      "valid": "Valid",
+      "all": "All"
+    },
+    "uploadDialog": {
+      "title": "Upload Compliance Document",
+      "description": "Add a new document for a worker",
+      "workerNameLabel": "Worker Name",
+      "workerNamePlaceholder": "Enter worker name",
+      "documentTypeLabel": "Document Type",
+      "documentTypePlaceholder": "Select document type",
+      "expiryDateLabel": "Expiry Date",
+      "uploadAreaText": "Click to upload or drag and drop",
+      "uploadAreaSubtext": "PDF, JPG, PNG up to 10MB",
+      "cancel": "Cancel",
+      "upload": "Upload Document",
+      "fillAllFields": "Please fill in all fields"
+    },
+    "searchPlaceholder": "Search documents or use query language (e.g., status = expiring daysUntilExpiry < 30)",
+    "emptyStates": {
+      "allCurrent": "All documents current",
+      "allCurrentDescription": "No documents expiring in the next 30 days"
+    },
+    "card": {
+      "view": "View",
+      "uploadNew": "Upload New",
+      "documentType": "Document Type",
+      "expiryDate": "Expiry Date",
+      "daysUntilExpiry": "Days Until Expiry",
+      "expired": "Expired",
+      "daysLabel": "{{days}} days"
+    }
   },
   "expenses": {
     "title": "Expenses",
