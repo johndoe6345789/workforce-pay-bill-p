@@ -26,6 +26,7 @@ import { toast } from 'sonner'
 import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { usePermissions } from '@/hooks/use-permissions'
+import { useTranslation } from '@/hooks/use-translation'
 import type { Expense, ExpenseStatus } from '@/lib/types'
 
 interface ExpensesViewProps {
@@ -53,6 +54,7 @@ export function ExpensesView({
   onApprove,
   onReject
 }: ExpensesViewProps) {
+  const { t } = useTranslation()
   const { hasPermission } = usePermissions()
   const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -106,33 +108,33 @@ export function ExpensesView({
   })
 
   const expenseFields: FilterField[] = [
-    { name: 'workerName', label: 'Worker Name', type: 'text' },
-    { name: 'clientName', label: 'Client Name', type: 'text' },
-    { name: 'status', label: 'Status', type: 'select', options: [
-      { value: 'pending', label: 'Pending' },
-      { value: 'approved', label: 'Approved' },
-      { value: 'rejected', label: 'Rejected' },
-      { value: 'paid', label: 'Paid' }
+    { name: 'workerName', label: t('expenses.workerName'), type: 'text' },
+    { name: 'clientName', label: t('expenses.clientName'), type: 'text' },
+    { name: 'status', label: t('common.status'), type: 'select', options: [
+      { value: 'pending', label: t('expenses.status.pending') },
+      { value: 'approved', label: t('expenses.status.approved') },
+      { value: 'rejected', label: t('expenses.status.rejected') },
+      { value: 'paid', label: t('expenses.status.paid') }
     ]},
-    { name: 'category', label: 'Category', type: 'select', options: [
-      { value: 'Travel', label: 'Travel' },
-      { value: 'Accommodation', label: 'Accommodation' },
-      { value: 'Meals', label: 'Meals' },
-      { value: 'Equipment', label: 'Equipment' },
-      { value: 'Training', label: 'Training' },
-      { value: 'Other', label: 'Other' }
+    { name: 'category', label: t('expenses.category'), type: 'select', options: [
+      { value: 'Travel', label: t('expenses.categories.travel') },
+      { value: 'Accommodation', label: t('expenses.categories.accommodation') },
+      { value: 'Meals', label: t('expenses.categories.meals') },
+      { value: 'Equipment', label: t('expenses.categories.equipment') },
+      { value: 'Training', label: t('expenses.categories.training') },
+      { value: 'Other', label: t('expenses.categories.other') }
     ]},
-    { name: 'amount', label: 'Amount', type: 'number' },
-    { name: 'date', label: 'Date', type: 'date' },
-    { name: 'billable', label: 'Billable', type: 'select', options: [
-      { value: 'true', label: 'Yes' },
-      { value: 'false', label: 'No' }
+    { name: 'amount', label: t('expenses.amount'), type: 'number' },
+    { name: 'date', label: t('expenses.date'), type: 'date' },
+    { name: 'billable', label: t('expenses.billable'), type: 'select', options: [
+      { value: 'true', label: t('common.yes') },
+      { value: 'false', label: t('common.no') }
     ]}
   ]
 
   const handleSubmitCreate = () => {
     if (!formData.workerName || !formData.clientName || !formData.date || !formData.category || !formData.amount) {
-      toast.error('Please fill in all required fields')
+      toast.error(t('expenses.createDialog.fillAllFields'))
       return
     }
 
@@ -161,45 +163,45 @@ export function ExpensesView({
   return (
     <Stack spacing={6}>
       <PageHeader
-        title="Expense Management"
-        description="Manage worker expenses and reimbursements"
+        title={t('expenses.title')}
+        description={t('expenses.subtitle')}
         actions={
           hasPermission('expenses.create') && (
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus size={18} className="mr-2" />
-                  Create Expense
+                  {t('expenses.createExpense')}
                 </Button>
               </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Create New Expense</DialogTitle>
+                <DialogTitle>{t('expenses.createDialog.title')}</DialogTitle>
                 <DialogDescription>
-                  Enter expense details for worker reimbursement or client billing
+                  {t('expenses.createDialog.description')}
                 </DialogDescription>
               </DialogHeader>
               <Grid cols={2} gap={4} className="py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="exp-worker">Worker Name</Label>
+                  <Label htmlFor="exp-worker">{t('expenses.createDialog.workerNameLabel')}</Label>
                   <Input
                     id="exp-worker"
-                    placeholder="Enter worker name"
+                    placeholder={t('expenses.createDialog.workerNamePlaceholder')}
                     value={formData.workerName}
                     onChange={(e) => setFormData({ ...formData, workerName: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="exp-client">Client Name</Label>
+                  <Label htmlFor="exp-client">{t('expenses.createDialog.clientNameLabel')}</Label>
                   <Input
                     id="exp-client"
-                    placeholder="Enter client name"
+                    placeholder={t('expenses.createDialog.clientNamePlaceholder')}
                     value={formData.clientName}
                     onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="exp-date">Expense Date</Label>
+                  <Label htmlFor="exp-date">{t('expenses.createDialog.expenseDateLabel')}</Label>
                   <Input
                     id="exp-date"
                     type="date"
@@ -208,41 +210,41 @@ export function ExpensesView({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="exp-category">Category</Label>
+                  <Label htmlFor="exp-category">{t('expenses.createDialog.categoryLabel')}</Label>
                   <Select
                     value={formData.category}
                     onValueChange={(value) => setFormData({ ...formData, category: value })}
                   >
                     <SelectTrigger id="exp-category">
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={t('expenses.createDialog.categoryPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Travel">Travel</SelectItem>
-                      <SelectItem value="Accommodation">Accommodation</SelectItem>
-                      <SelectItem value="Meals">Meals</SelectItem>
-                      <SelectItem value="Equipment">Equipment</SelectItem>
-                      <SelectItem value="Training">Training</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Travel">{t('expenses.categories.travel')}</SelectItem>
+                      <SelectItem value="Accommodation">{t('expenses.categories.accommodation')}</SelectItem>
+                      <SelectItem value="Meals">{t('expenses.categories.meals')}</SelectItem>
+                      <SelectItem value="Equipment">{t('expenses.categories.equipment')}</SelectItem>
+                      <SelectItem value="Training">{t('expenses.categories.training')}</SelectItem>
+                      <SelectItem value="Other">{t('expenses.categories.other')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2 col-span-2">
-                  <Label htmlFor="exp-description">Description</Label>
+                  <Label htmlFor="exp-description">{t('expenses.createDialog.descriptionLabel')}</Label>
                   <Textarea
                     id="exp-description"
-                    placeholder="Describe the expense"
+                    placeholder={t('expenses.createDialog.descriptionPlaceholder')}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="exp-amount">Amount (£)</Label>
+                  <Label htmlFor="exp-amount">{t('expenses.createDialog.amountLabel')}</Label>
                   <Input
                     id="exp-amount"
                     type="number"
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder={t('expenses.createDialog.amountPlaceholder')}
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                   />
@@ -255,13 +257,13 @@ export function ExpensesView({
                       onChange={(e) => setFormData({ ...formData, billable: e.target.checked })}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm">Billable to client</span>
+                    <span className="text-sm">{t('expenses.createDialog.billableLabel')}</span>
                   </label>
                 </div>
               </Grid>
               <Stack direction="horizontal" spacing={2} justify="end">
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleSubmitCreate}>Create Expense</Button>
+                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>{t('expenses.createDialog.cancel')}</Button>
+                <Button onClick={handleSubmitCreate}>{t('expenses.createDialog.create')}</Button>
               </Stack>
             </DialogContent>
           </Dialog>
@@ -273,29 +275,29 @@ export function ExpensesView({
         items={expensesToFilter}
         fields={expenseFields}
         onResultsChange={handleResultsChange}
-        placeholder="Search expenses or use query language (e.g., category = Travel billable = true)"
+        placeholder={t('expenses.searchPlaceholder')}
       />
 
       <Grid cols={4} gap={4}>
         <MetricCard
-          label="Pending Approval"
+          label={t('expenses.pendingApproval')}
           value={pendingExpenses.length}
-          description={`£${totalPendingAmount.toLocaleString()} total`}
+          description={t('expenses.totalPending', { amount: totalPendingAmount.toLocaleString() })}
           icon={<ClockCounterClockwise size={24} />}
         />
         <MetricCard
-          label="Approved"
+          label={t('expenses.approved')}
           value={approvedExpenses.length}
-          description={`£${totalApprovedAmount.toLocaleString()} total`}
+          description={t('expenses.totalApproved', { amount: totalApprovedAmount.toLocaleString() })}
           icon={<CheckCircle size={24} className="text-success" />}
         />
         <MetricCard
-          label="Rejected"
+          label={t('expenses.rejected')}
           value={expenses.filter(e => e.status === 'rejected').length}
           icon={<XCircle size={24} className="text-destructive" />}
         />
         <MetricCard
-          label="Paid"
+          label={t('expenses.paid')}
           value={expenses.filter(e => e.status === 'paid').length}
           icon={<CurrencyDollar size={24} />}
         />
@@ -310,32 +312,32 @@ export function ExpensesView({
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-            <SelectItem value="paid">Paid</SelectItem>
+            <SelectItem value="all">{t('expenses.status.all')}</SelectItem>
+            <SelectItem value="pending">{t('expenses.status.pending')}</SelectItem>
+            <SelectItem value="approved">{t('expenses.status.approved')}</SelectItem>
+            <SelectItem value="rejected">{t('expenses.status.rejected')}</SelectItem>
+            <SelectItem value="paid">{t('expenses.status.paid')}</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline">
           <Download size={18} className="mr-2" />
-          Export
+          {t('expenses.export')}
         </Button>
       </Stack>
 
       <Tabs defaultValue="pending" className="space-y-4">
         <TabsList>
           <TabsTrigger value="pending">
-            Pending ({expenses.filter(e => e.status === 'pending').length})
+            {t('expenses.tabs.pending')} ({expenses.filter(e => e.status === 'pending').length})
           </TabsTrigger>
           <TabsTrigger value="approved">
-            Approved ({expenses.filter(e => e.status === 'approved').length})
+            {t('expenses.tabs.approved')} ({expenses.filter(e => e.status === 'approved').length})
           </TabsTrigger>
           <TabsTrigger value="rejected">
-            Rejected ({expenses.filter(e => e.status === 'rejected').length})
+            {t('expenses.tabs.rejected')} ({expenses.filter(e => e.status === 'rejected').length})
           </TabsTrigger>
           <TabsTrigger value="paid">
-            Paid ({expenses.filter(e => e.status === 'paid').length})
+            {t('expenses.tabs.paid')} ({expenses.filter(e => e.status === 'paid').length})
           </TabsTrigger>
         </TabsList>
 
@@ -354,8 +356,8 @@ export function ExpensesView({
           {filteredExpenses.filter(e => e.status === 'pending').length === 0 && (
             <Card className="p-12 text-center">
               <CheckCircle size={48} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">All caught up!</h3>
-              <p className="text-muted-foreground">No pending expenses to review</p>
+              <h3 className="text-lg font-semibold mb-2">{t('expenses.allCaughtUp')}</h3>
+              <p className="text-muted-foreground">{t('expenses.noPendingExpenses')}</p>
             </Card>
           )}
         </TabsContent>
@@ -406,6 +408,7 @@ interface ExpenseCardProps {
 }
 
 function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCardProps) {
+  const { t } = useTranslation()
   const { hasPermission } = usePermissions()
   const statusConfig = {
     pending: { icon: ClockCounterClockwise, color: 'text-warning' },
@@ -431,31 +434,31 @@ function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCar
                 <Stack direction="horizontal" spacing={3} align="center" className="mb-2">
                   <h3 className="font-semibold text-lg">{expense.workerName}</h3>
                   <Badge variant={expense.status === 'approved' || expense.status === 'paid' ? 'success' : expense.status === 'rejected' ? 'destructive' : 'warning'}>
-                    {expense.status}
+                    {t(`expenses.status.${expense.status}`)}
                   </Badge>
                   {expense.billable && (
-                    <Badge variant="outline">Billable</Badge>
+                    <Badge variant="outline">{t('expenses.billable')}</Badge>
                   )}
                 </Stack>
                 <Grid cols={5} gap={4} className="text-sm">
                   <div>
-                    <p className="text-muted-foreground">Client</p>
+                    <p className="text-muted-foreground">{t('expenses.card.client')}</p>
                     <p className="font-medium">{expense.clientName}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Category</p>
+                    <p className="text-muted-foreground">{t('expenses.card.category')}</p>
                     <p className="font-medium">{expense.category}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Date</p>
+                    <p className="text-muted-foreground">{t('expenses.card.date')}</p>
                     <p className="font-medium">{new Date(expense.date).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Amount</p>
+                    <p className="text-muted-foreground">{t('expenses.card.amount')}</p>
                     <p className="font-semibold font-mono text-lg">£{expense.amount.toFixed(2)}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Currency</p>
+                    <p className="text-muted-foreground">{t('expenses.card.currency')}</p>
                     <p className="font-medium font-mono">{expense.currency}</p>
                   </div>
                 </Grid>
@@ -465,7 +468,7 @@ function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCar
                   </div>
                 )}
                 <div className="mt-2 text-sm text-muted-foreground">
-                  Submitted {new Date(expense.submittedDate).toLocaleDateString()}
+                  {t('expenses.card.submitted', { date: new Date(expense.submittedDate).toLocaleDateString() })}
                 </div>
               </div>
             </Stack>
@@ -480,7 +483,7 @@ function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCar
                   style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}
                 >
                   <CheckCircle size={16} className="mr-2" />
-                  Approve
+                  {t('expenses.approve')}
                 </Button>
                 <Button 
                   size="sm" 
@@ -488,14 +491,14 @@ function ExpenseCard({ expense, onApprove, onReject, onViewDetails }: ExpenseCar
                   onClick={() => onReject(expense.id)}
                 >
                   <XCircle size={16} className="mr-2" />
-                  Reject
+                  {t('expenses.reject')}
                 </Button>
               </>
             )}
             {expense.receiptUrl && (
               <Button size="sm" variant="outline">
                 <Camera size={16} className="mr-2" />
-                View Receipt
+                {t('expenses.viewReceipt')}
               </Button>
             )}
           </Stack>
