@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { usePurchaseOrdersCrud } from '@/hooks/use-purchase-orders-crud'
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
+import { useTranslation } from '@/hooks/use-translation'
 import { 
   FileText, 
   Plus, 
@@ -33,6 +34,7 @@ import { cn } from '@/lib/utils'
 import type { PurchaseOrder, LinkedInvoice, Invoice } from '@/lib/types'
 
 export function PurchaseOrderTracking() {
+  const { t } = useTranslation()
   const { entities: purchaseOrders, create, update, remove } = usePurchaseOrdersCrud()
   const { invoices } = useInvoicesCrud()
   const [searchQuery, setSearchQuery] = useState('')
@@ -109,13 +111,13 @@ export function PurchaseOrderTracking() {
 
   const handleCreate = async () => {
     if (!formData.poNumber || !formData.clientName || !formData.totalValue) {
-      toast.error('Please fill in all required fields')
+      toast.error(t('purchaseOrders.createDialog.fillAllFields'))
       return
     }
 
     const totalValue = parseFloat(formData.totalValue)
     if (isNaN(totalValue) || totalValue <= 0) {
-      toast.error('Total value must be a positive number')
+      toast.error(t('purchaseOrders.createDialog.invalidValue'))
       return
     }
 
@@ -142,7 +144,7 @@ export function PurchaseOrderTracking() {
 
     try {
       await create(newPO)
-      toast.success(`Purchase Order ${newPO.poNumber} created successfully`)
+      toast.success(t('purchaseOrders.messages.createSuccess', { poNumber: newPO.poNumber }))
       
       setFormData({
         poNumber: '',
@@ -156,7 +158,7 @@ export function PurchaseOrderTracking() {
       })
       setIsCreateOpen(false)
     } catch (error) {
-      toast.error('Failed to create purchase order')
+      toast.error(t('purchaseOrders.messages.createError'))
       console.error(error)
     }
   }
@@ -166,17 +168,21 @@ export function PurchaseOrderTracking() {
 
     const invoice = invoices.find(inv => inv.id === invoiceId)
     if (!invoice) {
-      toast.error('Invoice not found')
+      toast.error(t('purchaseOrders.messages.invoiceNotFound'))
       return
     }
 
     if (selectedPO.linkedInvoices.some(li => li.invoiceId === invoiceId)) {
-      toast.error('Invoice already linked to this PO')
+      toast.error(t('purchaseOrders.messages.alreadyLinked'))
       return
     }
 
     if (invoice.amount > selectedPO.remainingValue) {
-      toast.warning(`Invoice amount (${invoice.currency}${invoice.amount}) exceeds remaining PO value (${selectedPO.currency}${selectedPO.remainingValue})`)
+      toast.warning(t('purchaseOrders.messages.exceedsRemaining', { 
+        currency: invoice.currency, 
+        amount: invoice.amount, 
+        remaining: selectedPO.remainingValue 
+      }))
     }
 
     const linkedInvoice: LinkedInvoice = {
@@ -203,10 +209,13 @@ export function PurchaseOrderTracking() {
         lastModifiedDate: new Date().toISOString()
       })
       setSelectedPO(updatedPO)
-      toast.success(`Invoice ${invoice.invoiceNumber} linked to PO ${selectedPO.poNumber}`)
+      toast.success(t('purchaseOrders.messages.linkSuccess', { 
+        invoiceNumber: invoice.invoiceNumber, 
+        poNumber: selectedPO.poNumber 
+      }))
       setIsLinkInvoiceOpen(false)
     } catch (error) {
-      toast.error('Failed to link invoice')
+      toast.error(t('purchaseOrders.messages.linkError'))
       console.error(error)
     }
   }
@@ -230,28 +239,28 @@ export function PurchaseOrderTracking() {
         lastModifiedDate: new Date().toISOString()
       })
       setSelectedPO(updatedPO)
-      toast.success(`Invoice ${linkedInvoice.invoiceNumber} unlinked from PO`)
+      toast.success(t('purchaseOrders.messages.unlinkSuccess', { invoiceNumber: linkedInvoice.invoiceNumber }))
     } catch (error) {
-      toast.error('Failed to unlink invoice')
+      toast.error(t('purchaseOrders.messages.unlinkError'))
       console.error(error)
     }
   }
 
   const handleDelete = async (po: PurchaseOrder) => {
     if (po.linkedInvoices.length > 0) {
-      toast.error('Cannot delete PO with linked invoices. Unlink all invoices first.')
+      toast.error(t('purchaseOrders.messages.cannotDeleteLinked'))
       return
     }
 
     try {
       await remove(po.id)
-      toast.success(`Purchase Order ${po.poNumber} deleted`)
+      toast.success(t('purchaseOrders.messages.deleteSuccess', { poNumber: po.poNumber }))
       if (selectedPO?.id === po.id) {
         setIsDetailOpen(false)
         setSelectedPO(null)
       }
     } catch (error) {
-      toast.error('Failed to delete purchase order')
+      toast.error(t('purchaseOrders.messages.deleteError'))
       console.error(error)
     }
   }
@@ -293,7 +302,7 @@ export function PurchaseOrderTracking() {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="mt-4 text-muted-foreground">Loading purchase orders...</p>
+          <p className="mt-4 text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -303,12 +312,12 @@ export function PurchaseOrderTracking() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Purchase Order Tracking</h2>
-          <p className="text-muted-foreground mt-1">Track and manage client purchase orders with invoice linking</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('purchaseOrders.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('purchaseOrders.subtitle')}</p>
         </div>
         <Button onClick={() => setIsCreateOpen(true)}>
           <Plus size={18} className="mr-2" />
-          Create PO
+          {t('purchaseOrders.createPO')}
         </Button>
       </div>
 

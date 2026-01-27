@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
+import { useTranslation } from '@/hooks/use-translation'
 import { UserPlus, CheckCircle, Clock, FileText, Upload, Envelope, ArrowRight, Warning } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -38,6 +39,7 @@ interface OnboardingStepStatus {
 }
 
 export function OnboardingWorkflowManager() {
+  const { t } = useTranslation()
   const [workflows = [], setWorkflows] = useKV<OnboardingWorkflow[]>('onboarding-workflows', [])
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [formData, setFormData] = useState({
@@ -47,17 +49,17 @@ export function OnboardingWorkflowManager() {
   })
 
   const defaultSteps: OnboardingStepStatus[] = [
-    { step: 'personal-info', label: 'Personal Information', status: 'pending' },
-    { step: 'right-to-work', label: 'Right to Work', status: 'pending' },
-    { step: 'tax-forms', label: 'Tax Forms', status: 'pending' },
-    { step: 'bank-details', label: 'Bank Details', status: 'pending' },
-    { step: 'compliance-docs', label: 'Compliance Documents', status: 'pending' },
-    { step: 'contract-signing', label: 'Contract Signing', status: 'pending' }
+    { step: 'personal-info', label: t('onboarding.steps.personalInfo'), status: 'pending' },
+    { step: 'right-to-work', label: t('onboarding.steps.rightToWork'), status: 'pending' },
+    { step: 'tax-forms', label: t('onboarding.steps.taxForms'), status: 'pending' },
+    { step: 'bank-details', label: t('onboarding.steps.bankDetails'), status: 'pending' },
+    { step: 'compliance-docs', label: t('onboarding.steps.complianceDocs'), status: 'pending' },
+    { step: 'contract-signing', label: t('onboarding.steps.contractSigning'), status: 'pending' }
   ]
 
   const handleCreate = () => {
     if (!formData.workerName || !formData.email || !formData.startDate) {
-      toast.error('Please fill in all required fields')
+      toast.error(t('onboarding.createDialog.fillAllFields'))
       return
     }
 
@@ -74,7 +76,7 @@ export function OnboardingWorkflowManager() {
     }
 
     setWorkflows(current => [...(current || []), newWorkflow])
-    toast.success(`Onboarding workflow created for ${formData.workerName}`)
+    toast.success(t('onboarding.messages.createSuccess', { workerName: formData.workerName }))
     
     setFormData({ workerName: '', email: '', startDate: '' })
     setIsCreateOpen(false)
@@ -107,11 +109,11 @@ export function OnboardingWorkflowManager() {
         }
       })
     })
-    toast.success('Step completed')
+    toast.success(t('onboarding.messages.stepCompleted'))
   }
 
   const handleSendReminder = (workflow: OnboardingWorkflow) => {
-    toast.success(`Reminder email sent to ${workflow.email}`)
+    toast.success(t('onboarding.messages.reminderSent', { email: workflow.email }))
   }
 
   const inProgressWorkflows = workflows.filter(w => w.status === 'in-progress' || w.status === 'not-started')
@@ -122,45 +124,45 @@ export function OnboardingWorkflowManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Digital Onboarding</h2>
-          <p className="text-muted-foreground mt-1">Manage worker onboarding workflows</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('onboarding.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('onboarding.subtitle')}</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button>
               <UserPlus size={18} className="mr-2" />
-              Start Onboarding
+              {t('onboarding.startOnboarding')}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Start New Onboarding</DialogTitle>
+              <DialogTitle>{t('onboarding.createDialog.title')}</DialogTitle>
               <DialogDescription>
-                Create a digital onboarding workflow for a new worker
+                {t('onboarding.createDialog.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="ob-name">Worker Name *</Label>
+                <Label htmlFor="ob-name">{t('onboarding.createDialog.workerNameLabel')}</Label>
                 <Input
                   id="ob-name"
                   value={formData.workerName}
                   onChange={(e) => setFormData({ ...formData, workerName: e.target.value })}
-                  placeholder="John Smith"
+                  placeholder={t('onboarding.createDialog.workerNamePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ob-email">Email Address *</Label>
+                <Label htmlFor="ob-email">{t('onboarding.createDialog.emailLabel')}</Label>
                 <Input
                   id="ob-email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="john.smith@example.com"
+                  placeholder={t('onboarding.createDialog.emailPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ob-start">Expected Start Date *</Label>
+                <Label htmlFor="ob-start">{t('onboarding.createDialog.startDateLabel')}</Label>
                 <Input
                   id="ob-start"
                   type="date"
@@ -170,8 +172,8 @@ export function OnboardingWorkflowManager() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreate}>Start Onboarding</Button>
+              <Button variant="outline" onClick={() => setIsCreateOpen(false)}>{t('onboarding.createDialog.cancel')}</Button>
+              <Button onClick={handleCreate}>{t('onboarding.createDialog.start')}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -180,7 +182,7 @@ export function OnboardingWorkflowManager() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">In Progress</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('onboarding.metrics.inProgress')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{inProgressWorkflows.length}</div>
@@ -189,7 +191,7 @@ export function OnboardingWorkflowManager() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Completed</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('onboarding.metrics.completed')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold text-success">{completedWorkflows.length}</div>
@@ -198,7 +200,7 @@ export function OnboardingWorkflowManager() {
 
         <Card className="border-l-4 border-warning/20">
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Blocked</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('onboarding.metrics.blocked')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{blockedWorkflows.length}</div>
@@ -207,19 +209,19 @@ export function OnboardingWorkflowManager() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Avg. Time</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('onboarding.metrics.avgTime')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-semibold">3.2 days</div>
+            <div className="text-3xl font-semibold">{t('onboarding.metrics.avgTimeDays', { days: '3.2' })}</div>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="in-progress" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="in-progress">In Progress ({inProgressWorkflows.length})</TabsTrigger>
-          <TabsTrigger value="completed">Completed ({completedWorkflows.length})</TabsTrigger>
-          <TabsTrigger value="blocked">Blocked ({blockedWorkflows.length})</TabsTrigger>
+          <TabsTrigger value="in-progress">{t('onboarding.tabs.inProgress', { count: inProgressWorkflows.length })}</TabsTrigger>
+          <TabsTrigger value="completed">{t('onboarding.tabs.completed', { count: completedWorkflows.length })}</TabsTrigger>
+          <TabsTrigger value="blocked">{t('onboarding.tabs.blocked', { count: blockedWorkflows.length })}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="in-progress" className="space-y-3">
@@ -229,27 +231,42 @@ export function OnboardingWorkflowManager() {
               workflow={workflow} 
               onCompleteStep={handleCompleteStep}
               onSendReminder={handleSendReminder}
+              t={t}
             />
           ))}
           {inProgressWorkflows.length === 0 && (
             <Card className="p-12 text-center">
               <UserPlus size={48} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No active onboardings</h3>
-              <p className="text-muted-foreground">Start a new onboarding workflow to begin</p>
+              <h3 className="text-lg font-semibold mb-2">{t('onboarding.emptyStates.noActive')}</h3>
+              <p className="text-muted-foreground">{t('onboarding.emptyStates.noActiveDescription')}</p>
             </Card>
           )}
         </TabsContent>
 
         <TabsContent value="completed" className="space-y-3">
           {completedWorkflows.map(workflow => (
-            <OnboardingCard key={workflow.id} workflow={workflow} />
+            <OnboardingCard key={workflow.id} workflow={workflow} t={t} />
           ))}
+          {completedWorkflows.length === 0 && (
+            <Card className="p-12 text-center">
+              <CheckCircle size={48} className="mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">{t('onboarding.emptyStates.noCompleted')}</h3>
+              <p className="text-muted-foreground">{t('onboarding.emptyStates.noCompletedDescription')}</p>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="blocked" className="space-y-3">
           {blockedWorkflows.map(workflow => (
-            <OnboardingCard key={workflow.id} workflow={workflow} />
+            <OnboardingCard key={workflow.id} workflow={workflow} t={t} />
           ))}
+          {blockedWorkflows.length === 0 && (
+            <Card className="p-12 text-center">
+              <Warning size={48} className="mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">{t('onboarding.emptyStates.noBlocked')}</h3>
+              <p className="text-muted-foreground">{t('onboarding.emptyStates.noBlockedDescription')}</p>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>
@@ -260,9 +277,10 @@ interface OnboardingCardProps {
   workflow: OnboardingWorkflow
   onCompleteStep?: (workflowId: string, step: OnboardingStep) => void
   onSendReminder?: (workflow: OnboardingWorkflow) => void
+  t: (key: string, params?: Record<string, string | number>) => string
 }
 
-function OnboardingCard({ workflow, onCompleteStep, onSendReminder }: OnboardingCardProps) {
+function OnboardingCard({ workflow, onCompleteStep, onSendReminder, t }: OnboardingCardProps) {
   const [showDetails, setShowDetails] = useState(false)
 
   const statusConfig = {
@@ -290,7 +308,7 @@ function OnboardingCard({ workflow, onCompleteStep, onSendReminder }: Onboarding
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-semibold text-lg">{workflow.workerName}</h3>
                     <Badge variant={workflow.status === 'completed' ? 'success' : workflow.status === 'blocked' ? 'destructive' : 'warning'}>
-                      {workflow.status}
+                      {t(`onboarding.status.${workflow.status.replace('-', '') as 'notStarted' | 'inProgress' | 'completed' | 'blocked'}`)}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">{workflow.email}</p>
@@ -298,7 +316,7 @@ function OnboardingCard({ workflow, onCompleteStep, onSendReminder }: Onboarding
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Progress</span>
+                    <span className="text-muted-foreground">{t('onboarding.card.progress')}</span>
                     <span className="font-medium">{workflow.progress}%</span>
                   </div>
                   <Progress value={workflow.progress} className="h-2" />
@@ -306,17 +324,17 @@ function OnboardingCard({ workflow, onCompleteStep, onSendReminder }: Onboarding
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground">Start Date</p>
+                    <p className="text-muted-foreground">{t('onboarding.card.startDate')}</p>
                     <p className="font-medium">{new Date(workflow.startDate).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Current Step</p>
+                    <p className="text-muted-foreground">{t('onboarding.card.currentStep')}</p>
                     <p className="font-medium">
                       {workflow.steps.find(s => s.step === workflow.currentStep)?.label || 'N/A'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Completed Steps</p>
+                    <p className="text-muted-foreground">{t('onboarding.card.status')}</p>
                     <p className="font-medium">
                       {workflow.steps.filter(s => s.status === 'completed').length} / {workflow.steps.length}
                     </p>
@@ -333,7 +351,7 @@ function OnboardingCard({ workflow, onCompleteStep, onSendReminder }: Onboarding
                             <p className="text-sm font-medium">{step.label}</p>
                             {step.completedDate && (
                               <p className="text-xs text-muted-foreground">
-                                Completed {new Date(step.completedDate).toLocaleDateString()}
+                                {t('onboarding.stepStatus.completed')} {new Date(step.completedDate).toLocaleDateString()}
                               </p>
                             )}
                           </div>
@@ -351,7 +369,7 @@ function OnboardingCard({ workflow, onCompleteStep, onSendReminder }: Onboarding
                               variant="outline"
                               onClick={() => onCompleteStep(workflow.id, step.step)}
                             >
-                              Mark Complete
+                              {t('onboarding.completeStep')}
                             </Button>
                           )}
                         </div>
@@ -364,12 +382,12 @@ function OnboardingCard({ workflow, onCompleteStep, onSendReminder }: Onboarding
 
             <div className="flex flex-col gap-2 ml-4">
               <Button size="sm" variant="outline" onClick={() => setShowDetails(!showDetails)}>
-                {showDetails ? 'Hide' : 'View'} Steps
+                {showDetails ? t('common.close') : t('onboarding.viewWorkflow')}
               </Button>
               {workflow.status !== 'completed' && onSendReminder && (
                 <Button size="sm" variant="outline" onClick={() => onSendReminder(workflow)}>
                   <Envelope size={16} className="mr-2" />
-                  Remind
+                  {t('onboarding.sendReminder')}
                 </Button>
               )}
             </div>
