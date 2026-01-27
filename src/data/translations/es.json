@@ -1168,5 +1168,33 @@
     "paid": "Pagado",
     "unpaid": "No Pagado",
     "overdue": "Vencido"
+  },
+  "roadmap": {
+    "title": "Hoja de Ruta del Producto",
+    "subtitle": "Fases de desarrollo y cronograma de características",
+    "downloadPDF": "Descargar PDF",
+    "completedFeatures": "Características Completadas",
+    "componentLibrary": "Biblioteca de Componentes",
+    "currentFocus": "Enfoque Actual",
+    "totalPhases": "Fases Totales",
+    "overview": "Resumen",
+    "legend": "Leyenda",
+    "technicalInfrastructure": "Infraestructura Técnica",
+    "successMetrics": "Métricas de Éxito",
+    "releaseCadence": "Cadencia de Lanzamientos",
+    "majorReleases": "Versiones Principales",
+    "minorUpdates": "Actualizaciones Menores",
+    "patches": "Parches",
+    "hotfixes": "Correcciones Urgentes",
+    "lastUpdated": "Última Actualización",
+    "version": "Versión",
+    "legendItems": {
+      "completed": "Completado",
+      "completedDescription": "La característica está completamente implementada y probada",
+      "inProgress": "En Progreso",
+      "inProgressDescription": "Actualmente en desarrollo",
+      "planned": "Planificado",
+      "plannedDescription": "En la hoja de ruta para desarrollo futuro"
+    }
   }
 }

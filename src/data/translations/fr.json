@@ -1168,5 +1168,33 @@
     "paid": "Payé",
     "unpaid": "Non Payé",
     "overdue": "En Retard"
+  },
+  "roadmap": {
+    "title": "Feuille de Route Produit",
+    "subtitle": "Phases de développement et calendrier des fonctionnalités",
+    "downloadPDF": "Télécharger PDF",
+    "completedFeatures": "Fonctionnalités Terminées",
+    "componentLibrary": "Bibliothèque de Composants",
+    "currentFocus": "Focus Actuel",
+    "totalPhases": "Phases Totales",
+    "overview": "Vue d'Ensemble",
+    "legend": "Légende",
+    "technicalInfrastructure": "Infrastructure Technique",
+    "successMetrics": "Indicateurs de Réussite",
+    "releaseCadence": "Cadence de Sortie",
+    "majorReleases": "Versions Majeures",
+    "minorUpdates": "Mises à Jour Mineures",
+    "patches": "Correctifs",
+    "hotfixes": "Correctifs d'Urgence",
+    "lastUpdated": "Dernière Mise à Jour",
+    "version": "Version",
+    "legendItems": {
+      "completed": "Terminé",
+      "completedDescription": "La fonctionnalité est entièrement implémentée et testée",
+      "inProgress": "En Cours",
+      "inProgressDescription": "Actuellement en développement",
+      "planned": "Planifié",
+      "plannedDescription": "Sur la feuille de route pour le développement futur"
+    }
   }
 }

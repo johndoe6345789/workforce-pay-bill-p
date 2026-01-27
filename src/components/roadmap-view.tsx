@@ -4,6 +4,7 @@ import { CheckCircle, ClockCounterClockwise, MapTrifold, Warning, Download } fro
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import roadmapData from '@/data/roadmap.json'
+import { useTranslation } from '@/hooks/use-translation'
 
 type FeatureStatus = 'completed' | 'inProgress' | 'planned'
 
@@ -72,6 +73,7 @@ interface RoadmapData {
 
 export function RoadmapView() {
   const [data] = useState<RoadmapData>(roadmapData as RoadmapData)
+  const { t } = useTranslation()
 
   const getStatusIcon = (status: FeatureStatus) => {
     switch (status) {
@@ -135,13 +137,13 @@ export function RoadmapView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Product Roadmap</h2>
-          <p className="text-muted-foreground mt-1">Development phases and feature timeline</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('roadmap.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('roadmap.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
             <Download size={18} className="mr-2" />
-            Download PDF
+            {t('roadmap.downloadPDF')}
           </Button>
         </div>
       </div>
@@ -151,7 +153,7 @@ export function RoadmapView() {
           <CardHeader>
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <CheckCircle size={18} className="text-success" weight="fill" />
-              Completed Features
+              {t('roadmap.completedFeatures')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -164,7 +166,7 @@ export function RoadmapView() {
           <CardHeader>
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <CheckCircle size={18} className="text-accent" weight="fill" />
-              Component Library
+              {t('roadmap.componentLibrary')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -177,7 +179,7 @@ export function RoadmapView() {
           <CardHeader>
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <ClockCounterClockwise size={18} className="text-warning" weight="fill" />
-              Current Focus
+              {t('roadmap.currentFocus')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -190,7 +192,7 @@ export function RoadmapView() {
           <CardHeader>
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <MapTrifold size={18} className="text-accent" weight="fill" />
-              Total Phases
+              {t('roadmap.totalPhases')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -204,7 +206,7 @@ export function RoadmapView() {
         <CardContent className="p-6">
           <h1 className="text-3xl font-semibold tracking-tight mb-4 mt-6">{data.title}</h1>
           
-          <h2 className="text-2xl font-semibold tracking-tight mb-3 mt-6">Overview</h2>
+          <h2 className="text-2xl font-semibold tracking-tight mb-3 mt-6">{t('roadmap.overview')}</h2>
           <p className="text-sm text-muted-foreground mb-6">{data.overview}</p>
           
           <hr className="my-6 border-border" />
@@ -213,7 +215,7 @@ export function RoadmapView() {
           
           <div className="mb-8">
             <h2 className="text-2xl font-semibold tracking-tight mb-3 mt-6 flex items-center gap-2">
-              {data.technicalInfrastructure.title}
+              {t('roadmap.technicalInfrastructure')}
             </h2>
             {data.technicalInfrastructure.sections.map(renderSection)}
           </div>
@@ -221,7 +223,7 @@ export function RoadmapView() {
           <hr className="my-6 border-border" />
 
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold tracking-tight mb-3 mt-6">Legend</h2>
+            <h2 className="text-2xl font-semibold tracking-tight mb-3 mt-6">{t('roadmap.legend')}</h2>
             <ul className="space-y-2 mb-4 pl-6">
               {data.legend.map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
@@ -237,7 +239,7 @@ export function RoadmapView() {
           <hr className="my-6 border-border" />
 
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold tracking-tight mb-3 mt-6">{data.successMetrics.title}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight mb-3 mt-6">{t('roadmap.successMetrics')}</h2>
             {data.successMetrics.categories.map((category, i) => (
               <div key={i} className="mb-4">
                 <h3 className="text-lg font-semibold mb-2 mt-4">{category.title}</h3>
@@ -256,9 +258,9 @@ export function RoadmapView() {
           <hr className="my-6 border-border" />
 
           <p className="text-sm text-muted-foreground text-center">
-            <em>Last Updated: {data.lastUpdated}</em>
+            <em>{t('roadmap.lastUpdated')}: {data.lastUpdated}</em>
             <br />
-            <em>Version: {data.version}</em>
+            <em>{t('roadmap.version')}: {data.version}</em>
           </p>
         </CardContent>
       </Card>
@@ -267,23 +269,23 @@ export function RoadmapView() {
         <CardContent className="p-6">
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <Warning size={20} className="text-warning" />
-            Release Cadence
+            {t('roadmap.releaseCadence')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-muted-foreground">Major Releases</p>
+              <p className="text-muted-foreground">{t('roadmap.majorReleases')}</p>
               <p className="font-medium">{data.releaseCadence.major}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Minor Updates</p>
+              <p className="text-muted-foreground">{t('roadmap.minorUpdates')}</p>
               <p className="font-medium">{data.releaseCadence.minor}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Patches</p>
+              <p className="text-muted-foreground">{t('roadmap.patches')}</p>
               <p className="font-medium">{data.releaseCadence.patches}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Hotfixes</p>
+              <p className="text-muted-foreground">{t('roadmap.hotfixes')}</p>
               <p className="font-medium">{data.releaseCadence.hotfixes}</p>
             </div>
           </div>

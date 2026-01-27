@@ -1168,5 +1168,33 @@
     "paid": "Paid",
     "unpaid": "Unpaid",
     "overdue": "Overdue"
+  },
+  "roadmap": {
+    "title": "Product Roadmap",
+    "subtitle": "Development phases and feature timeline",
+    "downloadPDF": "Download PDF",
+    "completedFeatures": "Completed Features",
+    "componentLibrary": "Component Library",
+    "currentFocus": "Current Focus",
+    "totalPhases": "Total Phases",
+    "overview": "Overview",
+    "legend": "Legend",
+    "technicalInfrastructure": "Technical Infrastructure",
+    "successMetrics": "Success Metrics",
+    "releaseCadence": "Release Cadence",
+    "majorReleases": "Major Releases",
+    "minorUpdates": "Minor Updates",
+    "patches": "Patches",
+    "hotfixes": "Hotfixes",
+    "lastUpdated": "Last Updated",
+    "version": "Version",
+    "legendItems": {
+      "completed": "Completed",
+      "completedDescription": "Feature is fully implemented and tested",
+      "inProgress": "In Progress",
+      "inProgressDescription": "Currently being developed",
+      "planned": "Planned",
+      "plannedDescription": "On the roadmap for future development"
+    }
   }
 }
