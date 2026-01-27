@@ -492,8 +492,8 @@
     }
   },
   "reports": {
-    "title": "Rapports",
-    "subtitle": "Générer et consulter des rapports",
+    "title": "Rapports & Analyses",
+    "subtitle": "Analyse de marge et prévisions en temps réel",
     "customReport": "Rapport Personnalisé",
     "runReport": "Exécuter un Rapport",
     "scheduleReport": "Planifier un Rapport",
@@ -506,7 +506,34 @@
     "complianceReport": "Rapport de Conformité",
     "marginAnalysis": "Analyse de Marge",
     "missingTimesheets": "Feuilles de Temps Manquantes",
-    "auditTrail": "Piste d'Audit"
+    "auditTrail": "Piste d'Audit",
+    "totalRevenueYTD": "Revenu Total (Cumul Annuel)",
+    "totalCostsYTD": "Coûts Totaux (Cumul Annuel)",
+    "grossMarginYTD": "Marge Brute (Cumul Annuel)",
+    "momChange": "Variation Mensuelle",
+    "yearToDate": "Cumul annuel",
+    "vsLastMonth": "par rapport au mois dernier",
+    "tabs": {
+      "marginAnalysis": "Analyse de Marge",
+      "forecasting": "Prévisions"
+    },
+    "marginAnalysisTitle": "Marge Brute en Temps Réel par Mois",
+    "marginAnalysisDescription": "Répartition des revenus, coûts et marges pour {{year}}",
+    "revenue": "Revenu",
+    "costs": "Coûts",
+    "actualRevenue": "Revenu Réel",
+    "actualCosts": "Coûts Réels",
+    "predictedRevenue": "Revenu Prévu",
+    "predictedCosts": "Coûts Prévus",
+    "margin": "Marge",
+    "estMargin": "Marge Estimée",
+    "forecastingTitle": "Prévisions de Revenu & Marge Prédictives",
+    "forecastingDescription": "Prévisions alimentées par IA basées sur les tendances historiques et les modèles de croissance",
+    "notEnoughData": "Données historiques insuffisantes pour générer des prévisions",
+    "notEnoughDataDescription": "Nécessite au moins 2 mois de données",
+    "forecastMethodology": "Méthodologie de Prévision",
+    "forecastMethodologyDescription": "Les prévisions sont calculées en utilisant les tendances historiques des revenus, les taux de croissance et les modèles saisonniers. Les niveaux de confiance diminuent pour les prévisions à plus long terme. Utilisez ces informations à des fins de planification et de budgétisation.",
+    "confidence": "{{confidence}}% de confiance"
   },
   "notifications": {
     "title": "Notifications",

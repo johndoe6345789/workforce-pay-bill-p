@@ -17,12 +17,14 @@ import {
 } from '@phosphor-icons/react'
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
 import { usePayrollCrud } from '@/hooks/use-payroll-crud'
+import { useTranslation } from '@/hooks/use-translation'
 import type { MarginAnalysis, ForecastData } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 export function ReportsView() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month')
   const [selectedYear, setSelectedYear] = useState('2025')
+  const { t } = useTranslation()
   
   const { invoices } = useInvoicesCrud()
   const { payrollRuns } = usePayrollCrud()
@@ -113,8 +115,8 @@ export function ReportsView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Reports & Analytics</h2>
-          <p className="text-muted-foreground mt-1">Real-time margin analysis and forecasting</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('reports.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('reports.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -130,7 +132,7 @@ export function ReportsView() {
           </Select>
           <Button variant="outline">
             <Download size={18} className="mr-2" />
-            Export Report
+            {t('reports.exportReport')}
           </Button>
         </div>
       </div>
@@ -138,33 +140,33 @@ export function ReportsView() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="border-l-4 border-success/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Total Revenue (YTD)</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('reports.totalRevenueYTD')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold font-mono">£{totalRevenue.toLocaleString()}</div>
             <div className="flex items-center gap-1 mt-1 text-xs text-success">
               <TrendUp size={14} weight="bold" />
-              <span>Year to date</span>
+              <span>{t('reports.yearToDate')}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-warning/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Total Costs (YTD)</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('reports.totalCostsYTD')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold font-mono">£{totalCosts.toLocaleString()}</div>
             <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
               <TrendUp size={14} weight="bold" />
-              <span>Year to date</span>
+              <span>{t('reports.yearToDate')}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-accent/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Gross Margin (YTD)</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('reports.grossMarginYTD')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold font-mono">£{totalMargin.toLocaleString()}</div>
@@ -176,7 +178,7 @@ export function ReportsView() {
 
         <Card className="border-l-4 border-primary/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">MoM Change</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('reports.momChange')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className={cn(
@@ -191,7 +193,7 @@ export function ReportsView() {
               ) : (
                 <TrendDown size={14} weight="bold" className="text-destructive" />
               )}
-              <span>vs last month</span>
+              <span>{t('reports.vsLastMonth')}</span>
             </div>
           </CardContent>
         </Card>
@@ -201,19 +203,19 @@ export function ReportsView() {
         <TabsList>
           <TabsTrigger value="margin-analysis">
             <ChartBar size={16} className="mr-2" />
-            Margin Analysis
+            {t('reports.tabs.marginAnalysis')}
           </TabsTrigger>
           <TabsTrigger value="forecasting">
             <ChartLine size={16} className="mr-2" />
-            Forecasting
+            {t('reports.tabs.forecasting')}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="margin-analysis" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Real-Time Gross Margin by Month</CardTitle>
-              <CardDescription>Revenue, costs, and margin breakdown for {selectedYear}</CardDescription>
+              <CardTitle>{t('reports.marginAnalysisTitle')}</CardTitle>
+              <CardDescription>{t('reports.marginAnalysisDescription', { year: selectedYear })}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -255,11 +257,11 @@ export function ReportsView() {
                 <div className="flex items-center justify-center gap-6 pt-4 border-t border-border">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-accent rounded" />
-                    <span className="text-sm">Revenue</span>
+                    <span className="text-sm">{t('reports.revenue')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-warning/60 rounded" />
-                    <span className="text-sm">Costs</span>
+                    <span className="text-sm">{t('reports.costs')}</span>
                   </div>
                 </div>
 
@@ -271,15 +273,15 @@ export function ReportsView() {
                       </CardHeader>
                       <CardContent className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Revenue</span>
+                          <span className="text-muted-foreground">{t('reports.revenue')}</span>
                           <span className="font-mono font-medium">£{data.revenue.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Costs</span>
+                          <span className="text-muted-foreground">{t('reports.costs')}</span>
                           <span className="font-mono font-medium">£{data.costs.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm pt-2 border-t border-border">
-                          <span className="text-muted-foreground font-medium">Margin</span>
+                          <span className="text-muted-foreground font-medium">{t('reports.margin')}</span>
                           <div className="text-right">
                             <div className="font-mono font-semibold">£{data.margin.toLocaleString()}</div>
                             <div className={cn(
@@ -305,18 +307,18 @@ export function ReportsView() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lightning size={20} weight="fill" className="text-accent" />
-                Predictive Revenue & Margin Forecast
+                {t('reports.forecastingTitle')}
               </CardTitle>
               <CardDescription>
-                AI-powered forecasting based on historical trends and growth patterns
+                {t('reports.forecastingDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {forecast.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <ChartLine size={48} className="mx-auto mb-4 opacity-50" />
-                  <p>Not enough historical data to generate forecast</p>
-                  <p className="text-sm mt-2">Need at least 2 months of data</p>
+                  <p>{t('reports.notEnoughData')}</p>
+                  <p className="text-sm mt-2">{t('reports.notEnoughDataDescription')}</p>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -373,19 +375,19 @@ export function ReportsView() {
                   <div className="flex items-center justify-center gap-6 pt-4 border-t border-border">
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-accent rounded" />
-                      <span className="text-sm">Actual Revenue</span>
+                      <span className="text-sm">{t('reports.actualRevenue')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-accent/40 border-2 border-dashed border-accent rounded" />
-                      <span className="text-sm">Predicted Revenue</span>
+                      <span className="text-sm">{t('reports.predictedRevenue')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-warning/60 rounded" />
-                      <span className="text-sm">Actual Costs</span>
+                      <span className="text-sm">{t('reports.actualCosts')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-warning/20 border-2 border-dashed border-warning rounded" />
-                      <span className="text-sm">Predicted Costs</span>
+                      <span className="text-sm">{t('reports.predictedCosts')}</span>
                     </div>
                   </div>
 
@@ -407,15 +409,15 @@ export function ReportsView() {
                           </CardHeader>
                           <CardContent className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">Predicted Revenue</span>
+                              <span className="text-muted-foreground">{t('reports.predictedRevenue')}</span>
                               <span className="font-mono font-medium">£{data.predictedRevenue.toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">Predicted Costs</span>
+                              <span className="text-muted-foreground">{t('reports.predictedCosts')}</span>
                               <span className="font-mono font-medium">£{data.predictedCosts.toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between text-sm pt-2 border-t border-border">
-                              <span className="text-muted-foreground font-medium">Est. Margin</span>
+                              <span className="text-muted-foreground font-medium">{t('reports.estMargin')}</span>
                               <div className="text-right">
                                 <div className="font-mono font-semibold">£{margin.toLocaleString()}</div>
                                 <div className="text-xs font-medium text-accent">
@@ -434,10 +436,9 @@ export function ReportsView() {
                       <div className="flex items-start gap-3">
                         <Lightning size={20} className="text-accent mt-0.5" weight="fill" />
                         <div className="flex-1 text-sm">
-                          <p className="font-medium mb-1">Forecast Methodology</p>
+                          <p className="font-medium mb-1">{t('reports.forecastMethodology')}</p>
                           <p className="text-muted-foreground">
-                            Predictions are calculated using historical revenue trends, growth rates, and seasonal patterns. 
-                            Confidence levels decrease for longer-term forecasts. Use these insights for planning and budgeting purposes.
+                            {t('reports.forecastMethodologyDescription')}
                           </p>
                         </div>
                       </div>

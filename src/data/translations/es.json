@@ -492,8 +492,8 @@
     }
   },
   "reports": {
-    "title": "Informes",
-    "subtitle": "Generar y ver informes",
+    "title": "Informes & Análisis",
+    "subtitle": "Análisis de margen y pronósticos en tiempo real",
     "customReport": "Informe Personalizado",
     "runReport": "Ejecutar Informe",
     "scheduleReport": "Programar Informe",
@@ -506,7 +506,34 @@
     "complianceReport": "Informe de Cumplimiento",
     "marginAnalysis": "Análisis de Margen",
     "missingTimesheets": "Hojas de Tiempo Faltantes",
-    "auditTrail": "Registro de Auditoría"
+    "auditTrail": "Registro de Auditoría",
+    "totalRevenueYTD": "Ingresos Totales (Acumulado Anual)",
+    "totalCostsYTD": "Costos Totales (Acumulado Anual)",
+    "grossMarginYTD": "Margen Bruto (Acumulado Anual)",
+    "momChange": "Cambio Mensual",
+    "yearToDate": "Acumulado anual",
+    "vsLastMonth": "vs mes anterior",
+    "tabs": {
+      "marginAnalysis": "Análisis de Margen",
+      "forecasting": "Pronósticos"
+    },
+    "marginAnalysisTitle": "Margen Bruto en Tiempo Real por Mes",
+    "marginAnalysisDescription": "Desglose de ingresos, costos y márgenes para {{year}}",
+    "revenue": "Ingresos",
+    "costs": "Costos",
+    "actualRevenue": "Ingresos Reales",
+    "actualCosts": "Costos Reales",
+    "predictedRevenue": "Ingresos Predichos",
+    "predictedCosts": "Costos Predichos",
+    "margin": "Margen",
+    "estMargin": "Margen Est.",
+    "forecastingTitle": "Pronóstico Predictivo de Ingresos y Márgenes",
+    "forecastingDescription": "Pronósticos impulsados por IA basados en tendencias históricas y patrones de crecimiento",
+    "notEnoughData": "No hay suficientes datos históricos para generar pronósticos",
+    "notEnoughDataDescription": "Se necesitan al menos 2 meses de datos",
+    "forecastMethodology": "Metodología de Pronóstico",
+    "forecastMethodologyDescription": "Las predicciones se calculan utilizando tendencias históricas de ingresos, tasas de crecimiento y patrones estacionales. Los niveles de confianza disminuyen para pronósticos a más largo plazo. Utilice estos conocimientos para fines de planificación y presupuesto.",
+    "confidence": "{{confidence}}% de confianza"
   },
   "notifications": {
     "title": "Notificaciones",

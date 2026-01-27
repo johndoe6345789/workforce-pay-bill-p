@@ -492,8 +492,8 @@
     }
   },
   "reports": {
-    "title": "Reports",
-    "subtitle": "Generate and view reports",
+    "title": "Reports & Analytics",
+    "subtitle": "Real-time margin analysis and forecasting",
     "customReport": "Custom Report",
     "runReport": "Run Report",
     "scheduleReport": "Schedule Report",
@@ -506,7 +506,34 @@
     "complianceReport": "Compliance Report",
     "marginAnalysis": "Margin Analysis",
     "missingTimesheets": "Missing Timesheets",
-    "auditTrail": "Audit Trail"
+    "auditTrail": "Audit Trail",
+    "totalRevenueYTD": "Total Revenue (YTD)",
+    "totalCostsYTD": "Total Costs (YTD)",
+    "grossMarginYTD": "Gross Margin (YTD)",
+    "momChange": "MoM Change",
+    "yearToDate": "Year to date",
+    "vsLastMonth": "vs last month",
+    "tabs": {
+      "marginAnalysis": "Margin Analysis",
+      "forecasting": "Forecasting"
+    },
+    "marginAnalysisTitle": "Real-Time Gross Margin by Month",
+    "marginAnalysisDescription": "Revenue, costs, and margin breakdown for {{year}}",
+    "revenue": "Revenue",
+    "costs": "Costs",
+    "actualRevenue": "Actual Revenue",
+    "actualCosts": "Actual Costs",
+    "predictedRevenue": "Predicted Revenue",
+    "predictedCosts": "Predicted Costs",
+    "margin": "Margin",
+    "estMargin": "Est. Margin",
+    "forecastingTitle": "Predictive Revenue & Margin Forecast",
+    "forecastingDescription": "AI-powered forecasting based on historical trends and growth patterns",
+    "notEnoughData": "Not enough historical data to generate forecast",
+    "notEnoughDataDescription": "Need at least 2 months of data",
+    "forecastMethodology": "Forecast Methodology",
+    "forecastMethodologyDescription": "Predictions are calculated using historical revenue trends, growth rates, and seasonal patterns. Confidence levels decrease for longer-term forecasts. Use these insights for planning and budgeting purposes.",
+    "confidence": "{{confidence}}% confidence"
   },
   "notifications": {
     "title": "Notifications",
