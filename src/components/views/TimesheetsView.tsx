@@ -24,8 +24,8 @@ import { Stack } from '@/components/ui/stack'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Separator } from '@/components/ui/separator'
 import { Progress } from '@/components/ui/progress'
-import { TimesheetAdjustmentWizard } from '@/components/TimesheetAdjustmentWizard'
 import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
+import { TimeAndRateAdjustmentWizard } from '@/components/TimeAndRateAdjustmentWizard'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { TimesheetCreateDialogs } from '@/components/timesheets/TimesheetCreateDialogs'
 import { TimesheetTabs } from '@/components/timesheets/TimesheetTabs'
@@ -214,6 +214,77 @@ export function TimesheetsView({
       console.error('Error adjusting timesheet:', error)
     }
   }, [updateTimesheet, hasPermission])
+
+  const handleTimeAndRateAdjustment = useCallback(async (adjustment: {
+    timesheetId: string
+    workerId: string
+    workerName: string
+    clientName: string
+    originalHours: number
+    originalRate: number
+    adjustedHours?: number
+    adjustedRate?: number
+    adjustmentReason: string
+    adjustmentType: 'time' | 'rate' | 'both'
+    approvalRequired: boolean
+    notes?: string
+  }) => {
+    if (!hasPermission('timesheets.edit')) {
+      toast.error('You do not have permission to adjust timesheets')
+      return
+    }
+    
+    try {
+      const currentTimesheet = timesheets.find(t => t.id === adjustment.timesheetId)
+      const adjustmentRecord: any = {
+        id: `adj-${Date.now()}`,
+        adjustmentDate: new Date().toISOString(),
+        adjustedBy: 'Current User',
+        previousHours: adjustment.originalHours,
+        newHours: adjustment.adjustedHours ?? adjustment.originalHours,
+        previousRate: adjustment.originalRate,
+        newRate: adjustment.adjustedRate ?? adjustment.originalRate,
+        reason: adjustment.adjustmentReason,
+        notes: adjustment.notes,
+        requiresApproval: adjustment.approvalRequired,
+        status: adjustment.approvalRequired ? 'pending_approval' : 'applied'
+      }
+
+      const updates: any = {
+        adjustments: [
+          ...(currentTimesheet?.adjustments || []),
+          adjustmentRecord
+        ]
+      }
+
+      if (adjustment.adjustedHours !== undefined) {
+        updates.hours = adjustment.adjustedHours
+      }
+      if (adjustment.adjustedRate !== undefined) {
+        updates.rate = adjustment.adjustedRate
+      }
+      if (adjustment.adjustedHours !== undefined || adjustment.adjustedRate !== undefined) {
+        const newHours = adjustment.adjustedHours ?? adjustment.originalHours
+        const newRate = adjustment.adjustedRate ?? adjustment.originalRate
+        updates.amount = newHours * newRate
+      }
+
+      if (adjustment.approvalRequired) {
+        updates.status = 'pending'
+      }
+
+      await updateTimesheet(adjustment.timesheetId, updates)
+      
+      if (adjustment.approvalRequired) {
+        toast.success('Adjustment submitted for approval')
+      } else {
+        toast.success('Adjustment applied successfully')
+      }
+    } catch (error) {
+      toast.error('Failed to apply adjustment')
+      console.error('Error applying adjustment:', error)
+    }
+  }, [updateTimesheet, hasPermission, timesheets])
 
   const handleDelete = useCallback(async (id: string) => {
     if (!hasPermission('timesheets.delete')) {
@@ -491,13 +562,21 @@ export function TimesheetsView({
       />
 
       {selectedTimesheet && (
-        <TimesheetAdjustmentWizard
-          timesheet={selectedTimesheet}
+        <TimeAndRateAdjustmentWizard
+          timesheet={{
+            id: selectedTimesheet.id,
+            workerId: selectedTimesheet.workerId,
+            workerName: selectedTimesheet.workerName,
+            clientName: selectedTimesheet.clientName,
+            hoursWorked: selectedTimesheet.hours,
+            rate: selectedTimesheet.rate || 0,
+            status: selectedTimesheet.status
+          }}
           open={selectedTimesheet !== null}
           onOpenChange={(open) => {
             if (!open) setSelectedTimesheet(null)
           }}
-          onAdjust={(id, adjustment) => handleAdjust(id, adjustment)}
+          onSubmit={handleTimeAndRateAdjustment}
         />
       )}
     </Stack>

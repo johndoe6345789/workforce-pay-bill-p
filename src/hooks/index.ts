@@ -96,6 +96,7 @@ export { usePayrollBatch } from './use-payroll-batch'
 export { useTimeTracking } from './use-time-tracking'
 export { useMarginAnalysis } from './use-margin-analysis'
 export { useComplianceTracking } from './use-compliance-tracking'
+export { useTimeAndRateAdjustment } from './use-time-and-rate-adjustment'
 
 export { useFocusReturn } from './use-focus-return'
 export { useAnnounce } from './use-announce'
@@ -168,6 +169,7 @@ export type { FilterRule, FilterOperator, UseFilterableDataReturn } from './use-
 export type { FormatType, FormatOptions } from './use-formatter'
 export type { Template } from './use-template-manager'
 export type { PayrollBatch, PayrollBatchWorker, BatchValidation, ApprovalWorkflowState } from './use-payroll-batch'
+export type { TimeAndRateAdjustmentInput, AdjustmentRecord } from './use-time-and-rate-adjustment'
 
 export type { UseFetchOptions, UseFetchResult } from './use-fetch'
 export type { Breakpoint } from './use-breakpoint'
