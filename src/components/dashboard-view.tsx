@@ -14,42 +14,47 @@ import {
 } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import type { DashboardMetrics } from '@/lib/types'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface DashboardViewProps {
   metrics: DashboardMetrics
 }
 
 export function DashboardView({ metrics }: DashboardViewProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-semibold tracking-tight">Dashboard</h2>
-        <p className="text-muted-foreground mt-1">Real-time overview of your workforce operations</p>
+        <h2 className="text-3xl font-semibold tracking-tight">{t('dashboard.title')}</h2>
+        <p className="text-muted-foreground mt-1">{t('dashboard.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          title="Pending Approvals"
+          title={t('dashboard.pendingApprovals')}
           value={metrics.pendingApprovals}
           icon={<ClockCounterClockwise size={20} className="text-warning" />}
           trend={{ value: 12, direction: 'up' }}
+          trendText={t('dashboard.vsLastWeek', { value: '12' })}
           variant="warning"
         />
         <MetricCard
-          title="Pending Expenses"
+          title={t('dashboard.pendingExpenses')}
           value={metrics.pendingExpenses}
           icon={<Notepad size={20} className="text-info" />}
           variant="default"
         />
         <MetricCard
-          title="Overdue Invoices"
+          title={t('dashboard.overdueInvoices')}
           value={metrics.overdueInvoices}
           icon={<Receipt size={20} className="text-destructive" />}
           trend={{ value: 5, direction: 'down' }}
+          trendText={t('dashboard.vsLastWeek', { value: '5' })}
           variant="error"
         />
         <MetricCard
-          title="Compliance Alerts"
+          title={t('dashboard.complianceAlerts')}
           value={metrics.complianceAlerts}
           icon={<Warning size={20} className="text-warning" />}
           variant="warning"
@@ -59,8 +64,8 @@ export function DashboardView({ metrics }: DashboardViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle className="text-lg">Monthly Revenue</CardTitle>
-            <CardDescription>Total invoiced this month</CardDescription>
+            <CardTitle className="text-lg">{t('dashboard.monthlyRevenue')}</CardTitle>
+            <CardDescription>{t('dashboard.monthlyRevenueDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold font-mono">
@@ -68,15 +73,15 @@ export function DashboardView({ metrics }: DashboardViewProps) {
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm text-success">
               <ArrowUp size={16} weight="bold" />
-              <span>12.5% from last month</span>
+              <span>{t('dashboard.vsLastMonth', { value: '12.5' })}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle className="text-lg">Monthly Payroll</CardTitle>
-            <CardDescription>Total payroll costs</CardDescription>
+            <CardTitle className="text-lg">{t('dashboard.monthlyPayroll')}</CardTitle>
+            <CardDescription>{t('dashboard.monthlyPayrollDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold font-mono">
@@ -84,15 +89,15 @@ export function DashboardView({ metrics }: DashboardViewProps) {
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
               <ArrowUp size={16} weight="bold" />
-              <span>8.3% from last month</span>
+              <span>{t('dashboard.vsLastMonth', { value: '8.3' })}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle className="text-lg">Gross Margin</CardTitle>
-            <CardDescription>Revenue minus payroll</CardDescription>
+            <CardTitle className="text-lg">{t('dashboard.grossMargin')}</CardTitle>
+            <CardDescription>{t('dashboard.grossMarginDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold font-mono">
@@ -100,7 +105,7 @@ export function DashboardView({ metrics }: DashboardViewProps) {
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm text-success">
               <ArrowUp size={16} weight="bold" />
-              <span>3.2% from last month</span>
+              <span>{t('dashboard.vsLastMonth', { value: '3.2' })}</span>
             </div>
           </CardContent>
         </Card>
@@ -109,34 +114,34 @@ export function DashboardView({ metrics }: DashboardViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Recent Activity</CardTitle>
-            <CardDescription>Latest timesheet and billing events</CardDescription>
+            <CardTitle className="text-lg">{t('dashboard.recentActivity')}</CardTitle>
+            <CardDescription>{t('dashboard.recentActivityDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <ActivityItem
                 icon={<CheckCircle size={18} className="text-success" />}
-                title="Timesheet approved"
+                title={t('dashboard.timesheetApproved')}
                 description="John Smith - Week ending 15 Jan 2025"
-                time="5 minutes ago"
+                time={t('dashboard.minutesAgo', { value: '5' })}
               />
               <ActivityItem
                 icon={<Receipt size={18} className="text-info" />}
-                title="Invoice generated"
+                title={t('dashboard.invoiceGenerated')}
                 description="INV-00234 - Acme Corp - £2,450"
-                time="12 minutes ago"
+                time={t('dashboard.minutesAgo', { value: '12' })}
               />
               <ActivityItem
                 icon={<CheckCircle size={18} className="text-success" />}
-                title="Payroll completed"
+                title={t('dashboard.payrollCompleted')}
                 description="Weekly run - 45 workers - £28,900"
-                time="1 hour ago"
+                time={t('dashboard.hourAgo', { value: '1' })}
               />
               <ActivityItem
                 icon={<Warning size={18} className="text-warning" />}
-                title="Document expiring soon"
-                description="DBS check for Sarah Johnson - 14 days"
-                time="2 hours ago"
+                title={t('dashboard.documentExpiringSoon')}
+                description={`DBS check for Sarah Johnson - ${t('dashboard.days', { value: '14' })}`}
+                time={t('dashboard.hoursAgo', { value: '2' })}
               />
             </div>
           </CardContent>
@@ -144,25 +149,25 @@ export function DashboardView({ metrics }: DashboardViewProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
-            <CardDescription>Common tasks and workflows</CardDescription>
+            <CardTitle className="text-lg">{t('dashboard.quickActions')}</CardTitle>
+            <CardDescription>{t('dashboard.quickActionsDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <Button className="w-full justify-start" variant="outline">
               <Clock size={18} className="mr-2" />
-              Create Timesheet
+              {t('dashboard.createTimesheet')}
             </Button>
             <Button className="w-full justify-start" variant="outline">
               <Receipt size={18} className="mr-2" />
-              Generate Invoice
+              {t('dashboard.generateInvoice')}
             </Button>
             <Button className="w-full justify-start" variant="outline">
               <CurrencyDollar size={18} className="mr-2" />
-              Run Payroll
+              {t('dashboard.runPayroll')}
             </Button>
             <Button className="w-full justify-start" variant="outline">
               <Download size={18} className="mr-2" />
-              Export Reports
+              {t('dashboard.exportReports')}
             </Button>
           </CardContent>
         </Card>
@@ -176,10 +181,11 @@ interface MetricCardProps {
   value: number
   icon: React.ReactNode
   trend?: { value: number; direction: 'up' | 'down' }
+  trendText?: string
   variant?: 'default' | 'success' | 'warning' | 'error'
 }
 
-function MetricCard({ title, value, icon, trend, variant = 'default' }: MetricCardProps) {
+function MetricCard({ title, value, icon, trend, trendText, variant = 'default' }: MetricCardProps) {
   const borderColors = {
     default: 'border-border',
     success: 'border-success/20',
@@ -207,7 +213,7 @@ function MetricCard({ title, value, icon, trend, variant = 'default' }: MetricCa
             ) : (
               <ArrowDown size={14} weight="bold" />
             )}
-            <span>{trend.value}% vs last week</span>
+            <span>{trendText || `${trend.value}% vs last week`}</span>
           </div>
         )}
       </CardContent>
