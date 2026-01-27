@@ -33,6 +33,7 @@ import { usePayrollCalculations } from '@/hooks/use-payroll-calculations'
 import { usePayrollCrud } from '@/hooks/use-payroll-crud'
 import { usePayrollBatch } from '@/hooks/use-payroll-batch'
 import { usePAYEIntegration } from '@/hooks/use-paye-integration'
+import { useTranslation } from '@/hooks/use-translation'
 import { useAppSelector } from '@/store/hooks'
 import { toast } from 'sonner'
 import type { Timesheet } from '@/lib/types'
@@ -43,6 +44,7 @@ interface PayrollViewProps {
 }
 
 export function PayrollView({ timesheets, workers }: PayrollViewProps) {
+  const { t } = useTranslation()
   const [viewingPayroll, setViewingPayroll] = useState<any | null>(null)
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [showCalculator, setShowCalculator] = useState(false)
@@ -117,7 +119,7 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
   const handleCalculate = () => {
     const grossPay = parseFloat(calculatorGrossPay)
     if (isNaN(grossPay) || grossPay <= 0) {
-      toast.error('Please enter a valid gross pay amount')
+      toast.error(t('payroll.validGrossPayRequired'))
       return
     }
 
@@ -128,29 +130,29 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
   const handlePayrollComplete = useCallback(async (run: any) => {
     try {
       await createPayrollRun(run)
-      toast.success('Payroll run completed successfully')
+      toast.success(t('payroll.payrollCompleteSuccess'))
     } catch (error) {
-      toast.error('Failed to complete payroll run')
+      toast.error(t('payroll.payrollCompleteError'))
     }
-  }, [createPayrollRun])
+  }, [createPayrollRun, t])
 
   const handleDeletePayrollRun = useCallback(async (runId: string) => {
     try {
       await deletePayrollRun(runId)
-      toast.success('Payroll run deleted successfully')
+      toast.success(t('payroll.payrollDeleteSuccess'))
       if (viewingPayroll?.id === runId) {
         setViewingPayroll(null)
       }
     } catch (error) {
-      toast.error('Failed to delete payroll run')
+      toast.error(t('payroll.payrollDeleteError'))
     }
-  }, [deletePayrollRun, viewingPayroll])
+  }, [deletePayrollRun, viewingPayroll, t])
   
   return (
     <Stack spacing={6}>
       <PageHeader
-        title="Payroll Processing"
-        description="Manage payroll runs and worker payments"
+        title={t('payroll.title')}
+        description={t('payroll.subtitle')}
         actions={
           <Stack direction="horizontal" spacing={2}>
             <Button 
@@ -158,29 +160,29 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
               onClick={() => setShowPAYEManager(true)}
             >
               <FileText size={18} className="mr-2" />
-              PAYE RTI Manager
+              {t('payroll.payeRTIManager')}
             </Button>
             <Button 
               variant="outline" 
               onClick={() => setShowAnalytics(!showAnalytics)}
             >
               <ChartBar size={18} className="mr-2" />
-              {showAnalytics ? 'Hide' : 'Show'} Analytics
+              {showAnalytics ? t('payroll.hideAnalytics') : t('payroll.showAnalytics')}
             </Button>
             <Dialog open={showCalculator} onOpenChange={setShowCalculator}>
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <Calculator size={18} className="mr-2" />
-                  Tax Calculator
+                  {t('payroll.taxCalculator')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Payroll Tax Calculator</DialogTitle>
+                  <DialogTitle>{t('payroll.taxCalculator')}</DialogTitle>
                 </DialogHeader>
                 <Stack spacing={4}>
                   <div>
-                    <label className="text-sm font-medium">Gross Pay (Monthly)</label>
+                    <label className="text-sm font-medium">{t('payroll.grossPayMonthly')}</label>
                     <input
                       type="number"
                       value={calculatorGrossPay}
@@ -189,14 +191,14 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
                       placeholder="1000"
                     />
                   </div>
-                  <Button onClick={handleCalculate}>Calculate</Button>
+                  <Button onClick={handleCalculate}>{t('payroll.calculate')}</Button>
                   
                   {calculatorResult && (
                     <Stack spacing={3} className="border-t pt-4">
                       <Grid cols={2} gap={3}>
                         <Card>
                           <CardContent className="pt-4">
-                            <div className="text-sm text-muted-foreground">Gross Pay</div>
+                            <div className="text-sm text-muted-foreground">{t('payroll.grossPay')}</div>
                             <div className="text-xl font-semibold font-mono">
                               £{calculatorResult.grossPay.toFixed(2)}
                             </div>
@@ -204,7 +206,7 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
                         </Card>
                         <Card>
                           <CardContent className="pt-4">
-                            <div className="text-sm text-muted-foreground">Net Pay</div>
+                            <div className="text-sm text-muted-foreground">{t('payroll.netPay')}</div>
                             <div className="text-xl font-semibold font-mono text-success">
                               £{calculatorResult.netPay.toFixed(2)}
                             </div>
@@ -214,7 +216,7 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
                       
                       <Card>
                         <CardHeader>
-                          <CardTitle className="text-sm">Breakdown</CardTitle>
+                          <CardTitle className="text-sm">{t('payroll.breakdown')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                           {calculatorResult.breakdown.map((item: any, idx: number) => (
@@ -230,8 +232,8 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
 
                       <Card className="bg-muted/50">
                         <CardContent className="pt-4">
-                          <div className="text-xs text-muted-foreground mb-1">Tax Year: {payrollConfig.taxYear}</div>
-                          <div className="text-xs text-muted-foreground">Personal Allowance: £{payrollConfig.personalAllowance.toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground mb-1">{t('payroll.taxYear')}: {payrollConfig.taxYear}</div>
+                          <div className="text-xs text-muted-foreground">{t('payroll.personalAllowance')}: £{payrollConfig.personalAllowance.toLocaleString()}</div>
                         </CardContent>
                       </Card>
                     </Stack>
@@ -241,7 +243,7 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
             </Dialog>
             <Button onClick={() => setShowCreateDialog(true)}>
               <Plus size={18} className="mr-2" />
-              Run Payroll
+              {t('payroll.runPayroll')}
             </Button>
           </Stack>
         }
@@ -261,11 +263,11 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
         <TabsList>
           <TabsTrigger value="overview">
             <CurrencyDollar className="mr-2" />
-            Overview
+            {t('payroll.overview')}
           </TabsTrigger>
           <TabsTrigger value="batch-processing">
             <StackIcon className="mr-2" />
-            Batch Processing
+            {t('payroll.batchProcessing')}
             {pendingBatches.length > 0 && (
               <Badge className="ml-2" variant="destructive">
                 {pendingBatches.length}
@@ -274,7 +276,7 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
           </TabsTrigger>
           <TabsTrigger value="approval-queue">
             <CheckCircle className="mr-2" />
-            Approval Queue
+            {t('payroll.approvalQueue')}
           </TabsTrigger>
         </TabsList>
 
@@ -287,26 +289,26 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
           {showAnalytics && (
             <Grid cols={4} gap={4}>
               <MetricCard
-                label="Approved Timesheets"
+                label={t('payroll.approvedTimesheets')}
                 value={approvedTimesheets.length}
-                description="Ready for payroll"
+                description={t('payroll.readyForPayroll')}
                 icon={<Users size={24} />}
               />
               <MetricCard
-                label="Pending Approval"
+                label={t('payroll.pendingApproval')}
                 value={pendingTimesheets.length}
                 description={`£${totalPendingValue.toLocaleString()} value`}
                 icon={<ClockCounterClockwise size={24} />}
               />
               <MetricCard
-                label="Total Payroll Runs"
+                label={t('payroll.totalPayrollRuns')}
                 value={payrollRuns.length}
                 icon={<CurrencyDollar size={24} />}
               />
               <MetricCard
-                label="Last Run Total"
+                label={t('payroll.lastRunTotal')}
                 value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
-                description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
+                description={lastRun ? `${lastRun.workersCount} ${t('payroll.workersPaid')}` : t('payroll.noRunsYet')}
                 icon={<Download size={24} />}
               />
             </Grid>
@@ -314,29 +316,29 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
 
           <Grid cols={4} gap={4}>
             <MetricCard
-              label="Next Pay Date"
+              label={t('payroll.nextPayDate')}
               value="22 Jan 2025"
-              description="Weekly run in 3 days"
+              description={t('payroll.weeklyRun', { days: '3' })}
               icon={<CalendarBlank size={24} />}
             />
             <MetricCard
-              label="Pending Approval"
+              label={t('payroll.pendingApproval')}
               value={`${pendingTimesheets.length} timesheets`}
-              description="Must be approved for payroll"
+              description={t('payroll.mustBeApproved')}
               icon={<ClockCounterClockwise size={24} />}
             />
             <MetricCard
-              label="PAYE Pending"
+              label={t('payroll.payePending')}
               value={pendingPAYESubmissions.length}
-              description="RTI submissions ready"
+              description={t('payroll.rtiSubmissionsReady')}
               icon={<FileText size={24} />}
               onClick={() => setShowPAYEManager(true)}
               className="cursor-pointer hover:bg-muted/50 transition-colors"
             />
             <MetricCard
-              label="PAYE Submitted"
+              label={t('payroll.payeSubmitted')}
               value={submittedPAYESubmissions.length}
-              description="Sent to HMRC"
+              description={t('payroll.sentToHMRC')}
               icon={<CheckCircle size={24} />}
               onClick={() => setShowPAYEManager(true)}
               className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -345,9 +347,9 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
 
           <Grid cols={3} gap={4}>
             <MetricCard
-              label="Last Run Total"
+              label={t('payroll.lastRunTotal')}
               value={lastRun ? `£${lastRun.totalAmount.toLocaleString()}` : '£0'}
-              description={lastRun ? `${lastRun.workersCount} workers paid` : 'No runs yet'}
+              description={lastRun ? `${lastRun.workersCount} ${t('payroll.workersPaid')}` : t('payroll.noRunsYet')}
               icon={<CurrencyDollar size={24} />}
             />
           </Grid>
@@ -364,35 +366,35 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
                     <Stack spacing={2} className="flex-1">
                       <Stack direction="horizontal" spacing={3} align="center">
                         <CurrencyDollar size={20} weight="fill" className="text-primary" />
-                        <h3 className="font-semibold text-lg">Payroll Run</h3>
+                        <h3 className="font-semibold text-lg">{t('payroll.payrollRun')}</h3>
                         <Badge variant={run.status === 'completed' ? 'success' : run.status === 'failed' ? 'destructive' : 'warning'}>
-                          {run.status}
+                          {t(`payroll.status.${run.status}`)}
                         </Badge>
                       </Stack>
                       <Grid cols={4} gap={4} className="text-sm">
                         <div>
-                          <p className="text-muted-foreground">Period Ending</p>
+                          <p className="text-muted-foreground">{t('payroll.periodEnding')}</p>
                           <p className="font-medium">{new Date(run.periodEnding).toLocaleDateString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Workers</p>
+                          <p className="text-muted-foreground">{t('payroll.workers')}</p>
                           <p className="font-medium">{run.workersCount}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Total Amount</p>
+                          <p className="text-muted-foreground">{t('payroll.totalAmount')}</p>
                           <p className="font-semibold font-mono text-lg">£{run.totalAmount.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Processed</p>
+                          <p className="text-muted-foreground">{t('payroll.processed')}</p>
                           <p className="font-medium">
-                            {run.processedDate ? new Date(run.processedDate).toLocaleDateString() : 'Not yet'}
+                            {run.processedDate ? new Date(run.processedDate).toLocaleDateString() : t('payroll.notYet')}
                           </p>
                         </div>
                       </Grid>
                     </Stack>
                     <Stack direction="horizontal" spacing={2} className="ml-4" onClick={(e) => e.stopPropagation()}>
                       <Button size="sm" variant="outline" onClick={() => setViewingPayroll(run)}>
-                        View Details
+                        {t('payroll.viewDetails')}
                       </Button>
                       {run.status === 'completed' && (
                         <>
@@ -405,11 +407,11 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
                             }}
                           >
                             <FileText size={16} className="mr-2" />
-                            Create PAYE
+                            {t('payroll.createPAYE')}
                           </Button>
                           <Button size="sm" variant="outline">
                             <Download size={16} className="mr-2" />
-                            Export
+                            {t('payroll.export')}
                           </Button>
                         </>
                       )}
@@ -429,8 +431,8 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
             {payrollRuns.length === 0 && (
               <Card className="p-12 text-center">
                 <CurrencyDollar size={48} className="mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No payroll runs yet</h3>
-                <p className="text-muted-foreground">Create your first payroll run to get started</p>
+                <h3 className="text-lg font-semibold mb-2">{t('payroll.noPayrollRunsYet')}</h3>
+                <p className="text-muted-foreground">{t('payroll.createFirstPayroll')}</p>
               </Card>
             )}
           </Stack>
@@ -441,7 +443,7 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
             timesheets={timesheets}
             workers={workers}
             onBatchComplete={() => {
-              toast.success('Batch created and submitted for approval')
+              toast.success(t('payroll.batchCreatedSuccess'))
               setActiveTab('approval-queue')
             }}
           />
