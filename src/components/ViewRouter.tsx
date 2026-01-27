@@ -29,7 +29,7 @@ const EmailTemplateManager = lazy(() => import('@/components/EmailTemplateManage
 const InvoiceTemplateManager = lazy(() => import('@/components/InvoiceTemplateManager').then(m => ({ default: m.InvoiceTemplateManager })))
 const QRTimesheetScanner = lazy(() => import('@/components/QRTimesheetScanner').then(m => ({ default: m.QRTimesheetScanner })))
 const MissingTimesheetsReport = lazy(() => import('@/components/MissingTimesheetsReport').then(m => ({ default: m.MissingTimesheetsReport })))
-const PurchaseOrderManager = lazy(() => import('@/components/PurchaseOrderManager').then(m => ({ default: m.PurchaseOrderManager })))
+const PurchaseOrderTracking = lazy(() => import('@/components/PurchaseOrderTracking').then(m => ({ default: m.PurchaseOrderTracking })))
 const OnboardingWorkflowManager = lazy(() => import('@/components/OnboardingWorkflowManager').then(m => ({ default: m.OnboardingWorkflowManager })))
 const AuditTrailViewer = lazy(() => import('@/components/AuditTrailViewer').then(m => ({ default: m.AuditTrailViewer })))
 const NotificationRulesManager = lazy(() => import('@/components/NotificationRulesManager').then(m => ({ default: m.NotificationRulesManager })))
@@ -195,7 +195,7 @@ export function ViewRouter({
       return <InvoiceTemplateManager />
 
     case 'purchase-orders':
-      return <PurchaseOrderManager />
+      return <PurchaseOrderTracking />
 
     case 'onboarding':
       return <OnboardingWorkflowManager />

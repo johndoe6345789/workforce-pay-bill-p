@@ -305,3 +305,36 @@ export interface RecurrencePattern {
   endDate?: string
   excludeDates?: string[]
 }
+
+export type PurchaseOrderStatus = 'active' | 'expired' | 'fulfilled' | 'cancelled' | 'expiring-soon'
+
+export interface PurchaseOrder {
+  id: string
+  poNumber: string
+  clientId: string
+  clientName: string
+  issueDate: string
+  expiryDate?: string
+  totalValue: number
+  remainingValue: number
+  utilisedValue: number
+  status: PurchaseOrderStatus
+  currency: string
+  linkedInvoices: LinkedInvoice[]
+  notes?: string
+  approvedBy?: string
+  approvedDate?: string
+  createdBy: string
+  createdDate: string
+  lastModifiedDate: string
+  attachmentUrls?: string[]
+  tags?: string[]
+}
+
+export interface LinkedInvoice {
+  invoiceId: string
+  invoiceNumber: string
+  amount: number
+  linkedDate: string
+  linkedBy: string
+}

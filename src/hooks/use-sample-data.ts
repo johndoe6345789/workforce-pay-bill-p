@@ -34,6 +34,7 @@ export function useSampleData() {
           indexedDB.bulkCreate(STORES.PAYROLL_RUNS, transformedPayrollRuns),
           indexedDB.bulkCreate(STORES.WORKERS, appData.workers),
           indexedDB.bulkCreate(STORES.RATE_CARDS, appData.rateCards),
+          indexedDB.bulkCreate(STORES.PURCHASE_ORDERS, appData.purchaseOrders || []),
           indexedDB.saveAppState('clients', appData.clients)
         ])
         

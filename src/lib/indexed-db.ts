@@ -1,5 +1,5 @@
 const DB_NAME = 'WorkForceProDB'
-const DB_VERSION = 3
+const DB_VERSION = 4
 const SESSION_STORE = 'sessions'
 const APP_STATE_STORE = 'appState'
 const TIMESHEETS_STORE = 'timesheets'
@@ -9,6 +9,7 @@ const WORKERS_STORE = 'workers'
 const COMPLIANCE_DOCS_STORE = 'complianceDocs'
 const EXPENSES_STORE = 'expenses'
 const RATE_CARDS_STORE = 'rateCards'
+const PURCHASE_ORDERS_STORE = 'purchaseOrders'
 
 interface SessionData {
   id: string
@@ -113,6 +114,15 @@ class IndexedDBManager {
           const rateCardsStore = db.createObjectStore(RATE_CARDS_STORE, { keyPath: 'id' })
           rateCardsStore.createIndex('clientId', 'clientId', { unique: false })
           rateCardsStore.createIndex('role', 'role', { unique: false })
+        }
+
+        if (!db.objectStoreNames.contains(PURCHASE_ORDERS_STORE)) {
+          const purchaseOrdersStore = db.createObjectStore(PURCHASE_ORDERS_STORE, { keyPath: 'id' })
+          purchaseOrdersStore.createIndex('poNumber', 'poNumber', { unique: false })
+          purchaseOrdersStore.createIndex('clientId', 'clientId', { unique: false })
+          purchaseOrdersStore.createIndex('status', 'status', { unique: false })
+          purchaseOrdersStore.createIndex('issueDate', 'issueDate', { unique: false })
+          purchaseOrdersStore.createIndex('expiryDate', 'expiryDate', { unique: false })
         }
       }
     })
@@ -557,6 +567,7 @@ export const STORES = {
   COMPLIANCE_DOCS: COMPLIANCE_DOCS_STORE,
   EXPENSES: EXPENSES_STORE,
   RATE_CARDS: RATE_CARDS_STORE,
+  PURCHASE_ORDERS: PURCHASE_ORDERS_STORE,
 } as const
 
 export type { SessionData, AppStateData, BaseEntity }

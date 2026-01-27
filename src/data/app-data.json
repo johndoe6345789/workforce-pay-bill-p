@@ -416,5 +416,189 @@
       "activeWorkers": 12,
       "address": "321 Factory Lane, Manchester, M1 1AA"
     }
+  ],
+  "purchaseOrders": [
+    {
+      "id": "PO-001",
+      "poNumber": "PO-2024-001",
+      "clientId": "C-001",
+      "clientName": "Tech Solutions Ltd",
+      "issueDate": "2024-01-01",
+      "expiryDate": "2024-12-31",
+      "totalValue": 50000.00,
+      "remainingValue": 32500.00,
+      "utilisedValue": 17500.00,
+      "status": "active",
+      "currency": "GBP",
+      "linkedInvoices": [
+        {
+          "invoiceId": "INV-001",
+          "invoiceNumber": "INV-2024-001",
+          "amount": 12500.00,
+          "linkedDate": "2024-01-15T10:00:00Z",
+          "linkedBy": "Admin User"
+        },
+        {
+          "invoiceId": "INV-002",
+          "invoiceNumber": "INV-2024-002",
+          "amount": 5000.00,
+          "linkedDate": "2024-01-20T14:30:00Z",
+          "linkedBy": "Admin User"
+        }
+      ],
+      "notes": "Annual contract for IT contractors",
+      "approvedBy": "Jane Smith",
+      "approvedDate": "2024-01-01",
+      "createdBy": "Admin User",
+      "createdDate": "2024-01-01T09:00:00Z",
+      "lastModifiedDate": "2024-01-20T14:30:00Z"
+    },
+    {
+      "id": "PO-002",
+      "poNumber": "PO-2024-002",
+      "clientId": "C-002",
+      "clientName": "Global Finance Corp",
+      "issueDate": "2024-01-05",
+      "expiryDate": "2024-03-15",
+      "totalValue": 75000.00,
+      "remainingValue": 8500.00,
+      "utilisedValue": 66500.00,
+      "status": "expiring-soon",
+      "currency": "GBP",
+      "linkedInvoices": [
+        {
+          "invoiceId": "INV-003",
+          "invoiceNumber": "INV-2024-003",
+          "amount": 28000.00,
+          "linkedDate": "2024-01-25T11:00:00Z",
+          "linkedBy": "Finance Manager"
+        },
+        {
+          "invoiceId": "INV-004",
+          "invoiceNumber": "INV-2024-004",
+          "amount": 38500.00,
+          "linkedDate": "2024-02-10T16:00:00Z",
+          "linkedBy": "Finance Manager"
+        }
+      ],
+      "notes": "Q1 financial services staffing",
+      "approvedBy": "Michael Brown",
+      "approvedDate": "2024-01-05",
+      "createdBy": "Finance Manager",
+      "createdDate": "2024-01-05T10:00:00Z",
+      "lastModifiedDate": "2024-02-10T16:00:00Z",
+      "tags": ["urgent", "high-value"]
+    },
+    {
+      "id": "PO-003",
+      "poNumber": "PO-2024-003",
+      "clientId": "C-003",
+      "clientName": "Healthcare Plus",
+      "issueDate": "2024-01-10",
+      "expiryDate": "2024-06-30",
+      "totalValue": 120000.00,
+      "remainingValue": 110000.00,
+      "utilisedValue": 10000.00,
+      "status": "active",
+      "currency": "GBP",
+      "linkedInvoices": [
+        {
+          "invoiceId": "INV-005",
+          "invoiceNumber": "INV-2024-005",
+          "amount": 10000.00,
+          "linkedDate": "2024-01-28T09:00:00Z",
+          "linkedBy": "Operations Manager"
+        }
+      ],
+      "notes": "Healthcare staffing for H1 2024",
+      "approvedBy": "Sarah Davis",
+      "approvedDate": "2024-01-10",
+      "createdBy": "Operations Manager",
+      "createdDate": "2024-01-10T08:30:00Z",
+      "lastModifiedDate": "2024-01-28T09:00:00Z"
+    },
+    {
+      "id": "PO-004",
+      "poNumber": "PO-2024-004",
+      "clientId": "C-004",
+      "clientName": "Manufacturing Inc",
+      "issueDate": "2024-01-15",
+      "totalValue": 35000.00,
+      "remainingValue": 35000.00,
+      "utilisedValue": 0.00,
+      "status": "active",
+      "currency": "GBP",
+      "linkedInvoices": [],
+      "notes": "Production line temporary workers",
+      "approvedBy": "Robert Johnson",
+      "approvedDate": "2024-01-15",
+      "createdBy": "Procurement",
+      "createdDate": "2024-01-15T12:00:00Z",
+      "lastModifiedDate": "2024-01-15T12:00:00Z"
+    },
+    {
+      "id": "PO-005",
+      "poNumber": "PO-2023-045",
+      "clientId": "C-001",
+      "clientName": "Tech Solutions Ltd",
+      "issueDate": "2023-10-01",
+      "expiryDate": "2023-12-31",
+      "totalValue": 40000.00,
+      "remainingValue": 0.00,
+      "utilisedValue": 40000.00,
+      "status": "fulfilled",
+      "currency": "GBP",
+      "linkedInvoices": [
+        {
+          "invoiceId": "INV-OLD-001",
+          "invoiceNumber": "INV-2023-045",
+          "amount": 20000.00,
+          "linkedDate": "2023-10-15T10:00:00Z",
+          "linkedBy": "Admin User"
+        },
+        {
+          "invoiceId": "INV-OLD-002",
+          "invoiceNumber": "INV-2023-046",
+          "amount": 20000.00,
+          "linkedDate": "2023-11-15T10:00:00Z",
+          "linkedBy": "Admin User"
+        }
+      ],
+      "notes": "Q4 2023 IT contractor budget - completed",
+      "approvedBy": "Jane Smith",
+      "approvedDate": "2023-10-01",
+      "createdBy": "Admin User",
+      "createdDate": "2023-10-01T09:00:00Z",
+      "lastModifiedDate": "2023-12-15T10:00:00Z"
+    },
+    {
+      "id": "PO-006",
+      "poNumber": "PO-2023-050",
+      "clientId": "C-002",
+      "clientName": "Global Finance Corp",
+      "issueDate": "2023-11-01",
+      "expiryDate": "2024-01-15",
+      "totalValue": 25000.00,
+      "remainingValue": 8000.00,
+      "utilisedValue": 17000.00,
+      "status": "expired",
+      "currency": "GBP",
+      "linkedInvoices": [
+        {
+          "invoiceId": "INV-OLD-003",
+          "invoiceNumber": "INV-2023-050",
+          "amount": 17000.00,
+          "linkedDate": "2023-11-20T14:00:00Z",
+          "linkedBy": "Finance Manager"
+        }
+      ],
+      "notes": "Year-end contractor budget - expired with remaining balance",
+      "approvedBy": "Michael Brown",
+      "approvedDate": "2023-11-01",
+      "createdBy": "Finance Manager",
+      "createdDate": "2023-11-01T10:00:00Z",
+      "lastModifiedDate": "2024-01-15T09:00:00Z",
+      "tags": ["expired"]
+    }
   ]
 }

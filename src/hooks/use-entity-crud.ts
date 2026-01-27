@@ -7,7 +7,8 @@ import type {
   Worker, 
   ComplianceDocument,
   Expense,
-  RateCard 
+  RateCard,
+  PurchaseOrder
 } from '@/lib/types'
 
 export function useTimesheetsCRUD() {
@@ -38,9 +39,15 @@ export function useRateCardsCRUD() {
   return useCRUD<RateCard>(STORES.RATE_CARDS)
 }
 
+export function usePurchaseOrdersCRUD() {
+  return useCRUD<PurchaseOrder>(STORES.PURCHASE_ORDERS)
+}
+
 export { useTimesheetsCrud } from './use-timesheets-crud'
 export { useInvoicesCrud } from './use-invoices-crud'
 export { usePayrollCrud } from './use-payroll-crud'
 export { useExpensesCrud } from './use-expenses-crud'
 export { useComplianceCrud } from './use-compliance-crud'
 export { useWorkersCrud } from './use-workers-crud'
+export { usePurchaseOrdersCrud } from './use-purchase-orders-crud'
+
