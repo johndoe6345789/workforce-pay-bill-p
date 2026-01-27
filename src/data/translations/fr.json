@@ -1197,6 +1197,9 @@
       "inProgressDescription": "Actuellement en développement",
       "planned": "Planifié",
       "plannedDescription": "Sur la feuille de route pour le développement futur"
-    }
+    },
+    "pagesWithoutTranslations": "Pages Sans Traductions",
+    "pagesWithoutTranslationsDescription": "Les pages React suivantes ont encore besoin d'un support de traduction",
+    "remaining": "restantes"
   }
 }

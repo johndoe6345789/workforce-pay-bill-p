@@ -1197,6 +1197,9 @@
       "inProgressDescription": "Currently being developed",
       "planned": "Planned",
       "plannedDescription": "On the roadmap for future development"
-    }
+    },
+    "pagesWithoutTranslations": "Pages Without Translations",
+    "pagesWithoutTranslationsDescription": "The following React pages still need translation support to be added",
+    "remaining": "remaining"
   }
 }
