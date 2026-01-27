@@ -1,0 +1,220 @@
+{
+  "layout": {
+    "sections": [
+      {
+        "id": "metrics",
+        "type": "metrics-grid",
+        "columns": {
+          "mobile": 1,
+          "tablet": 2,
+          "desktop": 4
+        },
+        "metrics": [
+          {
+            "id": "pendingApprovals",
+            "titleKey": "dashboard.pendingApprovals",
+            "dataSource": "metrics.pendingApprovals",
+            "icon": "ClockCounterClockwise",
+            "iconColor": "text-warning",
+            "variant": "warning",
+            "trend": {
+              "enabled": true,
+              "direction": "up",
+              "value": 12,
+              "textKey": "dashboard.vsLastWeek",
+              "textParams": { "value": "12" }
+            }
+          },
+          {
+            "id": "pendingExpenses",
+            "titleKey": "dashboard.pendingExpenses",
+            "dataSource": "metrics.pendingExpenses",
+            "icon": "Notepad",
+            "iconColor": "text-info",
+            "variant": "default"
+          },
+          {
+            "id": "overdueInvoices",
+            "titleKey": "dashboard.overdueInvoices",
+            "dataSource": "metrics.overdueInvoices",
+            "icon": "Receipt",
+            "iconColor": "text-destructive",
+            "variant": "error",
+            "trend": {
+              "enabled": true,
+              "direction": "down",
+              "value": 5,
+              "textKey": "dashboard.vsLastWeek",
+              "textParams": { "value": "5" }
+            }
+          },
+          {
+            "id": "complianceAlerts",
+            "titleKey": "dashboard.complianceAlerts",
+            "dataSource": "metrics.complianceAlerts",
+            "icon": "Warning",
+            "iconColor": "text-warning",
+            "variant": "warning"
+          }
+        ]
+      },
+      {
+        "id": "financial-summary",
+        "type": "cards-grid",
+        "columns": {
+          "mobile": 1,
+          "tablet": 1,
+          "desktop": 3
+        },
+        "cards": [
+          {
+            "id": "monthlyRevenue",
+            "titleKey": "dashboard.monthlyRevenue",
+            "descriptionKey": "dashboard.monthlyRevenueDescription",
+            "dataSource": "metrics.monthlyRevenue",
+            "format": "currency",
+            "currencySymbol": "£",
+            "trend": {
+              "enabled": true,
+              "direction": "up",
+              "value": 12.5,
+              "textKey": "dashboard.vsLastMonth",
+              "textParams": { "value": "12.5" },
+              "color": "text-success"
+            }
+          },
+          {
+            "id": "monthlyPayroll",
+            "titleKey": "dashboard.monthlyPayroll",
+            "descriptionKey": "dashboard.monthlyPayrollDescription",
+            "dataSource": "metrics.monthlyPayroll",
+            "format": "currency",
+            "currencySymbol": "£",
+            "trend": {
+              "enabled": true,
+              "direction": "up",
+              "value": 8.3,
+              "textKey": "dashboard.vsLastMonth",
+              "textParams": { "value": "8.3" },
+              "color": "text-muted-foreground"
+            }
+          },
+          {
+            "id": "grossMargin",
+            "titleKey": "dashboard.grossMargin",
+            "descriptionKey": "dashboard.grossMarginDescription",
+            "dataSource": "metrics.grossMargin",
+            "format": "percentage",
+            "decimals": 1,
+            "trend": {
+              "enabled": true,
+              "direction": "up",
+              "value": 3.2,
+              "textKey": "dashboard.vsLastMonth",
+              "textParams": { "value": "3.2" },
+              "color": "text-success"
+            }
+          }
+        ]
+      },
+      {
+        "id": "activity-and-actions",
+        "type": "two-column-cards",
+        "columns": {
+          "mobile": 1,
+          "tablet": 1,
+          "desktop": 2
+        },
+        "cards": [
+          {
+            "id": "recentActivity",
+            "type": "activity-feed",
+            "titleKey": "dashboard.recentActivity",
+            "descriptionKey": "dashboard.recentActivityDescription",
+            "dataSource": "recentActivities",
+            "maxItems": 4
+          },
+          {
+            "id": "quickActions",
+            "type": "action-list",
+            "titleKey": "dashboard.quickActions",
+            "descriptionKey": "dashboard.quickActionsDescription",
+            "actions": [
+              {
+                "id": "createTimesheet",
+                "labelKey": "dashboard.createTimesheet",
+                "icon": "Clock",
+                "action": "navigate",
+                "target": "timesheets"
+              },
+              {
+                "id": "generateInvoice",
+                "labelKey": "dashboard.generateInvoice",
+                "icon": "Receipt",
+                "action": "navigate",
+                "target": "billing"
+              },
+              {
+                "id": "runPayroll",
+                "labelKey": "dashboard.runPayroll",
+                "icon": "CurrencyDollar",
+                "action": "navigate",
+                "target": "payroll"
+              },
+              {
+                "id": "exportReports",
+                "labelKey": "dashboard.exportReports",
+                "icon": "Download",
+                "action": "navigate",
+                "target": "reports"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "recentActivities": [
+    {
+      "id": "activity-1",
+      "icon": "CheckCircle",
+      "iconColor": "text-success",
+      "titleKey": "dashboard.timesheetApproved",
+      "description": "John Smith - Week ending 15 Jan 2025",
+      "timeKey": "dashboard.minutesAgo",
+      "timeParams": { "value": "5" },
+      "timestamp": "2025-01-15T14:55:00Z"
+    },
+    {
+      "id": "activity-2",
+      "icon": "Receipt",
+      "iconColor": "text-info",
+      "titleKey": "dashboard.invoiceGenerated",
+      "description": "INV-00234 - Acme Corp - £2,450",
+      "timeKey": "dashboard.minutesAgo",
+      "timeParams": { "value": "12" },
+      "timestamp": "2025-01-15T14:48:00Z"
+    },
+    {
+      "id": "activity-3",
+      "icon": "CheckCircle",
+      "iconColor": "text-success",
+      "titleKey": "dashboard.payrollCompleted",
+      "description": "Weekly run - 45 workers - £28,900",
+      "timeKey": "dashboard.hourAgo",
+      "timeParams": { "value": "1" },
+      "timestamp": "2025-01-15T13:00:00Z"
+    },
+    {
+      "id": "activity-4",
+      "icon": "Warning",
+      "iconColor": "text-warning",
+      "titleKey": "dashboard.documentExpiringSoon",
+      "descriptionKey": "dashboard.documentExpiringSoonDescription",
+      "descriptionParams": { "name": "Sarah Johnson", "days": "14" },
+      "timeKey": "dashboard.hoursAgo",
+      "timeParams": { "value": "2" },
+      "timestamp": "2025-01-15T12:00:00Z"
+    }
+  ]
+}

@@ -72,6 +72,7 @@ export { useFilterableData } from './use-filterable-data'
 export { useFormatter } from './use-formatter'
 export { useTemplateManager } from './use-template-manager'
 export { useLocaleInit } from './use-locale-init'
+export { useDashboardConfig } from './use-dashboard-config'
 
 export { useFetch } from './use-fetch'
 export { useLocalStorageState } from './use-local-storage-state'

@@ -106,6 +106,7 @@
     "invoiceGenerated": "Invoice generated",
     "payrollCompleted": "Payroll completed",
     "documentExpiringSoon": "Document expiring soon",
+    "documentExpiringSoonDescription": "DBS check for {{name}} - {{days}} days",
     "vsLastWeek": "{{value}}% vs last week",
     "vsLastMonth": "{{value}}% from last month",
     "minutesAgo": "{{value}} minutes ago",

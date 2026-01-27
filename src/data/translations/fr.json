@@ -106,6 +106,7 @@
     "invoiceGenerated": "Facture générée",
     "payrollCompleted": "Paie terminée",
     "documentExpiringSoon": "Document expirant bientôt",
+    "documentExpiringSoonDescription": "Vérification DBS pour {{name}} - {{days}} jours",
     "vsLastWeek": "{{value}}% par rapport à la semaine dernière",
     "vsLastMonth": "{{value}}% par rapport au mois dernier",
     "minutesAgo": "il y a {{value}} minutes",
