@@ -578,7 +578,11 @@
     "notFound": "Recurso no encontrado",
     "unauthorized": "No está autorizado para realizar esta acción",
     "serverError": "Error del servidor. Por favor, inténtelo más tarde.",
-    "loadingFailed": "Error al cargar datos"
+    "loadingFailed": "Error al cargar datos",
+    "runtimeError": "Esta aplicación ha encontrado un error de ejecución",
+    "runtimeErrorDescription": "Algo inesperado sucedió mientras se ejecutaba la aplicación. Los detalles del error se muestran a continuación. Póngase en contacto con el autor de la aplicación e infórmele sobre este problema.",
+    "errorDetails": "Detalles del Error:",
+    "tryAgain": "Intentar de Nuevo"
   },
   "currency": {
     "title": "Gestión de Monedas",

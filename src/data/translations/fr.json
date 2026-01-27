@@ -578,7 +578,11 @@
     "notFound": "Ressource introuvable",
     "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action",
     "serverError": "Erreur du serveur. Veuillez réessayer plus tard.",
-    "loadingFailed": "Échec du chargement des données"
+    "loadingFailed": "Échec du chargement des données",
+    "runtimeError": "Cette application a rencontré une erreur d'exécution",
+    "runtimeErrorDescription": "Quelque chose d'inattendu s'est produit lors de l'exécution de l'application. Les détails de l'erreur sont affichés ci-dessous. Contactez l'auteur de l'application et informez-le de ce problème.",
+    "errorDetails": "Détails de l'Erreur:",
+    "tryAgain": "Réessayer"
   },
   "currency": {
     "title": "Gestion des Devises",

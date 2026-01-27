@@ -578,7 +578,11 @@
     "notFound": "Resource not found",
     "unauthorized": "You are not authorized to perform this action",
     "serverError": "Server error. Please try again later.",
-    "loadingFailed": "Failed to load data"
+    "loadingFailed": "Failed to load data",
+    "runtimeError": "This spark has encountered a runtime error",
+    "runtimeErrorDescription": "Something unexpected happened while running the application. The error details are shown below. Contact the spark author and let them know about this issue.",
+    "errorDetails": "Error Details:",
+    "tryAgain": "Try Again"
   },
   "currency": {
     "title": "Currency Management",
