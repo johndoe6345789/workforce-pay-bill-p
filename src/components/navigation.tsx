@@ -15,6 +15,7 @@ import {
 import { NavItem } from '@/components/nav/NavItem'
 import { CoreOperationsNav, ReportsNav, ConfigurationNav, ToolsNav } from '@/components/nav/nav-sections'
 import { useAuth } from '@/hooks/use-auth'
+import { useTranslation } from '@/hooks/use-translation'
 import type { View } from '@/App'
 import type { DashboardMetrics } from '@/lib/types'
 
@@ -27,6 +28,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrentEntity, metrics }: SidebarProps) {
+  const { t } = useTranslation()
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['core']))
   const { user, logout } = useAuth()
   
@@ -55,13 +57,13 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
   return (
     <aside className="w-64 border-r border-border bg-card flex flex-col" role="navigation" aria-label="Main navigation">
       <div className="p-6 border-b border-border">
-        <h1 className="text-xl font-semibold tracking-tight">WorkForce Pro</h1>
-        <p className="text-xs text-muted-foreground mt-1">Back Office Platform</p>
+        <h1 className="text-xl font-semibold tracking-tight">{t('app.title')}</h1>
+        <p className="text-xs text-muted-foreground mt-1">{t('sidebar.backOfficePlatform')}</p>
       </div>
 
       <div className="p-4 border-b border-border">
         <Select value={currentEntity} onValueChange={setCurrentEntity}>
-          <SelectTrigger className="w-full" aria-label="Select entity">
+          <SelectTrigger className="w-full" aria-label={t('sidebar.selectEntity')}>
             <div className="flex items-center gap-2">
               <Buildings size={16} weight="fill" className="text-primary" aria-hidden="true" />
               <SelectValue />
@@ -78,7 +80,7 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto" aria-label="Application sections">
         <NavItem
           icon={<ChartBar size={20} />}
-          label="Dashboard"
+          label={t('navigation.dashboard')}
           active={currentView === 'dashboard'}
           onClick={() => setCurrentView('dashboard')}
           view="dashboard"
@@ -116,21 +118,21 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
         <Separator className="my-2" role="separator" />
         <NavItem
           icon={<PuzzlePiece size={20} />}
-          label="Component Library"
+          label={t('sidebar.componentLibrary')}
           active={currentView === 'component-showcase'}
           onClick={() => setCurrentView('component-showcase')}
           view="component-showcase"
         />
         <NavItem
           icon={<Code size={20} />}
-          label="Business Logic Hooks"
+          label={t('sidebar.businessLogicHooks')}
           active={currentView === 'business-logic-demo'}
           onClick={() => setCurrentView('business-logic-demo')}
           view="business-logic-demo"
         />
         <NavItem
           icon={<Database size={20} />}
-          label="Data Administration"
+          label={t('navigation.dataAdmin')}
           active={currentView === 'data-admin'}
           onClick={() => setCurrentView('data-admin')}
           view="data-admin"
@@ -138,14 +140,14 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
         />
         <NavItem
           icon={<Question size={20} />}
-          label="Query Guide"
+          label={t('navigation.queryGuide')}
           active={currentView === 'query-guide'}
           onClick={() => setCurrentView('query-guide')}
           view="query-guide"
         />
         <NavItem
           icon={<MapTrifold size={20} />}
-          label="Roadmap"
+          label={t('navigation.roadmap')}
           active={currentView === 'roadmap'}
           onClick={() => setCurrentView('roadmap')}
           view="roadmap"
@@ -166,15 +168,15 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
             <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
           </div>
         </button>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           className="w-full justify-start gap-2"
           onClick={logout}
-          aria-label="Log out of application"
+          aria-label={t('sidebar.logOut')}
         >
           <SignOut size={16} aria-hidden="true" />
-          Log Out
+          {t('sidebar.logOut')}
         </Button>
       </div>
     </aside>

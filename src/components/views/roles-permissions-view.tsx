@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { usePermissions, Role, Permission } from '@/hooks/use-permissions'
+import { useTranslation } from '@/hooks/use-translation'
 import { Plus, Shield, Users, Key, MagnifyingGlass, Pencil, Copy } from '@phosphor-icons/react'
 import { Grid } from '@/components/ui/grid'
 import { useAppSelector } from '@/store/hooks'
@@ -19,6 +20,7 @@ interface RoleWithUsers extends Role {
 }
 
 export function RolesPermissionsView() {
+  const { t } = useTranslation()
   const { roles, permissions, hasPermission } = usePermissions()
   const currentUser = useAppSelector(state => state.auth.user)
   
@@ -63,13 +65,13 @@ export function RolesPermissionsView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Roles & Permissions"
-        description="Manage user roles and access permissions across the platform"
+        title={t('roles.title')}
+        description={t('roles.subtitle')}
         actions={
           canManageRoles ? (
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2" />
-              Create Role
+              {t('roles.createRole')}
             </Button>
           ) : undefined
         }
@@ -79,11 +81,11 @@ export function RolesPermissionsView() {
         <TabsList>
           <TabsTrigger value="roles">
             <Users className="mr-2" />
-            Roles
+            {t('roles.rolesTab')}
           </TabsTrigger>
           <TabsTrigger value="permissions">
             <Key className="mr-2" />
-            Permissions
+            {t('roles.permissionsTab')}
           </TabsTrigger>
         </TabsList>
 
@@ -92,7 +94,7 @@ export function RolesPermissionsView() {
             <div className="relative flex-1 max-w-md">
               <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
               <Input
-                placeholder="Search roles..."
+                placeholder={t('roles.searchRoles')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -117,10 +119,10 @@ export function RolesPermissionsView() {
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users size={16} />
-                  <span>{role.userCount} users</span>
+                  <span>{role.userCount} {t('roles.users')}</span>
                   <span className="mx-2">•</span>
                   <Key size={16} />
-                  <span>{role.permissions.length} permissions</span>
+                  <span>{role.permissions.length} {t('roles.permissions')}</span>
                 </div>
 
                 <div className="flex gap-2 pt-2">
@@ -130,7 +132,7 @@ export function RolesPermissionsView() {
                     className="flex-1"
                     onClick={() => setSelectedRole(role)}
                   >
-                    View Details
+                    {t('roles.viewDetails')}
                   </Button>
                   {canManageRoles && (
                     <>
@@ -167,7 +169,7 @@ export function RolesPermissionsView() {
             <div className="relative flex-1 max-w-md">
               <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
               <Input
-                placeholder="Search permissions..."
+                placeholder={t('roles.searchPermissions')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -178,7 +180,7 @@ export function RolesPermissionsView() {
               onChange={(e) => setFilterModule(e.target.value)}
               className="px-4 py-2 border border-input rounded-md bg-background"
             >
-              <option value="all">All Modules</option>
+              <option value="all">{t('roles.allModules')}</option>
               {modules.map(module => (
                 <option key={module} value={module}>
                   {module.charAt(0).toUpperCase() + module.slice(1)}
@@ -244,28 +246,28 @@ export function RolesPermissionsView() {
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Users size={16} />
-                  <span>{selectedRole?.userCount} users assigned</span>
+                  <span>{selectedRole?.userCount} {t('roles.usersAssigned')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Key size={16} />
-                  <span>{selectedRole?.permissions.length} permissions</span>
+                  <span>{selectedRole?.permissions.length} {t('roles.permissions')}</span>
                 </div>
               </div>
 
               {currentUser?.roleId === selectedRole?.id && (
                 <Alert>
                   <AlertDescription>
-                    This is your current role
+                    {t('roles.thisIsYourCurrentRole')}
                   </AlertDescription>
                 </Alert>
               )}
 
               <div className="space-y-3">
-                <h4 className="font-semibold">Assigned Permissions</h4>
+                <h4 className="font-semibold">{t('roles.assignedPermissions')}</h4>
                 {selectedRole?.permissions.includes('*') ? (
                   <Alert>
                     <AlertDescription className="font-semibold">
-                      ✓ Full System Access (All Permissions)
+                      ✓ {t('roles.fullSystemAccess')}
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -307,12 +309,12 @@ export function RolesPermissionsView() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedRole(null)}>
-              Close
+              {t('common.close')}
             </Button>
             {canManageRoles && (
               <Button onClick={() => setIsEditDialogOpen(true)}>
                 <Pencil className="mr-2" />
-                Edit Role
+                {t('roles.editRole')}
               </Button>
             )}
           </DialogFooter>
@@ -350,6 +352,7 @@ interface RoleFormDialogProps {
 }
 
 function RoleFormDialog({ role, open, onOpenChange, onSave }: RoleFormDialogProps) {
+  const { t } = useTranslation()
   const { permissions: allPermissions } = usePermissions()
   const modules = Array.from(new Set(allPermissions.map(p => p.module)))
   
@@ -388,9 +391,9 @@ function RoleFormDialog({ role, open, onOpenChange, onSave }: RoleFormDialogProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>{role ? 'Edit Role' : 'Create New Role'}</DialogTitle>
+          <DialogTitle>{role ? t('roles.editRole') : t('roles.createNewRole')}</DialogTitle>
           <DialogDescription>
-            Define role details and assign permissions
+            {t('roles.defineRoleDetails')}
           </DialogDescription>
         </DialogHeader>
 
@@ -398,43 +401,43 @@ function RoleFormDialog({ role, open, onOpenChange, onSave }: RoleFormDialogProp
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Role Name</label>
+                <label className="text-sm font-medium">{t('roles.roleName')}</label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="e.g. Finance Manager"
+                  placeholder={t('roles.roleNamePlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Description</label>
+                <label className="text-sm font-medium">{t('roles.description')}</label>
                 <Input
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Brief description of this role"
+                  placeholder={t('roles.descriptionPlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Color</label>
+                <label className="text-sm font-medium">{t('roles.color')}</label>
                 <select
                   value={formData.color}
                   onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
                   className="w-full px-4 py-2 border border-input rounded-md bg-background"
                 >
-                  <option value="primary">Primary</option>
-                  <option value="secondary">Secondary</option>
-                  <option value="accent">Accent</option>
-                  <option value="success">Success</option>
-                  <option value="warning">Warning</option>
-                  <option value="info">Info</option>
-                  <option value="muted">Muted</option>
+                  <option value="primary">{t('roles.primary')}</option>
+                  <option value="secondary">{t('roles.secondary')}</option>
+                  <option value="accent">{t('roles.accent')}</option>
+                  <option value="success">{t('roles.success')}</option>
+                  <option value="warning">{t('roles.warning')}</option>
+                  <option value="info">{t('roles.info')}</option>
+                  <option value="muted">{t('roles.muted')}</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-semibold">Permissions</h4>
+              <h4 className="font-semibold">{t('roles.permissionsTab')}</h4>
               {modules.map(module => {
                 const modulePerms = allPermissions.filter(p => p.module === module)
                 const selectedCount = modulePerms.filter(p => 
@@ -484,10 +487,10 @@ function RoleFormDialog({ role, open, onOpenChange, onSave }: RoleFormDialogProp
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={onSave}>
-            {role ? 'Save Changes' : 'Create Role'}
+            {role ? t('roles.saveChanges') : t('roles.createRole')}
           </Button>
         </DialogFooter>
       </DialogContent>
