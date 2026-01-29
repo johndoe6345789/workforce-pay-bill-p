@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SessionManager } from '@/components/SessionManager'
 import { useAuth } from '@/hooks/use-auth'
 import { useSessionTimeoutPreferences } from '@/hooks/use-session-timeout-preferences'
+import { useTranslation } from '@/hooks/use-translation'
 import { toast } from 'sonner'
 import {
   User,
@@ -27,6 +28,7 @@ import {
 } from '@phosphor-icons/react'
 
 export function ProfileView() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const { preferences: timeoutPrefs, updateTimeout } = useSessionTimeoutPreferences()
@@ -79,7 +81,7 @@ export function ProfileView() {
   }
 
   const handleSaveProfile = () => {
-    toast.success('Profile updated successfully')
+    toast.success(t('profile.profileUpdated'))
     setIsEditing(false)
   }
 
@@ -96,48 +98,48 @@ export function ProfileView() {
   }
 
   const handleSaveSettings = () => {
-    toast.success('Settings saved successfully')
+    toast.success(t('profile.settingsSaved'))
   }
 
   const handleSaveSecurity = () => {
     updateTimeout(Number(security.sessionTimeout))
-    toast.success('Security settings updated', {
-      description: `Session timeout set to ${security.sessionTimeout} minutes`,
+    toast.success(t('profile.securitySettingsUpdated'), {
+      description: t('profile.sessionTimeoutSet', { minutes: security.sessionTimeout }),
     })
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-semibold tracking-tight">Profile & Settings</h2>
-        <p className="text-muted-foreground mt-1">Manage your account information and preferences</p>
+        <h2 className="text-3xl font-semibold tracking-tight">{t('profile.title')}</h2>
+        <p className="text-muted-foreground mt-1">{t('profile.subtitle')}</p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
           <TabsTrigger value="profile" className="gap-2">
             <User size={16} />
-            Profile
+            {t('profile.profileTab')}
           </TabsTrigger>
           <TabsTrigger value="preferences" className="gap-2">
             <Palette size={16} />
-            Preferences
+            {t('profile.preferencesTab')}
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell size={16} />
-            Notifications
+            {t('profile.notificationsTab')}
           </TabsTrigger>
           <TabsTrigger value="security" className="gap-2">
             <Shield size={16} />
-            Security
+            {t('profile.securityTab')}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your personal details and public profile</CardDescription>
+              <CardTitle>{t('profile.profileInformation')}</CardTitle>
+              <CardDescription>{t('profile.profileInformationDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-start gap-6">
@@ -160,26 +162,26 @@ export function ProfileView() {
                 <div className="flex-1 space-y-4">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{user?.role || 'Admin'}</Badge>
-                    <Badge variant="secondary">Active</Badge>
+                    <Badge variant="secondary">{t('profile.active')}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Member since January 2024
+                    {t('profile.memberSince', { date: 'January 2024' })}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   {!isEditing ? (
                     <Button onClick={() => setIsEditing(true)}>
-                      Edit Profile
+                      {t('profile.editProfile')}
                     </Button>
                   ) : (
                     <>
                       <Button variant="outline" onClick={handleCancelEdit}>
                         <X size={16} />
-                        Cancel
+                        {t('common.cancel')}
                       </Button>
                       <Button onClick={handleSaveProfile}>
                         <FloppyDisk size={16} />
-                        Save Changes
+                        {t('profile.saveChanges')}
                       </Button>
                     </>
                   )}
@@ -190,7 +192,7 @@ export function ProfileView() {
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">{t('profile.fullName')}</Label>
                   <Input
                     id="name"
                     value={profileData.name}
@@ -199,7 +201,7 @@ export function ProfileView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">{t('profile.emailAddress')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -209,7 +211,7 @@ export function ProfileView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">{t('profile.phoneNumber')}</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -220,7 +222,7 @@ export function ProfileView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="jobTitle">Job Title</Label>
+                  <Label htmlFor="jobTitle">{t('profile.jobTitle')}</Label>
                   <Input
                     id="jobTitle"
                     value={profileData.jobTitle}
@@ -229,7 +231,7 @@ export function ProfileView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
+                  <Label htmlFor="department">{t('profile.department')}</Label>
                   <Input
                     id="department"
                     value={profileData.department}
@@ -238,7 +240,7 @@ export function ProfileView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">{t('profile.location')}</Label>
                   <Input
                     id="location"
                     value={profileData.location}
@@ -252,25 +254,25 @@ export function ProfileView() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
-              <CardDescription>Update your password to keep your account secure</CardDescription>
+              <CardTitle>{t('profile.changePassword')}</CardTitle>
+              <CardDescription>{t('profile.changePasswordDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
+                <Label htmlFor="currentPassword">{t('profile.currentPassword')}</Label>
                 <Input id="currentPassword" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
+                <Label htmlFor="newPassword">{t('profile.newPassword')}</Label>
                 <Input id="newPassword" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Label htmlFor="confirmPassword">{t('profile.confirmNewPassword')}</Label>
                 <Input id="confirmPassword" type="password" />
               </div>
               <Button variant="secondary">
                 <Lock size={16} />
-                Update Password
+                {t('profile.updatePassword')}
               </Button>
             </CardContent>
           </Card>
@@ -279,15 +281,15 @@ export function ProfileView() {
         <TabsContent value="preferences" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Regional Settings</CardTitle>
-              <CardDescription>Configure your language, timezone, and format preferences</CardDescription>
+              <CardTitle>{t('profile.regionalSettings')}</CardTitle>
+              <CardDescription>{t('profile.regionalSettingsDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="language" className="flex items-center gap-2">
                     <Globe size={16} />
-                    Language
+                    {t('profile.language')}
                   </Label>
                   <Select value={settings.language} onValueChange={(value) => setSettings({ ...settings, language: value })}>
                     <SelectTrigger id="language">
@@ -295,16 +297,16 @@ export function ProfileView() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Spanish</SelectItem>
-                      <SelectItem value="fr">French</SelectItem>
-                      <SelectItem value="de">German</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="de">Deutsch</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="timezone" className="flex items-center gap-2">
                     <Clock size={16} />
-                    Timezone
+                    {t('profile.timezone')}
                   </Label>
                   <Select value={settings.timezone} onValueChange={(value) => setSettings({ ...settings, timezone: value })}>
                     <SelectTrigger id="timezone">
@@ -319,7 +321,7 @@ export function ProfileView() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="dateFormat">Date Format</Label>
+                  <Label htmlFor="dateFormat">{t('profile.dateFormat')}</Label>
                   <Select value={settings.dateFormat} onValueChange={(value) => setSettings({ ...settings, dateFormat: value })}>
                     <SelectTrigger id="dateFormat">
                       <SelectValue />
@@ -332,7 +334,7 @@ export function ProfileView() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="timeFormat">Time Format</Label>
+                  <Label htmlFor="timeFormat">{t('profile.timeFormat')}</Label>
                   <Select value={settings.timeFormat} onValueChange={(value) => setSettings({ ...settings, timeFormat: value })}>
                     <SelectTrigger id="timeFormat">
                       <SelectValue />
@@ -344,7 +346,7 @@ export function ProfileView() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="currency">Default Currency</Label>
+                  <Label htmlFor="currency">{t('profile.defaultCurrency')}</Label>
                   <Select value={settings.currency} onValueChange={(value) => setSettings({ ...settings, currency: value })}>
                     <SelectTrigger id="currency">
                       <SelectValue />
@@ -360,7 +362,7 @@ export function ProfileView() {
               <div className="pt-4">
                 <Button onClick={handleSaveSettings}>
                   <FloppyDisk size={16} />
-                  Save Preferences
+                  {t('profile.savePreferences')}
                 </Button>
               </div>
             </CardContent>
@@ -370,15 +372,15 @@ export function ProfileView() {
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>Choose how and when you want to be notified</CardDescription>
+              <CardTitle>{t('profile.notificationPreferences')}</CardTitle>
+              <CardDescription>{t('profile.notificationPreferencesDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="emailNotifications">Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Receive notifications via email</p>
+                    <Label htmlFor="emailNotifications">{t('profile.emailNotifications')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.emailNotificationsDescription')}</p>
                   </div>
                   <Switch
                     id="emailNotifications"
@@ -389,8 +391,8 @@ export function ProfileView() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="pushNotifications">Push Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Receive push notifications in your browser</p>
+                    <Label htmlFor="pushNotifications">{t('profile.pushNotifications')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.pushNotificationsDescription')}</p>
                   </div>
                   <Switch
                     id="pushNotifications"
@@ -401,8 +403,8 @@ export function ProfileView() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="weeklyDigest">Weekly Digest</Label>
-                    <p className="text-sm text-muted-foreground">Receive a weekly summary of activity</p>
+                    <Label htmlFor="weeklyDigest">{t('profile.weeklyDigest')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.weeklyDigestDescription')}</p>
                   </div>
                   <Switch
                     id="weeklyDigest"
@@ -413,8 +415,8 @@ export function ProfileView() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="timesheetReminders">Timesheet Reminders</Label>
-                    <p className="text-sm text-muted-foreground">Get reminded about pending timesheets</p>
+                    <Label htmlFor="timesheetReminders">{t('profile.timesheetReminders')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.timesheetRemindersDescription')}</p>
                   </div>
                   <Switch
                     id="timesheetReminders"
@@ -425,8 +427,8 @@ export function ProfileView() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="invoiceAlerts">Invoice Alerts</Label>
-                    <p className="text-sm text-muted-foreground">Get notified about invoice updates</p>
+                    <Label htmlFor="invoiceAlerts">{t('profile.invoiceAlerts')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.invoiceAlertsDescription')}</p>
                   </div>
                   <Switch
                     id="invoiceAlerts"
@@ -438,7 +440,7 @@ export function ProfileView() {
               <div className="pt-4">
                 <Button onClick={handleSaveSettings}>
                   <FloppyDisk size={16} />
-                  Save Notification Settings
+                  {t('profile.saveNotificationSettings')}
                 </Button>
               </div>
             </CardContent>
@@ -448,15 +450,15 @@ export function ProfileView() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage your account security and authentication</CardDescription>
+              <CardTitle>{t('profile.securitySettings')}</CardTitle>
+              <CardDescription>{t('profile.securitySettingsDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="twoFactor">Two-Factor Authentication</Label>
-                    <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
+                    <Label htmlFor="twoFactor">{t('profile.twoFactorAuth')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.twoFactorAuthDescription')}</p>
                   </div>
                   <Switch
                     id="twoFactor"
@@ -464,9 +466,9 @@ export function ProfileView() {
                     onCheckedChange={(checked) => {
                       setSecurity({ ...security, twoFactorEnabled: checked })
                       if (checked) {
-                        toast.success('Two-factor authentication enabled')
+                        toast.success(t('profile.twoFactorEnabled'))
                       } else {
-                        toast.info('Two-factor authentication disabled')
+                        toast.info(t('profile.twoFactorDisabled'))
                       }
                     }}
                   />
@@ -475,10 +477,10 @@ export function ProfileView() {
                 <div className="space-y-2">
                   <Label htmlFor="sessionTimeout" className="flex items-center gap-2">
                     <Clock size={16} />
-                    Session Timeout
+                    {t('profile.sessionTimeout')}
                   </Label>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Automatically log out after this period of inactivity
+                    {t('profile.sessionTimeoutDescription')}
                   </p>
                   <Select
                     value={security.sessionTimeout}
@@ -488,19 +490,19 @@ export function ProfileView() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="15">15 minutes</SelectItem>
-                      <SelectItem value="30">30 minutes (Recommended)</SelectItem>
-                      <SelectItem value="60">1 hour</SelectItem>
-                      <SelectItem value="120">2 hours</SelectItem>
-                      <SelectItem value="240">4 hours</SelectItem>
+                      <SelectItem value="15">{t('profile.minutes15')}</SelectItem>
+                      <SelectItem value="30">{t('profile.minutes30')}</SelectItem>
+                      <SelectItem value="60">{t('profile.hour1')}</SelectItem>
+                      <SelectItem value="120">{t('profile.hours2')}</SelectItem>
+                      <SelectItem value="240">{t('profile.hours4')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="loginAlerts">Login Alerts</Label>
-                    <p className="text-sm text-muted-foreground">Get notified of new login attempts</p>
+                    <Label htmlFor="loginAlerts">{t('profile.loginAlerts')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('profile.loginAlertsDescription')}</p>
                   </div>
                   <Switch
                     id="loginAlerts"
@@ -512,7 +514,7 @@ export function ProfileView() {
               <div className="pt-4">
                 <Button onClick={handleSaveSecurity}>
                   <FloppyDisk size={16} />
-                  Save Security Settings
+                  {t('profile.saveSecuritySettings')}
                 </Button>
               </div>
             </CardContent>

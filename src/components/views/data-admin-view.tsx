@@ -7,8 +7,11 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { PermissionGate } from '@/components/PermissionGate'
 import { IndexedDBDemo } from '@/components/IndexedDBDemo'
+import { useTranslation } from '@/hooks/use-translation'
 
 export function DataAdminView() {
+  const { t } = useTranslation()
+
   const resetAllData = async () => {
     try {
       await window.spark.kv.delete('sample-data-initialized')
@@ -20,12 +23,12 @@ export function DataAdminView() {
       await window.spark.kv.delete('expenses')
       await window.spark.kv.delete('rate-cards')
       await window.spark.kv.delete('clients')
-      
-      toast.success('Data cleared successfully', {
-        description: 'Refresh the page to reload default data from JSON'
+
+      toast.success(t('dataAdmin.dataClearedSuccess'), {
+        description: t('dataAdmin.dataClearedSuccessDescription')
       })
     } catch (error) {
-      toast.error('Failed to clear data')
+      toast.error(t('dataAdmin.dataClearFailed'))
     }
   }
 
@@ -60,11 +63,11 @@ export function DataAdminView() {
       a.click()
       URL.revokeObjectURL(url)
 
-      toast.success('Data exported successfully', {
-        description: 'Your data has been downloaded as a JSON file'
+      toast.success(t('dataAdmin.dataExportedSuccess'), {
+        description: t('dataAdmin.dataExportedSuccessDescription')
       })
     } catch (error) {
-      toast.error('Failed to export data')
+      toast.error(t('dataAdmin.dataExportFailed'))
     }
   }
 
@@ -72,11 +75,11 @@ export function DataAdminView() {
     try {
       const keys = await window.spark.kv.keys()
       console.log('All KV Storage Keys:', keys)
-      toast.success(`Found ${keys.length} keys`, {
-        description: 'Check the console for full list'
+      toast.success(t('dataAdmin.foundKeys', { count: keys.length }), {
+        description: t('dataAdmin.foundKeysDescription')
       })
     } catch (error) {
-      toast.error('Failed to retrieve keys')
+      toast.error(t('dataAdmin.keysFailed'))
     }
   }
 
@@ -84,18 +87,17 @@ export function DataAdminView() {
     <PermissionGate permission="settings.edit">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-semibold mb-2">Data Administration</h1>
+          <h1 className="text-3xl font-semibold mb-2">{t('dataAdmin.title')}</h1>
           <p className="text-muted-foreground">
-            Manage application data loaded from JSON files
+            {t('dataAdmin.subtitle')}
           </p>
         </div>
 
         <Alert>
           <FileJs className="h-4 w-4" />
-          <AlertTitle>JSON-Based Data</AlertTitle>
+          <AlertTitle>{t('dataAdmin.jsonBasedData')}</AlertTitle>
           <AlertDescription>
-            All application data is loaded from <code className="px-1 py-0.5 bg-muted rounded text-xs">/src/data/app-data.json</code> into persistent KV storage.
-            Changes you make in the app are saved to KV storage and persist between sessions.
+            {t('dataAdmin.jsonBasedDataDescription')}
           </AlertDescription>
         </Alert>
 
@@ -104,19 +106,19 @@ export function DataAdminView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
-              Export Current Data
+              {t('dataAdmin.exportCurrentData')}
             </CardTitle>
             <CardDescription>
-              Download all current data as a JSON file
+              {t('dataAdmin.exportCurrentDataDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              This will export all data currently in KV storage, including any modifications you've made.
+              {t('dataAdmin.exportDataInfo')}
             </p>
             <Button onClick={exportData} className="w-full">
               <Download className="mr-2 h-4 w-4" />
-              Export Data
+              {t('dataAdmin.exportData')}
             </Button>
           </CardContent>
         </Card>
@@ -125,19 +127,19 @@ export function DataAdminView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ArrowClockwise className="h-5 w-5" />
-              Reset to Default Data
+              {t('dataAdmin.resetToDefault')}
             </CardTitle>
             <CardDescription>
-              Clear all data and reload from JSON file
+              {t('dataAdmin.resetToDefaultDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              This will delete all data from KV storage. Refresh the page to reload the default data from app-data.json.
+              {t('dataAdmin.resetDataInfo')}
             </p>
             <Button onClick={resetAllData} variant="destructive" className="w-full">
               <ArrowClockwise className="mr-2 h-4 w-4" />
-              Reset Data
+              {t('dataAdmin.resetData')}
             </Button>
           </CardContent>
         </Card>
@@ -147,97 +149,97 @@ export function DataAdminView() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
-            Storage Information
+            {t('dataAdmin.storageInformation')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Data Entities</span>
+              <span className="text-sm font-medium">{t('dataAdmin.dataEntities')}</span>
               <Badge variant="secondary">8</Badge>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Timesheets</span>
+                <span className="text-muted-foreground">{t('navigation.timesheets')}</span>
                 <Badge variant="outline">timesheets</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Invoices</span>
+                <span className="text-muted-foreground">{t('navigation.billing')}</span>
                 <Badge variant="outline">invoices</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Payroll Runs</span>
+                <span className="text-muted-foreground">{t('navigation.payroll')}</span>
                 <Badge variant="outline">payroll-runs</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Workers</span>
+                <span className="text-muted-foreground">{t('auditTrail.entities.workers')}</span>
                 <Badge variant="outline">workers</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Compliance</span>
+                <span className="text-muted-foreground">{t('navigation.compliance')}</span>
                 <Badge variant="outline">compliance-docs</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Expenses</span>
+                <span className="text-muted-foreground">{t('navigation.expenses')}</span>
                 <Badge variant="outline">expenses</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Rate Cards</span>
+                <span className="text-muted-foreground">{t('navigation.rateTemplates')}</span>
                 <Badge variant="outline">rate-cards</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Clients</span>
+                <span className="text-muted-foreground">{t('billing.client')}</span>
                 <Badge variant="outline">clients</Badge>
               </div>
             </div>
           </div>
           <Button onClick={viewAllKeys} variant="outline" className="w-full">
             <Database className="mr-2 h-4 w-4" />
-            View All Keys (Console)
+            {t('dataAdmin.viewAllKeys')}
           </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Data Flow</CardTitle>
+          <CardTitle>{t('dataAdmin.dataFlow')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <Badge className="mt-0.5">1</Badge>
               <div>
-                <p className="font-medium text-sm">Load from JSON</p>
+                <p className="font-medium text-sm">{t('dataAdmin.loadFromJson')}</p>
                 <p className="text-xs text-muted-foreground">
-                  On first load, data is read from <code>/src/data/app-data.json</code>
+                  {t('dataAdmin.loadFromJsonDescription')}
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Badge className="mt-0.5">2</Badge>
               <div>
-                <p className="font-medium text-sm">Store in KV</p>
+                <p className="font-medium text-sm">{t('dataAdmin.storeInKv')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Data is written to persistent KV storage
+                  {t('dataAdmin.storeInKvDescription')}
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Badge className="mt-0.5">3</Badge>
               <div>
-                <p className="font-medium text-sm">Use in App</p>
+                <p className="font-medium text-sm">{t('dataAdmin.useInApp')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Components read from and write to KV storage via hooks
+                  {t('dataAdmin.useInAppDescription')}
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Badge className="mt-0.5">4</Badge>
               <div>
-                <p className="font-medium text-sm">Persist Changes</p>
+                <p className="font-medium text-sm">{t('dataAdmin.persistChanges')}</p>
                 <p className="text-xs text-muted-foreground">
-                  All changes persist between sessions automatically
+                  {t('dataAdmin.persistChangesDescription')}
                 </p>
               </div>
             </div>

@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Buildings, Lock, User, Eye, EyeSlash } from '@phosphor-icons/react'
 import { useAppDispatch } from '@/store/hooks'
 import { login } from '@/store/slices/authSlice'
+import { useTranslation } from '@/hooks/use-translation'
 import { toast } from 'sonner'
 import loginsData from '@/data/logins.json'
 import rolesData from '@/data/roles-permissions.json'
@@ -15,6 +16,7 @@ import { isValidEmail } from '@/lib/type-guards'
 import { handleError } from '@/lib/error-handler'
 
 export default function LoginScreen() {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -24,27 +26,27 @@ export default function LoginScreen() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const sanitizedEmail = sanitizeEmail(email)
-    
+
     if (!sanitizedEmail || !password) {
-      toast.error('Please enter your email and password')
+      toast.error(t('login.enterEmailPassword'))
       return
     }
 
     if (!isValidEmail(sanitizedEmail)) {
-      toast.error('Please enter a valid email address')
+      toast.error(t('login.invalidEmail'))
       return
     }
 
     setIsLoading(true)
-    
+
     try {
       setTimeout(() => {
         const user = loginsData.users.find(u => u.email === sanitizedEmail && u.password === password)
-        
+
         if (!user) {
-          toast.error('Invalid credentials')
+          toast.error(t('login.invalidCredentials'))
           setIsLoading(false)
           return
         }
@@ -61,8 +63,8 @@ export default function LoginScreen() {
           avatarUrl: user.avatarUrl || undefined,
           permissions
         }))
-        
-        toast.success(`Welcome back, ${user.name}!`)
+
+        toast.success(t('login.welcomeBack', { name: user.name }))
         setIsLoading(false)
       }, TIMEOUTS.LOGIN_DELAY)
     } catch (error) {
@@ -72,12 +74,12 @@ export default function LoginScreen() {
   }
 
   const handleExpressAdminLogin = () => {
-    const adminUser = loginsData.users.find(u => 
+    const adminUser = loginsData.users.find(u =>
       u.roleId === 'super-admin' || u.roleId === 'admin'
     )
-    
+
     if (!adminUser) {
-      toast.error('Admin user not found in system')
+      toast.error(t('login.adminNotFound'))
       console.error('Available users:', loginsData.users.map(u => ({ email: u.email, roleId: u.roleId })))
       return
     }
@@ -94,8 +96,8 @@ export default function LoginScreen() {
       avatarUrl: adminUser.avatarUrl || undefined,
       permissions
     }))
-    
-    toast.success(`Express login: Welcome ${adminUser.name}!`)
+
+    toast.success(t('login.expressWelcome', { name: adminUser.name }))
   }
 
   const isDevelopment = import.meta.env.DEV
@@ -114,20 +116,20 @@ export default function LoginScreen() {
             <Buildings size={64} weight="duotone" />
           </div>
           <h1 className="text-5xl font-semibold mb-6 leading-tight">
-            Welcome to<br />WorkForce Pro
+            {t('login.welcomeTo')}<br />{t('login.workforcePro')}
           </h1>
           <p className="text-xl text-white/90 leading-relaxed max-w-md">
-            Your complete back-office platform for workforce management, billing, and compliance.
+            {t('login.platformDescription')}
           </p>
-          
+
           <div className="mt-12 space-y-4">
             <div className="flex items-start gap-4">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-1">
                 <div className="w-2 h-2 rounded-full bg-white" />
               </div>
               <div>
-                <h3 className="font-medium text-lg mb-1">Streamlined Operations</h3>
-                <p className="text-white/80 text-sm">Automate timesheets, billing, and payroll in one unified platform</p>
+                <h3 className="font-medium text-lg mb-1">{t('login.streamlinedOperations')}</h3>
+                <p className="text-white/80 text-sm">{t('login.streamlinedOperationsDesc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -135,8 +137,8 @@ export default function LoginScreen() {
                 <div className="w-2 h-2 rounded-full bg-white" />
               </div>
               <div>
-                <h3 className="font-medium text-lg mb-1">Real-Time Insights</h3>
-                <p className="text-white/80 text-sm">Monitor KPIs and make data-driven decisions instantly</p>
+                <h3 className="font-medium text-lg mb-1">{t('login.realTimeInsights')}</h3>
+                <p className="text-white/80 text-sm">{t('login.realTimeInsightsDesc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -144,8 +146,8 @@ export default function LoginScreen() {
                 <div className="w-2 h-2 rounded-full bg-white" />
               </div>
               <div>
-                <h3 className="font-medium text-lg mb-1">Enterprise Security</h3>
-                <p className="text-white/80 text-sm">Bank-level encryption and compliance-ready audit trails</p>
+                <h3 className="font-medium text-lg mb-1">{t('login.enterpriseSecurity')}</h3>
+                <p className="text-white/80 text-sm">{t('login.enterpriseSecurityDesc')}</p>
               </div>
             </div>
           </div>
@@ -157,16 +159,16 @@ export default function LoginScreen() {
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-2">
               <Buildings size={32} className="text-primary" weight="duotone" />
-              <span className="text-2xl font-semibold text-foreground">WorkForce Pro</span>
+              <span className="text-2xl font-semibold text-foreground">{t('login.workforcePro')}</span>
             </div>
-            <h2 className="text-3xl font-semibold text-foreground mb-2">Log in to your account</h2>
-            <p className="text-muted-foreground">Enter your credentials to access the platform</p>
+            <h2 className="text-3xl font-semibold text-foreground mb-2">{t('login.loginToAccount')}</h2>
+            <p className="text-muted-foreground">{t('login.enterCredentials')}</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
-                Email Address
+                {t('login.emailAddress')}
               </Label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -175,7 +177,7 @@ export default function LoginScreen() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@company.com"
+                  placeholder={t('login.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-11"
@@ -187,7 +189,7 @@ export default function LoginScreen() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium">
-                Password
+                {t('login.password')}
               </Label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -196,7 +198,7 @@ export default function LoginScreen() {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  placeholder={t('login.passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 h-11"
@@ -223,7 +225,7 @@ export default function LoginScreen() {
                   disabled={isLoading}
                 />
                 <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
-                  Remember me
+                  {t('login.rememberMe')}
                 </Label>
               </div>
               <button
@@ -231,7 +233,7 @@ export default function LoginScreen() {
                 className="text-sm text-accent hover:text-accent/80 font-medium transition-colors"
                 disabled={isLoading}
               >
-                Forgot password?
+                {t('login.forgotPassword')}
               </button>
             </div>
 
@@ -240,7 +242,7 @@ export default function LoginScreen() {
               className="w-full h-11 text-base font-medium"
               disabled={isLoading}
             >
-              {isLoading ? 'Logging in...' : 'Log In'}
+              {isLoading ? t('login.loggingIn') : t('login.logIn')}
             </Button>
 
             {isDevelopment && (
@@ -250,7 +252,7 @@ export default function LoginScreen() {
                 variant="outline"
                 className="w-full h-11 text-base font-medium mt-3 border-accent text-accent hover:bg-accent hover:text-accent-foreground"
               >
-                🚀 Express Admin Login (Dev Only)
+                🚀 {t('login.expressAdminLogin')}
               </Button>
             )}
           </form>
@@ -258,7 +260,7 @@ export default function LoginScreen() {
           <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
             <details className="group">
               <summary className="text-sm font-medium cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
-                Test Accounts (Click to expand)
+                {t('login.testAccounts')}
               </summary>
               <div className="mt-3 space-y-2 text-xs">
                 <div className="grid grid-cols-2 gap-2">
@@ -289,22 +291,22 @@ export default function LoginScreen() {
 
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
+              {t('login.dontHaveAccount')}{' '}
               <button className="text-accent hover:text-accent/80 font-medium transition-colors">
-                Contact Sales
+                {t('login.contactSales')}
               </button>
             </p>
           </div>
 
           <div className="mt-8 pt-8 border-t border-border">
             <p className="text-xs text-center text-muted-foreground">
-              By logging in, you agree to our{' '}
+              {t('login.termsAgreement')}{' '}
               <button className="text-foreground hover:text-accent transition-colors">
-                Terms of Service
+                {t('login.termsOfService')}
               </button>{' '}
-              and{' '}
+              {t('login.and')}{' '}
               <button className="text-foreground hover:text-accent transition-colors">
-                Privacy Policy
+                {t('login.privacyPolicy')}
               </button>
             </p>
           </div>
