@@ -92,6 +92,8 @@
     "overdueInvoices": "Overdue Invoices",
     "complianceAlerts": "Compliance Alerts",
     "upcomingDeadlines": "Upcoming Deadlines",
+    "weekOverview": "Week Overview",
+    "thisWeek": "This Week",
     "monthlyRevenue": "Monthly Revenue",
     "monthlyRevenueDescription": "Total invoiced this month",
     "monthlyPayroll": "Monthly Payroll",
@@ -109,10 +111,18 @@
     "documentExpiringSoonDescription": "DBS check for {{name}} - {{days}} days",
     "vsLastWeek": "{{value}}% vs last week",
     "vsLastMonth": "{{value}}% from last month",
+    "vsLastMonthAmount": "vs. £{{amount}} last month",
     "minutesAgo": "{{value}} minutes ago",
     "hourAgo": "{{value}} hour ago",
     "hoursAgo": "{{value}} hours ago",
-    "days": "{{value}} days"
+    "days": "{{value}} days",
+    "requiresAttention": "Requires attention",
+    "awaitingReview": "Awaiting review",
+    "pastDueDate": "Past due date",
+    "actionRequired": "Action required",
+    "pendingCount": "{{count}} pending",
+    "overdueCount": "{{count}} overdue",
+    "alertsCount": "{{count}} alerts"
   },
   "timesheets": {
     "title": "Timesheets",
@@ -1240,7 +1250,15 @@
     "dataExportFailed": "Failed to export data",
     "foundKeys": "Found {{count}} keys",
     "foundKeysDescription": "Check the console for full list",
-    "keysFailed": "Failed to retrieve keys"
+    "keysFailed": "Failed to retrieve keys",
+    "timesheets": "Timesheets",
+    "invoices": "Invoices",
+    "payrollRuns": "Payroll Runs",
+    "workers": "Workers",
+    "complianceDocs": "Compliance",
+    "expenses": "Expenses",
+    "rateCards": "Rate Cards",
+    "clients": "Clients"
   },
   "profile": {
     "title": "Profile & Settings",
@@ -1319,9 +1337,16 @@
     "searchPermissions": "Search permissions...",
     "allModules": "All Modules",
     "users": "users",
+    "user": "user",
     "permissions": "permissions",
+    "permission": "permission",
+    "usersCount": "{{count}} user",
+    "usersCountPlural": "{{count}} users",
+    "permissionsCount": "{{count}} permission",
+    "permissionsCountPlural": "{{count}} permissions",
     "viewDetails": "View Details",
     "usersAssigned": "users assigned",
+    "userAssigned": "user assigned",
     "thisIsYourCurrentRole": "This is your current role",
     "assignedPermissions": "Assigned Permissions",
     "fullSystemAccess": "Full System Access (All Permissions)",
@@ -1382,6 +1407,7 @@
     "selectEntity": "Select entity",
     "componentLibrary": "Component Library",
     "businessLogicHooks": "Business Logic Hooks",
-    "logOut": "Log Out"
+    "logOut": "Log Out",
+    "logOutOfApplication": "Log out of application"
   }
 }

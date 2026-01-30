@@ -76,7 +76,7 @@ export function DashboardView({ metrics }: DashboardViewProps) {
           <Stack direction="horizontal" spacing={2}>
             <Button variant="outline">
               <CalendarBlank size={18} className="mr-2" />
-              {t('common.filter')}
+              {t('dashboard.thisWeek')}
             </Button>
             <Button variant="outline">
               <Download size={18} className="mr-2" />
@@ -92,26 +92,26 @@ export function DashboardView({ metrics }: DashboardViewProps) {
           value={metrics.pendingApprovals}
           icon={<ClockCounterClockwise size={24} />}
           change={{ value: 12, trend: 'up' }}
-          description={t('common.warning')}
+          description={t('dashboard.requiresAttention')}
         />
         <MetricCard
           label={t('dashboard.pendingExpenses')}
           value={metrics.pendingExpenses}
           icon={<Notepad size={24} />}
-          description={t('expenses.pendingApproval')}
+          description={t('dashboard.awaitingReview')}
         />
         <MetricCard
           label={t('dashboard.overdueInvoices')}
           value={metrics.overdueInvoices}
           icon={<Receipt size={24} />}
           change={{ value: 5, trend: 'down' }}
-          description={t('billing.overdue')}
+          description={t('dashboard.pastDueDate')}
         />
         <MetricCard
           label={t('dashboard.complianceAlerts')}
           value={metrics.complianceAlerts}
           icon={<Warning size={24} />}
-          description={t('common.warning')}
+          description={t('dashboard.actionRequired')}
         />
       </Grid>
 
@@ -202,22 +202,22 @@ export function DashboardView({ metrics }: DashboardViewProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-medium flex items-center gap-2">
               <TrendUp size={18} className="text-success" />
-              {t('dashboard.upcomingDeadlines')}
+              {t('dashboard.weekOverview')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Stack spacing={3}>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('navigation.timesheets')}</span>
-                <span className="text-sm font-semibold">{metrics.pendingTimesheets} {t('statuses.pending').toLowerCase()}</span>
+                <span className="text-sm font-semibold">{t('dashboard.pendingCount', { count: metrics.pendingTimesheets })}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('navigation.billing')}</span>
-                <span className="text-sm font-semibold">{metrics.overdueInvoices} {t('statuses.overdue').toLowerCase()}</span>
+                <span className="text-sm font-semibold">{t('dashboard.overdueCount', { count: metrics.overdueInvoices })}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('navigation.compliance')}</span>
-                <span className="text-sm font-semibold">{metrics.complianceAlerts} {t('notifications.title').toLowerCase()}</span>
+                <span className="text-sm font-semibold">{t('dashboard.alertsCount', { count: metrics.complianceAlerts })}</span>
               </div>
             </Stack>
           </CardContent>

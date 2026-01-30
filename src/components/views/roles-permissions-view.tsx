@@ -119,10 +119,10 @@ export function RolesPermissionsView() {
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users size={16} />
-                  <span>{role.userCount} {t('roles.users')}</span>
+                  <span>{role.userCount === 1 ? t('roles.usersCount', { count: role.userCount }) : t('roles.usersCountPlural', { count: role.userCount })}</span>
                   <span className="mx-2">•</span>
                   <Key size={16} />
-                  <span>{role.permissions.length} {t('roles.permissions')}</span>
+                  <span>{role.permissions.length === 1 ? t('roles.permissionsCount', { count: role.permissions.length }) : t('roles.permissionsCountPlural', { count: role.permissions.length })}</span>
                 </div>
 
                 <div className="flex gap-2 pt-2">
@@ -246,11 +246,11 @@ export function RolesPermissionsView() {
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Users size={16} />
-                  <span>{selectedRole?.userCount} {t('roles.usersAssigned')}</span>
+                  <span>{selectedRole?.userCount === 1 ? t('roles.usersCount', { count: selectedRole?.userCount }) : t('roles.usersCountPlural', { count: selectedRole?.userCount })} {t('roles.usersAssigned')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Key size={16} />
-                  <span>{selectedRole?.permissions.length} {t('roles.permissions')}</span>
+                  <span>{selectedRole?.permissions.length === 1 ? t('roles.permissionsCount', { count: selectedRole?.permissions.length }) : t('roles.permissionsCountPlural', { count: selectedRole?.permissions.length })}</span>
                 </div>
               </div>
 

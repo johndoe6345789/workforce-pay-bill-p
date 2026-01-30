@@ -161,35 +161,35 @@ export function DataAdminView() {
             <Separator />
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.timesheets')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.timesheets')}</span>
                 <Badge variant="outline">timesheets</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.billing')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.invoices')}</span>
                 <Badge variant="outline">invoices</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.payroll')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.payrollRuns')}</span>
                 <Badge variant="outline">payroll-runs</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('auditTrail.entities.workers')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.workers')}</span>
                 <Badge variant="outline">workers</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.compliance')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.complianceDocs')}</span>
                 <Badge variant="outline">compliance-docs</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.expenses')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.expenses')}</span>
                 <Badge variant="outline">expenses</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.rateTemplates')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.rateCards')}</span>
                 <Badge variant="outline">rate-cards</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('billing.client')}</span>
+                <span className="text-muted-foreground">{t('dataAdmin.clients')}</span>
                 <Badge variant="outline">clients</Badge>
               </div>
             </div>

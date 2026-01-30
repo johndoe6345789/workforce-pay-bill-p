@@ -92,6 +92,8 @@
     "overdueInvoices": "Factures en Retard",
     "complianceAlerts": "Alertes de Conformité",
     "upcomingDeadlines": "Échéances à Venir",
+    "weekOverview": "Aperçu de la Semaine",
+    "thisWeek": "Cette Semaine",
     "monthlyRevenue": "Revenus Mensuels",
     "monthlyRevenueDescription": "Total facturé ce mois-ci",
     "monthlyPayroll": "Paie Mensuelle",
@@ -109,10 +111,18 @@
     "documentExpiringSoonDescription": "Vérification DBS pour {{name}} - {{days}} jours",
     "vsLastWeek": "{{value}}% par rapport à la semaine dernière",
     "vsLastMonth": "{{value}}% par rapport au mois dernier",
+    "vsLastMonthAmount": "vs. £{{amount}} le mois dernier",
     "minutesAgo": "il y a {{value}} minutes",
     "hourAgo": "il y a {{value}} heure",
     "hoursAgo": "il y a {{value}} heures",
-    "days": "{{value}} jours"
+    "days": "{{value}} jours",
+    "requiresAttention": "Nécessite une attention",
+    "awaitingReview": "En attente de révision",
+    "pastDueDate": "Date d'échéance dépassée",
+    "actionRequired": "Action requise",
+    "pendingCount": "{{count}} en attente",
+    "overdueCount": "{{count}} en retard",
+    "alertsCount": "{{count}} alertes"
   },
   "timesheets": {
     "title": "Feuilles de Temps",
@@ -1240,7 +1250,15 @@
     "dataExportFailed": "Échec de l'exportation des données",
     "foundKeys": "{{count}} clés trouvées",
     "foundKeysDescription": "Consultez la console pour la liste complète",
-    "keysFailed": "Échec de la récupération des clés"
+    "keysFailed": "Échec de la récupération des clés",
+    "timesheets": "Feuilles de Temps",
+    "invoices": "Factures",
+    "payrollRuns": "Exécutions de Paie",
+    "workers": "Travailleurs",
+    "complianceDocs": "Conformité",
+    "expenses": "Dépenses",
+    "rateCards": "Grilles Tarifaires",
+    "clients": "Clients"
   },
   "profile": {
     "title": "Profil et Paramètres",
@@ -1319,9 +1337,16 @@
     "searchPermissions": "Rechercher des permissions...",
     "allModules": "Tous les Modules",
     "users": "utilisateurs",
+    "user": "utilisateur",
     "permissions": "permissions",
+    "permission": "permission",
+    "usersCount": "{{count}} utilisateur",
+    "usersCountPlural": "{{count}} utilisateurs",
+    "permissionsCount": "{{count}} permission",
+    "permissionsCountPlural": "{{count}} permissions",
     "viewDetails": "Voir les Détails",
     "usersAssigned": "utilisateurs assignés",
+    "userAssigned": "utilisateur assigné",
     "thisIsYourCurrentRole": "C'est votre rôle actuel",
     "assignedPermissions": "Permissions Assignées",
     "fullSystemAccess": "Accès Système Complet (Toutes les Permissions)",
@@ -1382,6 +1407,7 @@
     "selectEntity": "Sélectionner une entité",
     "componentLibrary": "Bibliothèque de Composants",
     "businessLogicHooks": "Hooks de Logique Métier",
-    "logOut": "Se Déconnecter"
+    "logOut": "Se Déconnecter",
+    "logOutOfApplication": "Se déconnecter de l'application"
   }
 }

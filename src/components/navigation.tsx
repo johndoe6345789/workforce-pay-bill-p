@@ -173,7 +173,7 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           size="sm"
           className="w-full justify-start gap-2"
           onClick={logout}
-          aria-label={t('sidebar.logOut')}
+          aria-label={t('sidebar.logOutOfApplication')}
         >
           <SignOut size={16} aria-hidden="true" />
           {t('sidebar.logOut')}
