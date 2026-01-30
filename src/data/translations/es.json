@@ -109,10 +109,20 @@
     "documentExpiringSoonDescription": "Verificación DBS para {{name}} - {{days}} días",
     "vsLastWeek": "{{value}}% vs semana pasada",
     "vsLastMonth": "{{value}}% desde el mes pasado",
+    "vsLastMonthAmount": "vs. £{{amount}} el mes pasado",
     "minutesAgo": "hace {{value}} minutos",
     "hourAgo": "hace {{value}} hora",
     "hoursAgo": "hace {{value}} horas",
-    "days": "{{value}} días"
+    "days": "{{value}} días",
+    "weekOverview": "Resumen de la Semana",
+    "thisWeek": "Esta Semana",
+    "requiresAttention": "Requiere atención",
+    "awaitingReview": "Esperando revisión",
+    "pastDueDate": "Fecha vencida",
+    "actionRequired": "Acción requerida",
+    "pendingCount": "{{count}} pendiente(s)",
+    "overdueCount": "{{count}} vencido(s)",
+    "alertsCount": "{{count}} alerta(s)"
   },
   "timesheets": {
     "title": "Hojas de Tiempo",
@@ -1240,7 +1250,15 @@
     "dataExportFailed": "Error al exportar datos",
     "foundKeys": "Se encontraron {{count}} claves",
     "foundKeysDescription": "Revisa la consola para la lista completa",
-    "keysFailed": "Error al obtener claves"
+    "keysFailed": "Error al obtener claves",
+    "timesheets": "Hojas de Tiempo",
+    "invoices": "Facturas",
+    "payrollRuns": "Ejecuciones de Nómina",
+    "workers": "Trabajadores",
+    "complianceDocs": "Cumplimiento",
+    "expenses": "Gastos",
+    "rateCards": "Tarjetas de Tarifas",
+    "clients": "Clientes"
   },
   "profile": {
     "title": "Perfil y Configuración",
@@ -1319,9 +1337,16 @@
     "searchPermissions": "Buscar permisos...",
     "allModules": "Todos los Módulos",
     "users": "usuarios",
+    "user": "usuario",
     "permissions": "permisos",
+    "permission": "permiso",
+    "usersCount": "{{count}} usuario",
+    "usersCountPlural": "{{count}} usuarios",
+    "permissionsCount": "{{count}} permiso",
+    "permissionsCountPlural": "{{count}} permisos",
     "viewDetails": "Ver Detalles",
     "usersAssigned": "usuarios asignados",
+    "userAssigned": "usuario asignado",
     "thisIsYourCurrentRole": "Este es tu rol actual",
     "assignedPermissions": "Permisos Asignados",
     "fullSystemAccess": "Acceso Completo al Sistema (Todos los Permisos)",
@@ -1382,6 +1407,7 @@
     "selectEntity": "Seleccionar entidad",
     "componentLibrary": "Biblioteca de Componentes",
     "businessLogicHooks": "Hooks de Lógica de Negocio",
-    "logOut": "Cerrar Sesión"
+    "logOut": "Cerrar Sesión",
+    "logOutOfApplication": "Cerrar sesión de la aplicación"
   }
 }
