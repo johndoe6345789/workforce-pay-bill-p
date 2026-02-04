@@ -8,7 +8,11 @@ import type {
   Expense,
   ExpenseStatus,
   InvoiceStatus,
-  ShiftEntry
+  ShiftEntry,
+  NewNotification,
+  AppActions,
+  TimesheetAdjustment,
+  CreditNote
 } from '@/lib/types'
 
 export function useAppActions(
@@ -18,8 +22,8 @@ export function useAppActions(
   setInvoices: (updater: (current: Invoice[]) => Invoice[]) => void,
   setComplianceDocs: (updater: (current: ComplianceDocument[]) => ComplianceDocument[]) => void,
   setExpenses: (updater: (current: Expense[]) => Expense[]) => void,
-  addNotification: (notification: any) => void
-) {
+  addNotification: (notification: NewNotification) => void
+): AppActions {
   const handleApproveTimesheet = useCallback((id: string) => {
     setTimesheets(current => {
       const updated = current.map(t => 
@@ -64,22 +68,25 @@ export function useAppActions(
     toast.error('Timesheet rejected')
   }, [setTimesheets, addNotification])
 
-  const handleAdjustTimesheet = (timesheetId: string, adjustment: any) => {
+  const handleAdjustTimesheet = (timesheetId: string, adjustment: TimesheetAdjustment) => {
     setTimesheets(current => 
       current.map(t => {
         if (t.id !== timesheetId) return t
         
         const newAdjustment = {
-          id: `ADJ-${Date.now()}`,
-          adjustmentDate: new Date().toISOString(),
-          ...adjustment
+          ...adjustment,
+          id: adjustment.id || `ADJ-${Date.now()}`,
+          adjustmentDate: adjustment.adjustmentDate || new Date().toISOString(),
         }
+        
+        const newHours = adjustment.newHours
+        const newRate = adjustment.newRate ?? t.rate ?? 0
         
         return {
           ...t,
-          hours: adjustment.newHours,
-          rate: adjustment.newRate,
-          amount: adjustment.newHours * adjustment.newRate,
+          hours: newHours,
+          rate: newRate,
+          amount: newHours * newRate,
           adjustments: [...(t.adjustments || []), newAdjustment]
         }
       })
@@ -315,7 +322,7 @@ export function useAppActions(
     setInvoices(current => [...current, invoice])
   }
 
-  const handleCreateCreditNote = (creditNote: any, creditInvoice: Invoice) => {
+  const handleCreateCreditNote = (creditNote: CreditNote, creditInvoice: Invoice) => {
     setInvoices(current => [...current, creditInvoice])
   }
 

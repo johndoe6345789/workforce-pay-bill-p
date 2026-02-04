@@ -9,7 +9,8 @@ import type {
   ComplianceDocument,
   Expense,
   RateCard,
-  DashboardMetrics
+  DashboardMetrics,
+  AppActions
 } from '@/lib/types'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Button } from '@/components/ui/button'
@@ -61,7 +62,7 @@ interface ViewRouterProps {
   expenses: Expense[]
   rateCards: RateCard[]
   setTimesheets: (updater: (current: Timesheet[]) => Timesheet[]) => void
-  actions: any
+  actions: AppActions
 }
 
 function LoadingFallback() {

@@ -54,7 +54,7 @@ export function useAppData(options?: { liveRefresh?: boolean; pollingInterval?: 
 
   const metrics: DashboardMetrics = useMemo(() => {
     const monthlyRevenue = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0)
-    const monthlyPayroll = payrollRuns.reduce((sum, pr) => sum + (pr.totalAmount || (pr as any).totalGross || 0), 0)
+    const monthlyPayroll = payrollRuns.reduce((sum, pr) => sum + (pr.totalAmount || 0), 0)
     
     return {
       pendingTimesheets: timesheets.filter(t => t.status === 'pending').length,
