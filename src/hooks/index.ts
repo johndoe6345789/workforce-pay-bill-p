@@ -128,6 +128,13 @@ export {
   useWorkersCrud
 } from './use-entity-crud'
 
+export { useTranslationCache } from './use-translation-cache'
+export { useReduxPersistence, loadPersistedUIState, clearPersistedUIState } from './use-redux-persistence'
+export { usePerformanceMonitor, recordMetric, getPerformanceStats, clearPerformanceMetrics, exportPerformanceReport } from './use-performance-monitor'
+export { usePagination as usePaginationAdvanced } from './use-pagination-advanced'
+export { useSortAdvanced, useMultiSort } from './use-sort-advanced'
+export { useAdvancedTable } from './use-advanced-table'
+
 export type { AsyncState } from './use-async'
 export type { FormErrors } from './use-form-validation'
 export type { IntersectionObserverOptions } from './use-intersection-observer'
@@ -183,3 +190,7 @@ export type { UseFavoritesOptions, UseFavoritesResult } from './use-favorites'
 export type { UseClipboardResult } from './use-clipboard-copy'
 export type { SessionTimeoutConfig, SessionTimeoutState } from './use-session-timeout'
 export type { SessionTimeoutPreferences } from './use-session-timeout-preferences'
+
+export type { PaginationConfig, PaginationResult } from './use-pagination-advanced'
+export type { SortDirection as SortDirectionAdvanced, SortConfig as SortConfigAdvanced, MultiSortConfig } from './use-sort-advanced'
+export type { TableColumn, TableState, TableActions, UseAdvancedTableResult } from './use-advanced-table'
