@@ -22,4 +22,7 @@ export default defineConfig({
       '@': resolve(projectRoot, 'src')
     }
   },
+  optimizeDeps: {
+    include: ['react-redux', '@reduxjs/toolkit']
+  },
 });
