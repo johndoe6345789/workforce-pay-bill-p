@@ -1,96 +1,91 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 export interface VirtualScrollOptions {
   itemHeight: number
+  containerHeight: number
   overscan?: number
-  containerHeight?: number
+  totalItems: number
 }
 
-export function useVirtualScroll<T>(
-  items: T[],
-  options: VirtualScrollOptions
-) {
-  const {
-    itemHeight,
-    overscan = 3,
-    containerHeight = 600
-  } = options
+export interface VirtualScrollResult {
+  virtualItems: Array<{
+    index: number
+    start: number
+    size: number
+  }>
+  totalSize: number
+  scrollToIndex: (index: number) => void
+  containerProps: {
+    style: React.CSSProperties
+    onScroll: (e: React.UIEvent<HTMLElement>) => void
+  }
+  innerProps: {
+    style: React.CSSProperties
+  }
+}
 
+export function useVirtualScroll({
+  itemHeight,
+  containerHeight,
+  overscan = 3,
+  totalItems,
+}: VirtualScrollOptions): VirtualScrollResult {
   const [scrollTop, setScrollTop] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLElement | null>(null)
 
-  const totalHeight = items.length * itemHeight
+  const totalSize = totalItems * itemHeight
 
-  const visibleRange = useMemo(() => {
-    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan)
-    const endIndex = Math.min(
-      items.length,
-      Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
-    )
-
-    return { startIndex, endIndex }
-  }, [scrollTop, itemHeight, containerHeight, items.length, overscan])
-
-  const visibleItems = useMemo(() => {
-    return items.slice(visibleRange.startIndex, visibleRange.endIndex).map((item, index) => ({
-      item,
-      index: visibleRange.startIndex + index,
-      offsetTop: (visibleRange.startIndex + index) * itemHeight
-    }))
-  }, [items, visibleRange, itemHeight])
-
-  const handleScroll = useCallback((e: Event) => {
-    const target = e.target as HTMLDivElement
-    setScrollTop(target.scrollTop)
-  }, [])
+  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan)
+  const endIndex = Math.min(
+    totalItems - 1,
+    Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
+  )
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    setScrollTop(0)
+  }, [totalItems])
 
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
-  }, [handleScroll])
-
-  const scrollToIndex = useCallback((index: number, align: 'start' | 'center' | 'end' = 'start') => {
-    const container = containerRef.current
-    if (!container) return
-
-    let scrollPosition: number
-
-    switch (align) {
-      case 'center':
-        scrollPosition = index * itemHeight - containerHeight / 2 + itemHeight / 2
-        break
-      case 'end':
-        scrollPosition = index * itemHeight - containerHeight + itemHeight
-        break
-      default:
-        scrollPosition = index * itemHeight
-    }
-
-    container.scrollTo({
-      top: Math.max(0, Math.min(scrollPosition, totalHeight - containerHeight)),
-      behavior: 'smooth'
+  const virtualItems: Array<{ index: number; start: number; size: number }> = []
+  for (let i = startIndex; i <= endIndex; i++) {
+    virtualItems.push({
+      index: i,
+      start: i * itemHeight,
+      size: itemHeight,
     })
-  }, [itemHeight, containerHeight, totalHeight])
+  }
 
-  const scrollToTop = useCallback(() => {
-    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
+    const target = e.currentTarget
+    setScrollTop(target.scrollTop)
+    containerRef.current = target
   }, [])
 
-  const scrollToBottom = useCallback(() => {
-    containerRef.current?.scrollTo({ top: totalHeight, behavior: 'smooth' })
-  }, [totalHeight])
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      if (containerRef.current) {
+        containerRef.current.scrollTop = index * itemHeight
+      }
+    },
+    [itemHeight]
+  )
 
   return {
-    containerRef,
-    totalHeight,
-    visibleItems,
-    visibleRange,
+    virtualItems,
+    totalSize,
     scrollToIndex,
-    scrollToTop,
-    scrollToBottom,
-    scrollTop
+    containerProps: {
+      style: {
+        height: containerHeight,
+        overflow: 'auto',
+        position: 'relative',
+      },
+      onScroll: handleScroll,
+    },
+    innerProps: {
+      style: {
+        height: totalSize,
+        position: 'relative',
+      },
+    },
   }
 }
