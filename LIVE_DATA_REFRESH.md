@@ -101,9 +101,16 @@ Added exports for new live refresh hooks.
 ## Configuration Options
 
 ### Global Polling Interval
-Set the polling interval for all live refresh hooks:
+The polling interval is set globally when using `useIndexedDBLive`:
 ```tsx
-useIndexedDBLivePolling(1000) // Check every 1 second
+const [data] = useIndexedDBLive(
+  STORES.TIMESHEETS,
+  [],
+  {
+    enabled: true,
+    pollingInterval: 2000  // 2 seconds (default)
+  }
+)
 ```
 
 ### Per-Hook Configuration
