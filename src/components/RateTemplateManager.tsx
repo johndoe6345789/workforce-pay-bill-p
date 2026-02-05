@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
+import { useTranslation } from '@/hooks/use-translation'
 import { 
   CurrencyCircleDollar, 
   Plus,
@@ -35,7 +36,8 @@ interface RateTemplate {
 }
 
 export function RateTemplateManager() {
-  const [templates = [], setTemplates] = useKV<RateTemplate[]>('rate-templates', [])
+  const { t } = useTranslation()
+  const [templates = [], setTemplates] = useIndexedDBState<RateTemplate[]>('rate-templates', [])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<RateTemplate | null>(null)
   const [formData, setFormData] = useState<Partial<RateTemplate>>({
@@ -54,7 +56,7 @@ export function RateTemplateManager() {
 
   const handleCreate = () => {
     if (!formData.name || !formData.role || !formData.standardRate) {
-      toast.error('Please fill in required fields')
+      toast.error(t('rateTemplates.fillAllFields'))
       return
     }
 
@@ -74,7 +76,7 @@ export function RateTemplateManager() {
     }
 
     setTemplates((current) => [...(current || []), newTemplate])
-    toast.success('Rate template created')
+    toast.success(t('rateTemplates.templateCreated'))
     resetForm()
   }
 
@@ -88,13 +90,13 @@ export function RateTemplateManager() {
           : t
       )
     )
-    toast.success('Rate template updated')
+    toast.success(t('rateTemplates.templateUpdated'))
     resetForm()
   }
 
   const handleDelete = (id: string) => {
     setTemplates((current) => (current || []).filter((t) => t.id !== id))
-    toast.success('Rate template deleted')
+    toast.success(t('rateTemplates.templateDeleted'))
   }
 
   const handleDuplicate = (template: RateTemplate) => {
@@ -105,7 +107,7 @@ export function RateTemplateManager() {
       effectiveFrom: new Date().toISOString().split('T')[0]
     }
     setTemplates((current) => [...(current || []), newTemplate])
-    toast.success('Rate template duplicated')
+    toast.success(t('rateTemplates.templateDuplicated'))
   }
 
   const handleEdit = (template: RateTemplate) => {
@@ -144,8 +146,8 @@ export function RateTemplateManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Rate Templates</h2>
-          <p className="text-muted-foreground mt-1">Pre-configured rates for roles and clients</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('rateTemplates.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('rateTemplates.subtitle')}</p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
           if (!open) resetForm()
@@ -154,61 +156,61 @@ export function RateTemplateManager() {
           <DialogTrigger asChild>
             <Button>
               <Plus size={18} className="mr-2" />
-              Create Template
+              {t('rateTemplates.createTemplate')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{editingTemplate ? 'Edit' : 'Create'} Rate Template</DialogTitle>
+              <DialogTitle>{editingTemplate ? t('rateTemplates.editTemplate') : t('rateTemplates.createTemplate')}</DialogTitle>
               <DialogDescription>
-                Configure standard and premium rates for a role or client
+                {t('rateTemplates.createDialog.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4 py-4">
               <div className="space-y-2 col-span-2">
-                <Label htmlFor="name">Template Name *</Label>
+                <Label htmlFor="name">{t('rateTemplates.templateNameLabel')}</Label>
                 <Input
                   id="name"
-                  placeholder="e.g., Senior Developer - Acme Corp"
+                  placeholder={t('rateTemplates.templateNamePlaceholder')}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="role">Role *</Label>
+                <Label htmlFor="role">{t('rateTemplates.roleLabel')}</Label>
                 <Input
                   id="role"
-                  placeholder="e.g., Senior Developer"
+                  placeholder={t('rateTemplates.rolePlaceholder')}
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="client">Client (Optional)</Label>
+                <Label htmlFor="client">{t('rateTemplates.clientLabel')}</Label>
                 <Input
                   id="client"
-                  placeholder="e.g., Acme Corp"
+                  placeholder={t('rateTemplates.clientPlaceholder')}
                   value={formData.client}
                   onChange={(e) => setFormData({ ...formData, client: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="standardRate">Standard Rate (£/hr) *</Label>
+                <Label htmlFor="standardRate">{t('rateTemplates.standardRateLabel')}</Label>
                 <Input
                   id="standardRate"
                   type="number"
                   step="0.01"
-                  placeholder="25.00"
+                  placeholder={t('rateTemplates.standardRatePlaceholder')}
                   value={formData.standardRate}
                   onChange={(e) => setFormData({ ...formData, standardRate: parseFloat(e.target.value) || 0 })}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="currency">Currency</Label>
+                <Label htmlFor="currency">{t('rateTemplates.currencyLabel')}</Label>
                 <Select
                   value={formData.currency}
                   onValueChange={(value) => setFormData({ ...formData, currency: value })}
@@ -225,7 +227,7 @@ export function RateTemplateManager() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="overtimeRate">Overtime Rate (£/hr)</Label>
+                <Label htmlFor="overtimeRate">{t('rateTemplates.overtimeRateLabel')}</Label>
                 <Input
                   id="overtimeRate"
                   type="number"
@@ -234,11 +236,11 @@ export function RateTemplateManager() {
                   value={formData.overtimeRate}
                   onChange={(e) => setFormData({ ...formData, overtimeRate: parseFloat(e.target.value) || 0 })}
                 />
-                <p className="text-xs text-muted-foreground">Default: 1.5x standard</p>
+                <p className="text-xs text-muted-foreground">{t('rateTemplates.overtimeRateHelper')}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="weekendRate">Weekend Rate (£/hr)</Label>
+                <Label htmlFor="weekendRate">{t('rateTemplates.weekendRateLabel')}</Label>
                 <Input
                   id="weekendRate"
                   type="number"
@@ -247,11 +249,11 @@ export function RateTemplateManager() {
                   value={formData.weekendRate}
                   onChange={(e) => setFormData({ ...formData, weekendRate: parseFloat(e.target.value) || 0 })}
                 />
-                <p className="text-xs text-muted-foreground">Default: 1.5x standard</p>
+                <p className="text-xs text-muted-foreground">{t('rateTemplates.weekendRateHelper')}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="nightShiftRate">Night Shift Rate (£/hr)</Label>
+                <Label htmlFor="nightShiftRate">{t('rateTemplates.nightShiftRateLabel')}</Label>
                 <Input
                   id="nightShiftRate"
                   type="number"
@@ -260,11 +262,11 @@ export function RateTemplateManager() {
                   value={formData.nightShiftRate}
                   onChange={(e) => setFormData({ ...formData, nightShiftRate: parseFloat(e.target.value) || 0 })}
                 />
-                <p className="text-xs text-muted-foreground">Default: 1.25x standard</p>
+                <p className="text-xs text-muted-foreground">{t('rateTemplates.nightShiftRateHelper')}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="holidayRate">Holiday Rate (£/hr)</Label>
+                <Label htmlFor="holidayRate">{t('rateTemplates.holidayRateLabel')}</Label>
                 <Input
                   id="holidayRate"
                   type="number"
@@ -273,11 +275,11 @@ export function RateTemplateManager() {
                   value={formData.holidayRate}
                   onChange={(e) => setFormData({ ...formData, holidayRate: parseFloat(e.target.value) || 0 })}
                 />
-                <p className="text-xs text-muted-foreground">Default: 2x standard</p>
+                <p className="text-xs text-muted-foreground">{t('rateTemplates.holidayRateHelper')}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="effectiveFrom">Effective From</Label>
+                <Label htmlFor="effectiveFrom">{t('rateTemplates.effectiveFromLabel')}</Label>
                 <Input
                   id="effectiveFrom"
                   type="date"
@@ -287,9 +289,9 @@ export function RateTemplateManager() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={resetForm}>Cancel</Button>
+              <Button variant="outline" onClick={resetForm}>{t('common.cancel')}</Button>
               <Button onClick={editingTemplate ? handleUpdate : handleCreate}>
-                {editingTemplate ? 'Update' : 'Create'} Template
+                {editingTemplate ? t('common.save') : t('common.add')} {t('rateTemplates.templateName')}
               </Button>
             </div>
           </DialogContent>
@@ -299,7 +301,7 @@ export function RateTemplateManager() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Total Templates</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('rateTemplates.totalTemplates')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{templates.length}</div>
@@ -308,7 +310,7 @@ export function RateTemplateManager() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Active Templates</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('rateTemplates.activeTemplates')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{templates.filter(t => t.isActive).length}</div>
@@ -320,8 +322,8 @@ export function RateTemplateManager() {
         {templates.length === 0 ? (
           <Card className="p-12 text-center">
             <CurrencyCircleDollar size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No rate templates</h3>
-            <p className="text-muted-foreground">Create your first rate template to get started</p>
+            <h3 className="text-lg font-semibold mb-2">{t('rateTemplates.noTemplates')}</h3>
+            <p className="text-muted-foreground">{t('rateTemplates.noTemplatesDescription')}</p>
           </Card>
         ) : (
           templates.map((template) => (
@@ -335,7 +337,7 @@ export function RateTemplateManager() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-lg">{template.name}</h3>
                           <Badge variant={template.isActive ? 'success' : 'outline'}>
-                            {template.isActive ? 'Active' : 'Inactive'}
+                            {template.isActive ? t('rateTemplates.active') : t('rateTemplates.inactive')}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -346,35 +348,35 @@ export function RateTemplateManager() {
 
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Standard</p>
-                        <p className="font-semibold font-mono">£{template.standardRate.toFixed(2)}/hr</p>
+                        <p className="text-muted-foreground">{t('rateTemplates.standard')}</p>
+                        <p className="font-semibold font-mono">£{template.standardRate.toFixed(2)}{t('rateTemplates.perHour')}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Overtime</p>
-                        <p className="font-semibold font-mono">£{template.overtimeRate.toFixed(2)}/hr</p>
+                        <p className="text-muted-foreground">{t('rateTemplates.overtime')}</p>
+                        <p className="font-semibold font-mono">£{template.overtimeRate.toFixed(2)}{t('rateTemplates.perHour')}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Weekend</p>
-                        <p className="font-semibold font-mono">£{template.weekendRate.toFixed(2)}/hr</p>
+                        <p className="text-muted-foreground">{t('rateTemplates.weekend')}</p>
+                        <p className="font-semibold font-mono">£{template.weekendRate.toFixed(2)}{t('rateTemplates.perHour')}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Night</p>
-                        <p className="font-semibold font-mono">£{template.nightShiftRate.toFixed(2)}/hr</p>
+                        <p className="text-muted-foreground">{t('rateTemplates.night')}</p>
+                        <p className="font-semibold font-mono">£{template.nightShiftRate.toFixed(2)}{t('rateTemplates.perHour')}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Holiday</p>
-                        <p className="font-semibold font-mono">£{template.holidayRate.toFixed(2)}/hr</p>
+                        <p className="text-muted-foreground">{t('rateTemplates.holiday')}</p>
+                        <p className="font-semibold font-mono">£{template.holidayRate.toFixed(2)}{t('rateTemplates.perHour')}</p>
                       </div>
                     </div>
 
                     <div className="text-xs text-muted-foreground">
-                      Effective from {new Date(template.effectiveFrom).toLocaleDateString()} • Currency: {template.currency}
+                      {t('rateTemplates.effectiveFromDate', { date: new Date(template.effectiveFrom).toLocaleDateString() })} • {t('rateTemplates.currency')}: {template.currency}
                     </div>
                   </div>
 
                   <div className="flex gap-2 ml-4">
                     <Button size="sm" variant="outline" onClick={() => toggleActive(template.id)}>
-                      {template.isActive ? 'Deactivate' : 'Activate'}
+                      {template.isActive ? t('rateTemplates.deactivate') : t('rateTemplates.activate')}
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => handleDuplicate(template)}>
                       <Copy size={16} />

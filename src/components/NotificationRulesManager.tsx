@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
+import { useTranslation } from '@/hooks/use-translation'
 import { Bell, Plus, Pencil, Trash, ToggleLeft, ToggleRight } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -38,7 +39,8 @@ export interface NotificationRule {
 }
 
 export function NotificationRulesManager() {
-  const [rules = [], setRules] = useKV<NotificationRule[]>('notification-rules', [])
+  const { t } = useTranslation()
+  const [rules = [], setRules] = useIndexedDBState<NotificationRule[]>('notification-rules', [])
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editingRule, setEditingRule] = useState<NotificationRule | null>(null)
   const [formData, setFormData] = useState<Partial<NotificationRule>>({
@@ -56,7 +58,7 @@ export function NotificationRulesManager() {
 
   const handleCreate = () => {
     if (!formData.name || !formData.messageTemplate) {
-      toast.error('Please fill in required fields')
+      toast.error(t('notificationRules.fillAllFields'))
       return
     }
 
@@ -75,7 +77,7 @@ export function NotificationRulesManager() {
     }
 
     setRules(current => [...(current || []), newRule])
-    toast.success('Notification rule created')
+    toast.success(t('notificationRules.ruleCreated'))
     resetForm()
     setIsCreateOpen(false)
   }
@@ -91,7 +93,7 @@ export function NotificationRulesManager() {
           : rule
       )
     })
-    toast.success('Notification rule updated')
+    toast.success(t('notificationRules.ruleUpdated'))
     setEditingRule(null)
     resetForm()
   }
@@ -112,7 +114,7 @@ export function NotificationRulesManager() {
       if (!current) return []
       return current.filter(rule => rule.id !== ruleId)
     })
-    toast.success('Notification rule deleted')
+    toast.success(t('notificationRules.ruleDeleted'))
   }
 
   const resetForm = () => {
@@ -142,8 +144,8 @@ export function NotificationRulesManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Notification Rules</h2>
-          <p className="text-muted-foreground mt-1">Configure automated notification triggers and workflows</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('notificationRules.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('notificationRules.subtitle')}</p>
         </div>
         <Dialog open={isCreateOpen || !!editingRule} onOpenChange={(open) => {
           if (!open) {
@@ -155,14 +157,14 @@ export function NotificationRulesManager() {
           <DialogTrigger asChild>
             <Button onClick={() => setIsCreateOpen(true)}>
               <Plus size={18} className="mr-2" />
-              Create Rule
+              {t('notificationRules.createRule')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{editingRule ? 'Edit' : 'Create'} Notification Rule</DialogTitle>
+              <DialogTitle>{editingRule ? t('notificationRules.createDialog.editTitle') : t('notificationRules.createDialog.title')}</DialogTitle>
               <DialogDescription>
-                Define when and how notifications should be sent
+                {t('notificationRules.createDialog.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4 max-h-[60vh] overflow-auto">
