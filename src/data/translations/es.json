@@ -3644,5 +3644,107 @@
     "workflowCompleted": "Flujo de trabajo completado",
     "noWorkflows": "Sin flujos de trabajo activos",
     "noWorkflowsDescription": "Crea un flujo de trabajo para probar aprobaciones paralelas"
+  },
+  "keyboardShortcuts": {
+    "title": "Atajos de Teclado",
+    "description": "Usa estos atajos de teclado para navegar e interactuar con WorkForce Pro de manera más eficiente.",
+    "categories": {
+      "navigation": "Navegación",
+      "general": "General",
+      "tables": "Tablas"
+    },
+    "shortcuts": {
+      "openQuickSearch": "Abrir búsqueda rápida",
+      "showKeyboardShortcuts": "Mostrar atajos de teclado",
+      "closeDialogs": "Cerrar diálogos o modales",
+      "goToDashboard": "Ir al Panel de Control",
+      "goToTimesheets": "Ir a Hojas de Tiempo",
+      "goToBilling": "Ir a Facturación",
+      "goToPayroll": "Ir a Nómina",
+      "goToCompliance": "Ir a Cumplimiento",
+      "openNotifications": "Abrir notificaciones",
+      "moveFocusForward": "Mover foco hacia adelante",
+      "moveFocusBackward": "Mover foco hacia atrás",
+      "activateButton": "Activar botón o enlace",
+      "toggleCheckbox": "Alternar casilla o selección",
+      "navigateTableCells": "Navegar celdas de tabla",
+      "openRowDetails": "Abrir detalles de fila",
+      "selectAllRows": "Seleccionar todas las filas"
+    },
+    "note": "Nota:",
+    "macNote": "En Mac, usa {{cmd}} en lugar de {{ctrl}}"
+  },
+  "notificationCenter": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "noNotifications": "Sin notificaciones",
+    "noNotificationsDescription": "¡Estás al día!"
+  },
+  "createInvoiceDialog": {
+    "title": "Crear Factura",
+    "description": "Generar una nueva factura para facturación",
+    "invoiceNumber": "Número de Factura",
+    "invoiceNumberPlaceholder": "FAC-2024-001",
+    "clientName": "Nombre del Cliente",
+    "clientNamePlaceholder": "Ingrese el nombre del cliente",
+    "issueDate": "Fecha de Emisión",
+    "dueDate": "Fecha de Vencimiento",
+    "amount": "Monto",
+    "amountPlaceholder": "0,00",
+    "currency": "Moneda",
+    "type": "Tipo de Factura",
+    "paymentTerms": "Términos de Pago",
+    "paymentTermsPlaceholder": "ej: Neto 30",
+    "notes": "Notas",
+    "notesPlaceholder": "Notas adicionales",
+    "cancel": "Cancelar",
+    "create": "Crear Factura",
+    "invoiceTypes": {
+      "timesheet": "Hoja de Tiempo",
+      "permanentPlacement": "Colocación Permanente",
+      "creditNote": "Nota de Crédito",
+      "adhoc": "Ad-hoc"
+    },
+    "validation": {
+      "invoiceNumberRequired": "El número de factura es requerido",
+      "clientNameRequired": "El nombre del cliente es requerido",
+      "issueDateRequired": "La fecha de emisión es requerida",
+      "dueDateRequired": "La fecha de vencimiento es requerida",
+      "amountRequired": "El monto es requerido",
+      "amountPositive": "El monto debe ser un número positivo",
+      "currencyRequired": "La moneda es requerida"
+    },
+    "creating": "Creando factura...",
+    "success": "Factura creada con éxito",
+    "error": "Error al crear la factura"
+  },
+  "createPayrollDialog": {
+    "title": "Crear Ejecución de Nómina",
+    "description": "Procesar nómina para hojas de tiempo aprobadas",
+    "periodEnding": "Fin de Período",
+    "processingType": "Tipo de Procesamiento",
+    "processingTypes": {
+      "allApproved": "Todas las Hojas de Tiempo Aprobadas",
+      "selectedWorkers": "Trabajadores Seleccionados",
+      "oneClick": "Un Clic (Selección Automática)"
+    },
+    "selectedWorkers": "Trabajadores Seleccionados",
+    "selectWorkers": "Seleccione los trabajadores a incluir en esta ejecución de nómina",
+    "availableTimesheets": "Hojas de Tiempo Disponibles",
+    "timesheetsFound": "{{count}} hojas de tiempo aprobadas encontradas",
+    "noTimesheets": "No hay hojas de tiempo aprobadas disponibles",
+    "totalHours": "Horas Totales",
+    "totalAmount": "Monto Total",
+    "workerCount": "Cantidad de Trabajadores",
+    "summary": "Resumen de Nómina",
+    "cancel": "Cancelar",
+    "create": "Crear Nómina",
+    "validation": {
+      "periodEndingRequired": "La fecha de fin de período es requerida",
+      "noTimesheetsSelected": "No hay hojas de tiempo disponibles para nómina"
+    },
+    "creating": "Creando ejecución de nómina...",
+    "success": "Ejecución de nómina creada con éxito",
+    "error": "Error al crear la ejecución de nómina"
   }
 }

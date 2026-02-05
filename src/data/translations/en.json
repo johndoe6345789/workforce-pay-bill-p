@@ -2108,5 +2108,107 @@
     "marginDescription": "Calculate margins, markup, and profitability metrics",
     "complianceTitle": "Compliance Tracking Demo",
     "complianceDescription": "Monitor document expiry and compliance status"
+  },
+  "keyboardShortcuts": {
+    "title": "Keyboard Shortcuts",
+    "description": "Use these keyboard shortcuts to navigate and interact with WorkForce Pro more efficiently.",
+    "categories": {
+      "navigation": "Navigation",
+      "general": "General",
+      "tables": "Tables"
+    },
+    "shortcuts": {
+      "openQuickSearch": "Open quick search",
+      "showKeyboardShortcuts": "Show keyboard shortcuts",
+      "closeDialogs": "Close dialogs or modals",
+      "goToDashboard": "Go to Dashboard",
+      "goToTimesheets": "Go to Timesheets",
+      "goToBilling": "Go to Billing",
+      "goToPayroll": "Go to Payroll",
+      "goToCompliance": "Go to Compliance",
+      "openNotifications": "Open notifications",
+      "moveFocusForward": "Move focus forward",
+      "moveFocusBackward": "Move focus backward",
+      "activateButton": "Activate button or link",
+      "toggleCheckbox": "Toggle checkbox or select",
+      "navigateTableCells": "Navigate table cells",
+      "openRowDetails": "Open row details",
+      "selectAllRows": "Select all rows"
+    },
+    "note": "Note:",
+    "macNote": "On Mac, use {{cmd}} instead of {{ctrl}}"
+  },
+  "notificationCenter": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNotifications": "No notifications",
+    "noNotificationsDescription": "You're all caught up!"
+  },
+  "createInvoiceDialog": {
+    "title": "Create Invoice",
+    "description": "Generate a new invoice for billing",
+    "invoiceNumber": "Invoice Number",
+    "invoiceNumberPlaceholder": "INV-2024-001",
+    "clientName": "Client Name",
+    "clientNamePlaceholder": "Enter client name",
+    "issueDate": "Issue Date",
+    "dueDate": "Due Date",
+    "amount": "Amount",
+    "amountPlaceholder": "0.00",
+    "currency": "Currency",
+    "type": "Invoice Type",
+    "paymentTerms": "Payment Terms",
+    "paymentTermsPlaceholder": "e.g., Net 30",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes",
+    "cancel": "Cancel",
+    "create": "Create Invoice",
+    "invoiceTypes": {
+      "timesheet": "Timesheet",
+      "permanentPlacement": "Permanent Placement",
+      "creditNote": "Credit Note",
+      "adhoc": "Ad-hoc"
+    },
+    "validation": {
+      "invoiceNumberRequired": "Invoice number is required",
+      "clientNameRequired": "Client name is required",
+      "issueDateRequired": "Issue date is required",
+      "dueDateRequired": "Due date is required",
+      "amountRequired": "Amount is required",
+      "amountPositive": "Amount must be a positive number",
+      "currencyRequired": "Currency is required"
+    },
+    "creating": "Creating invoice...",
+    "success": "Invoice created successfully",
+    "error": "Failed to create invoice"
+  },
+  "createPayrollDialog": {
+    "title": "Create Payroll Run",
+    "description": "Process payroll for approved timesheets",
+    "periodEnding": "Period Ending",
+    "processingType": "Processing Type",
+    "processingTypes": {
+      "allApproved": "All Approved Timesheets",
+      "selectedWorkers": "Selected Workers",
+      "oneClick": "One-Click (Auto-select)"
+    },
+    "selectedWorkers": "Selected Workers",
+    "selectWorkers": "Select workers to include in this payroll run",
+    "availableTimesheets": "Available Timesheets",
+    "timesheetsFound": "{{count}} approved timesheets found",
+    "noTimesheets": "No approved timesheets available",
+    "totalHours": "Total Hours",
+    "totalAmount": "Total Amount",
+    "workerCount": "Worker Count",
+    "summary": "Payroll Summary",
+    "cancel": "Cancel",
+    "create": "Create Payroll",
+    "validation": {
+      "periodEndingRequired": "Period ending date is required",
+      "noTimesheetsSelected": "No timesheets available for payroll"
+    },
+    "creating": "Creating payroll run...",
+    "success": "Payroll run created successfully",
+    "error": "Failed to create payroll run"
   }
 }

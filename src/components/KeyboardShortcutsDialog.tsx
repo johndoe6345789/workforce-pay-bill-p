@@ -7,103 +7,13 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Keyboard } from '@phosphor-icons/react'
+import { useTranslation } from '@/hooks/use-translation'
 
 type KeyboardShortcut = {
   keys: string[]
-  description: string
+  descriptionKey: string
   category: string
 }
-
-const shortcuts: KeyboardShortcut[] = [
-  {
-    keys: ['Ctrl', 'K'],
-    description: 'Open quick search',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Ctrl', '?'],
-    description: 'Show keyboard shortcuts',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Escape'],
-    description: 'Close dialogs or modals',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Alt', '1'],
-    description: 'Go to Dashboard',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Alt', '2'],
-    description: 'Go to Timesheets',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Alt', '3'],
-    description: 'Go to Billing',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Alt', '4'],
-    description: 'Go to Payroll',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Alt', '5'],
-    description: 'Go to Compliance',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Alt', 'N'],
-    description: 'Open notifications',
-    category: 'Navigation'
-  },
-  {
-    keys: ['Tab'],
-    description: 'Move focus forward',
-    category: 'General'
-  },
-  {
-    keys: ['Shift', 'Tab'],
-    description: 'Move focus backward',
-    category: 'General'
-  },
-  {
-    keys: ['Enter'],
-    description: 'Activate button or link',
-    category: 'General'
-  },
-  {
-    keys: ['Space'],
-    description: 'Toggle checkbox or select',
-    category: 'General'
-  },
-  {
-    keys: ['↑', '↓', '←', '→'],
-    description: 'Navigate table cells',
-    category: 'Tables'
-  },
-  {
-    keys: ['Enter'],
-    description: 'Open row details',
-    category: 'Tables'
-  },
-  {
-    keys: ['Ctrl', 'A'],
-    description: 'Select all rows',
-    category: 'Tables'
-  },
-]
-
-const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
-  if (!acc[shortcut.category]) {
-    acc[shortcut.category] = []
-  }
-  acc[shortcut.category].push(shortcut)
-  return acc
-}, {} as Record<string, KeyboardShortcut[]>)
 
 interface KeyboardShortcutsDialogProps {
   open: boolean
@@ -111,6 +21,100 @@ interface KeyboardShortcutsDialogProps {
 }
 
 export function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialogProps) {
+  const { t } = useTranslation()
+
+  const shortcuts: KeyboardShortcut[] = [
+    {
+      keys: ['Ctrl', 'K'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.openQuickSearch',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Ctrl', '?'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.showKeyboardShortcuts',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Escape'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.closeDialogs',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Alt', '1'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.goToDashboard',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Alt', '2'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.goToTimesheets',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Alt', '3'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.goToBilling',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Alt', '4'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.goToPayroll',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Alt', '5'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.goToCompliance',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Alt', 'N'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.openNotifications',
+      category: 'keyboardShortcuts.categories.navigation'
+    },
+    {
+      keys: ['Tab'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.moveFocusForward',
+      category: 'keyboardShortcuts.categories.general'
+    },
+    {
+      keys: ['Shift', 'Tab'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.moveFocusBackward',
+      category: 'keyboardShortcuts.categories.general'
+    },
+    {
+      keys: ['Enter'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.activateButton',
+      category: 'keyboardShortcuts.categories.general'
+    },
+    {
+      keys: ['Space'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.toggleCheckbox',
+      category: 'keyboardShortcuts.categories.general'
+    },
+    {
+      keys: ['↑', '↓', '←', '→'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.navigateTableCells',
+      category: 'keyboardShortcuts.categories.tables'
+    },
+    {
+      keys: ['Enter'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.openRowDetails',
+      category: 'keyboardShortcuts.categories.tables'
+    },
+    {
+      keys: ['Ctrl', 'A'],
+      descriptionKey: 'keyboardShortcuts.shortcuts.selectAllRows',
+      category: 'keyboardShortcuts.categories.tables'
+    },
+  ]
+
+  const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
+    const category = t(shortcut.category)
+    if (!acc[category]) {
+      acc[category] = []
+    }
+    acc[category].push(shortcut)
+    return acc
+  }, {} as Record<string, KeyboardShortcut[]>)
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
@@ -121,10 +125,10 @@ export function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcut
         <DialogHeader>
           <DialogTitle id="keyboard-shortcuts-title" className="flex items-center gap-2">
             <Keyboard size={24} />
-            Keyboard Shortcuts
+            {t('keyboardShortcuts.title')}
           </DialogTitle>
           <DialogDescription id="keyboard-shortcuts-description">
-            Use these keyboard shortcuts to navigate and interact with WorkForce Pro more efficiently.
+            {t('keyboardShortcuts.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -138,7 +142,7 @@ export function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcut
                     key={`${category}-${index}`}
                     className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted/50"
                   >
-                    <span className="text-sm">{shortcut.description}</span>
+                    <span className="text-sm">{t(shortcut.descriptionKey)}</span>
                     <div className="flex items-center gap-1">
                       {shortcut.keys.map((key, keyIndex) => (
                         <span key={keyIndex} className="flex items-center gap-1">
@@ -163,7 +167,10 @@ export function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcut
 
         <div className="pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            <strong>Note:</strong> On Mac, use <Badge variant="outline" className="font-mono text-xs">⌘ Cmd</Badge> instead of <Badge variant="outline" className="font-mono text-xs">Ctrl</Badge>
+            <strong>{t('keyboardShortcuts.note')}</strong> {t('keyboardShortcuts.macNote', { 
+              cmd: '⌘ Cmd', 
+              ctrl: 'Ctrl' 
+            })}
           </p>
         </div>
       </DialogContent>

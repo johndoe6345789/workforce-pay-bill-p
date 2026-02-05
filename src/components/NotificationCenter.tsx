@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/hooks/use-translation'
 import type { Notification } from '@/lib/types'
 
 interface NotificationCenterProps {
@@ -20,10 +21,12 @@ export function NotificationCenter({
   onMarkAllAsRead,
   onDelete
 }: NotificationCenterProps) {
+  const { t } = useTranslation()
+
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="relative">
+        <Button variant="outline" size="sm" className="relative" aria-label={t('notificationCenter.title')}>
           <Bell size={18} />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
@@ -34,10 +37,10 @@ export function NotificationCenter({
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0" align="end">
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h3 className="font-semibold">Notifications</h3>
+          <h3 className="font-semibold">{t('notificationCenter.title')}</h3>
           {unreadCount > 0 && (
             <Button variant="ghost" size="sm" onClick={onMarkAllAsRead}>
-              Mark all read
+              {t('notificationCenter.markAllRead')}
             </Button>
           )}
         </div>
@@ -45,7 +48,7 @@ export function NotificationCenter({
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Bell size={32} className="mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No notifications</p>
+              <p className="text-sm">{t('notificationCenter.noNotifications')}</p>
             </div>
           ) : (
             <div className="p-2">
@@ -80,6 +83,7 @@ export function NotificationCenter({
                         e.stopPropagation()
                         onDelete(notif.id)
                       }}
+                      aria-label={t('notifications.delete')}
                     >
                       <X size={14} />
                     </Button>

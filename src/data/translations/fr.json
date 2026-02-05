@@ -1891,5 +1891,107 @@
     "marginDescription": "Calcule les marges, le markup et les métriques de rentabilité",
     "complianceTitle": "Démo de Suivi de la Conformité",
     "complianceDescription": "Surveille l'expiration des documents et l'état de conformité"
+  },
+  "keyboardShortcuts": {
+    "title": "Raccourcis Clavier",
+    "description": "Utilisez ces raccourcis clavier pour naviguer et interagir avec WorkForce Pro plus efficacement.",
+    "categories": {
+      "navigation": "Navigation",
+      "general": "Général",
+      "tables": "Tableaux"
+    },
+    "shortcuts": {
+      "openQuickSearch": "Ouvrir la recherche rapide",
+      "showKeyboardShortcuts": "Afficher les raccourcis clavier",
+      "closeDialogs": "Fermer les dialogues ou modales",
+      "goToDashboard": "Aller au Tableau de Bord",
+      "goToTimesheets": "Aller aux Feuilles de Temps",
+      "goToBilling": "Aller à la Facturation",
+      "goToPayroll": "Aller à la Paie",
+      "goToCompliance": "Aller à la Conformité",
+      "openNotifications": "Ouvrir les notifications",
+      "moveFocusForward": "Déplacer le focus vers l'avant",
+      "moveFocusBackward": "Déplacer le focus vers l'arrière",
+      "activateButton": "Activer le bouton ou le lien",
+      "toggleCheckbox": "Basculer la case à cocher ou la sélection",
+      "navigateTableCells": "Naviguer dans les cellules du tableau",
+      "openRowDetails": "Ouvrir les détails de la ligne",
+      "selectAllRows": "Sélectionner toutes les lignes"
+    },
+    "note": "Note :",
+    "macNote": "Sur Mac, utilisez {{cmd}} au lieu de {{ctrl}}"
+  },
+  "notificationCenter": {
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "noNotifications": "Aucune notification",
+    "noNotificationsDescription": "Vous êtes à jour !"
+  },
+  "createInvoiceDialog": {
+    "title": "Créer une Facture",
+    "description": "Générer une nouvelle facture pour la facturation",
+    "invoiceNumber": "Numéro de Facture",
+    "invoiceNumberPlaceholder": "FAC-2024-001",
+    "clientName": "Nom du Client",
+    "clientNamePlaceholder": "Entrez le nom du client",
+    "issueDate": "Date d'Émission",
+    "dueDate": "Date d'Échéance",
+    "amount": "Montant",
+    "amountPlaceholder": "0,00",
+    "currency": "Devise",
+    "type": "Type de Facture",
+    "paymentTerms": "Conditions de Paiement",
+    "paymentTermsPlaceholder": "ex : Net 30",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes supplémentaires",
+    "cancel": "Annuler",
+    "create": "Créer la Facture",
+    "invoiceTypes": {
+      "timesheet": "Feuille de Temps",
+      "permanentPlacement": "Placement Permanent",
+      "creditNote": "Note de Crédit",
+      "adhoc": "Ad-hoc"
+    },
+    "validation": {
+      "invoiceNumberRequired": "Le numéro de facture est requis",
+      "clientNameRequired": "Le nom du client est requis",
+      "issueDateRequired": "La date d'émission est requise",
+      "dueDateRequired": "La date d'échéance est requise",
+      "amountRequired": "Le montant est requis",
+      "amountPositive": "Le montant doit être un nombre positif",
+      "currencyRequired": "La devise est requise"
+    },
+    "creating": "Création de la facture...",
+    "success": "Facture créée avec succès",
+    "error": "Échec de la création de la facture"
+  },
+  "createPayrollDialog": {
+    "title": "Créer un Traitement de Paie",
+    "description": "Traiter la paie pour les feuilles de temps approuvées",
+    "periodEnding": "Fin de Période",
+    "processingType": "Type de Traitement",
+    "processingTypes": {
+      "allApproved": "Toutes les Feuilles de Temps Approuvées",
+      "selectedWorkers": "Travailleurs Sélectionnés",
+      "oneClick": "Un Clic (Sélection Auto)"
+    },
+    "selectedWorkers": "Travailleurs Sélectionnés",
+    "selectWorkers": "Sélectionnez les travailleurs à inclure dans ce traitement de paie",
+    "availableTimesheets": "Feuilles de Temps Disponibles",
+    "timesheetsFound": "{{count}} feuilles de temps approuvées trouvées",
+    "noTimesheets": "Aucune feuille de temps approuvée disponible",
+    "totalHours": "Heures Totales",
+    "totalAmount": "Montant Total",
+    "workerCount": "Nombre de Travailleurs",
+    "summary": "Résumé de la Paie",
+    "cancel": "Annuler",
+    "create": "Créer la Paie",
+    "validation": {
+      "periodEndingRequired": "La date de fin de période est requise",
+      "noTimesheetsSelected": "Aucune feuille de temps disponible pour la paie"
+    },
+    "creating": "Création du traitement de paie...",
+    "success": "Traitement de paie créé avec succès",
+    "error": "Échec de la création du traitement de paie"
   }
 }
