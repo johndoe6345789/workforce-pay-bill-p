@@ -218,15 +218,15 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
                       </div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Client</p>
+                          <p className="text-muted-foreground">{t('contractValidator.client')}</p>
                           <p className="font-medium">{timesheet.clientName}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Week Ending</p>
+                          <p className="text-muted-foreground">{t('contractValidator.weekEnding')}</p>
                           <p className="font-medium">{new Date(timesheet.weekEnding).toLocaleDateString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Hours</p>
+                          <p className="text-muted-foreground">{t('contractValidator.hours')}</p>
                           <p className="font-medium font-mono">{timesheet.hours}</p>
                         </div>
                       </div>

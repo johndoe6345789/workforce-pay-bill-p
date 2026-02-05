@@ -316,27 +316,27 @@ export function HolidayPayManager() {
                         <div>
                           <h3 className="font-semibold text-lg">{accrual.workerName}</h3>
                           <p className="text-sm text-muted-foreground">
-                            Last updated {new Date(accrual.lastUpdated).toLocaleDateString()}
+                            {t('holidayPay.lastUpdated', { date: new Date(accrual.lastUpdated).toLocaleDateString() })}
                           </p>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Accrued</p>
-                          <p className="font-semibold font-mono text-lg">{accrual.accruedDays.toFixed(1)} days</p>
+                          <p className="text-muted-foreground">{t('holidayPay.accrued')}</p>
+                          <p className="font-semibold font-mono text-lg">{t('holidayPay.daysLabel', { count: accrual.accruedDays.toFixed(1) })}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Taken</p>
-                          <p className="font-semibold font-mono text-lg">{accrual.takenDays.toFixed(1)} days</p>
+                          <p className="text-muted-foreground">{t('holidayPay.taken')}</p>
+                          <p className="font-semibold font-mono text-lg">{t('holidayPay.daysLabel', { count: accrual.takenDays.toFixed(1) })}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Remaining</p>
+                          <p className="text-muted-foreground">{t('holidayPay.remaining')}</p>
                           <p className={cn(
                             "font-semibold font-mono text-lg",
                             accrual.remainingDays < 5 ? "text-warning" : "text-success"
                           )}>
-                            {accrual.remainingDays.toFixed(1)} days
+                            {t('holidayPay.daysLabel', { count: accrual.remainingDays.toFixed(1) })}
                           </p>
                         </div>
                       </div>
@@ -352,8 +352,8 @@ export function HolidayPayManager() {
           {requests.length === 0 ? (
             <Card className="p-12 text-center">
               <Airplane size={48} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No holiday requests</h3>
-              <p className="text-muted-foreground">Create a new holiday request to get started</p>
+              <h3 className="text-lg font-semibold mb-2">{t('holidayPay.noRequests')}</h3>
+              <p className="text-muted-foreground">{t('holidayPay.noRequestsDescription')}</p>
             </Card>
           ) : (
             requests.map((request) => (
@@ -372,26 +372,26 @@ export function HolidayPayManager() {
                               request.status === 'approved' ? 'success' :
                               request.status === 'rejected' ? 'destructive' : 'warning'
                             }>
-                              {request.status}
+                              {t(`holidayPay.status.${request.status}`)}
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Requested on {new Date(request.requestedDate).toLocaleDateString()}
+                            {t('holidayPay.requestedOn', { date: new Date(request.requestedDate).toLocaleDateString() })}
                           </p>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Start Date</p>
+                          <p className="text-muted-foreground">{t('holidayPay.startDate')}</p>
                           <p className="font-medium">{new Date(request.startDate).toLocaleDateString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">End Date</p>
+                          <p className="text-muted-foreground">{t('holidayPay.endDate')}</p>
                           <p className="font-medium">{new Date(request.endDate).toLocaleDateString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Days</p>
+                          <p className="text-muted-foreground">{t('holidayPay.days')}</p>
                           <p className="font-semibold font-mono">{request.days}</p>
                         </div>
                       </div>
@@ -402,10 +402,10 @@ export function HolidayPayManager() {
                         <Button size="sm" onClick={() => handleApproveRequest(request.id)}
                           style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}>
                           <CheckCircle size={16} className="mr-2" />
-                          Approve
+                          {t('holidayPay.approve')}
                         </Button>
                         <Button size="sm" variant="destructive" onClick={() => handleRejectRequest(request.id)}>
-                          Reject
+                          {t('holidayPay.reject')}
                         </Button>
                       </div>
                     )}
@@ -422,9 +422,9 @@ export function HolidayPayManager() {
           <div className="flex items-center gap-3">
             <Calculator size={24} className="text-primary" />
             <div>
-              <p className="font-medium">Accrual Calculation</p>
+              <p className="font-medium">{t('holidayPay.accrualCalculation')}</p>
               <p className="text-sm text-muted-foreground">
-                Holiday pay accrues at {STANDARD_ACCRUAL_RATE}% of hours worked (5.6 weeks per year statutory minimum)
+                {t('holidayPay.accrualCalculationDescription', { rate: STANDARD_ACCRUAL_RATE })}
               </p>
             </div>
           </div>

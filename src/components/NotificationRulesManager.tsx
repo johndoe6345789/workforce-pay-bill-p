@@ -169,29 +169,29 @@ export function NotificationRulesManager() {
             </DialogHeader>
             <div className="space-y-4 py-4 max-h-[60vh] overflow-auto">
               <div className="space-y-2">
-                <Label htmlFor="rule-name">Rule Name *</Label>
+                <Label htmlFor="rule-name">{t('notificationRules.ruleNameLabel')}</Label>
                 <Input
                   id="rule-name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Timesheet Approval Notification"
+                  placeholder={t('notificationRules.ruleNamePlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="rule-desc">Description</Label>
+                <Label htmlFor="rule-desc">{t('notificationRules.descriptionLabel')}</Label>
                 <Textarea
                   id="rule-desc"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Notify managers when a new timesheet is submitted"
+                  placeholder={t('notificationRules.descriptionPlaceholder')}
                   rows={2}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="trigger-event">Trigger Event *</Label>
+                  <Label htmlFor="trigger-event">{t('notificationRules.triggerEventLabel')}</Label>
                   <Select 
                     value={formData.triggerEvent} 
                     onValueChange={(v: TriggerEvent) => setFormData({ ...formData, triggerEvent: v })}
@@ -200,21 +200,21 @@ export function NotificationRulesManager() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="timesheet-submitted">Timesheet Submitted</SelectItem>
-                      <SelectItem value="timesheet-approved">Timesheet Approved</SelectItem>
-                      <SelectItem value="timesheet-rejected">Timesheet Rejected</SelectItem>
-                      <SelectItem value="invoice-generated">Invoice Generated</SelectItem>
-                      <SelectItem value="invoice-overdue">Invoice Overdue</SelectItem>
-                      <SelectItem value="compliance-expiring">Compliance Expiring</SelectItem>
-                      <SelectItem value="compliance-expired">Compliance Expired</SelectItem>
-                      <SelectItem value="expense-submitted">Expense Submitted</SelectItem>
-                      <SelectItem value="payroll-completed">Payroll Completed</SelectItem>
+                      <SelectItem value="timesheet-submitted">{t('notificationRules.events.timesheetSubmitted')}</SelectItem>
+                      <SelectItem value="timesheet-approved">{t('notificationRules.events.timesheetApproved')}</SelectItem>
+                      <SelectItem value="timesheet-rejected">{t('notificationRules.events.timesheetRejected')}</SelectItem>
+                      <SelectItem value="invoice-generated">{t('notificationRules.events.invoiceGenerated')}</SelectItem>
+                      <SelectItem value="invoice-overdue">{t('notificationRules.events.invoiceOverdue')}</SelectItem>
+                      <SelectItem value="compliance-expiring">{t('notificationRules.events.complianceExpiring')}</SelectItem>
+                      <SelectItem value="compliance-expired">{t('notificationRules.events.complianceExpired')}</SelectItem>
+                      <SelectItem value="expense-submitted">{t('notificationRules.events.expenseSubmitted')}</SelectItem>
+                      <SelectItem value="payroll-completed">{t('notificationRules.events.payrollCompleted')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="priority">Priority *</Label>
+                  <Label htmlFor="priority">{t('notificationRules.priorityLabel')}</Label>
                   <Select 
                     value={formData.priority} 
                     onValueChange={(v: NotificationPriority) => setFormData({ ...formData, priority: v })}
@@ -223,10 +223,10 @@ export function NotificationRulesManager() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
+                      <SelectItem value="low">{t('notificationRules.priorities.low')}</SelectItem>
+                      <SelectItem value="medium">{t('notificationRules.priorities.medium')}</SelectItem>
+                      <SelectItem value="high">{t('notificationRules.priorities.high')}</SelectItem>
+                      <SelectItem value="urgent">{t('notificationRules.priorities.urgent')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -234,7 +234,7 @@ export function NotificationRulesManager() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="channel">Channel *</Label>
+                  <Label htmlFor="channel">{t('notificationRules.channelLabel')}</Label>
                   <Select 
                     value={formData.channel} 
                     onValueChange={(v: NotificationChannel) => setFormData({ ...formData, channel: v })}
@@ -243,37 +243,37 @@ export function NotificationRulesManager() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="in-app">In-App Only</SelectItem>
-                      <SelectItem value="email">Email Only</SelectItem>
-                      <SelectItem value="both">In-App & Email</SelectItem>
+                      <SelectItem value="in-app">{t('notificationRules.channels.inAppOnly')}</SelectItem>
+                      <SelectItem value="email">{t('notificationRules.channels.emailOnly')}</SelectItem>
+                      <SelectItem value="both">{t('notificationRules.channels.inAppAndEmail')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="delay">Delay (minutes)</Label>
+                  <Label htmlFor="delay">{t('notificationRules.delayLabel')}</Label>
                   <Input
                     id="delay"
                     type="number"
                     min="0"
                     value={formData.delayMinutes}
                     onChange={(e) => setFormData({ ...formData, delayMinutes: parseInt(e.target.value) || 0 })}
-                    placeholder="0"
+                    placeholder={t('notificationRules.delayPlaceholder')}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message-template">Message Template *</Label>
+                <Label htmlFor="message-template">{t('notificationRules.messageTemplateLabel')}</Label>
                 <Textarea
                   id="message-template"
                   value={formData.messageTemplate}
                   onChange={(e) => setFormData({ ...formData, messageTemplate: e.target.value })}
-                  placeholder="New timesheet submitted by {workerName} for {clientName}"
+                  placeholder={t('notificationRules.messageTemplatePlaceholder')}
                   rows={3}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Use placeholders like {'{workerName}'}, {'{clientName}'}, {'{amount}'}, etc.
+                  {t('notificationRules.messageTemplateHelper')}
                 </p>
               </div>
 
@@ -283,7 +283,7 @@ export function NotificationRulesManager() {
                   checked={formData.enabled}
                   onCheckedChange={(checked) => setFormData({ ...formData, enabled: checked })}
                 />
-                <Label htmlFor="rule-enabled">Enable this rule</Label>
+                <Label htmlFor="rule-enabled">{t('notificationRules.enableThisRule')}</Label>
               </div>
             </div>
             <div className="flex justify-end gap-2">
@@ -292,10 +292,10 @@ export function NotificationRulesManager() {
                 setEditingRule(null)
                 resetForm()
               }}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button onClick={editingRule ? handleUpdate : handleCreate}>
-                {editingRule ? 'Update' : 'Create'} Rule
+                {editingRule ? t('common.edit') : t('common.add')} {t('notificationRules.ruleName')}
               </Button>
             </div>
           </DialogContent>
@@ -305,7 +305,7 @@ export function NotificationRulesManager() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Total Rules</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('notificationRules.totalRules')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{rules.length}</div>
@@ -314,7 +314,7 @@ export function NotificationRulesManager() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Active Rules</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('notificationRules.activeRules')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold text-success">{activeRules.length}</div>
@@ -323,7 +323,7 @@ export function NotificationRulesManager() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Inactive Rules</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('notificationRules.inactiveRules')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold text-muted-foreground">{inactiveRules.length}</div>
@@ -335,8 +335,8 @@ export function NotificationRulesManager() {
         {rules.length === 0 ? (
           <Card className="p-12 text-center">
             <Bell size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No notification rules</h3>
-            <p className="text-muted-foreground">Create your first rule to automate notifications</p>
+            <h3 className="text-lg font-semibold mb-2">{t('notificationRules.noRules')}</h3>
+            <p className="text-muted-foreground">{t('notificationRules.noRulesDescription')}</p>
           </Card>
         ) : (
           rules.map(rule => (
@@ -361,10 +361,10 @@ export function NotificationRulesManager() {
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold">{rule.name}</h3>
                           <Badge variant={rule.enabled ? 'success' : 'secondary'}>
-                            {rule.enabled ? 'Active' : 'Inactive'}
+                            {rule.enabled ? t('statuses.active') : t('statuses.inactive')}
                           </Badge>
                           <Badge variant="outline" className="capitalize">
-                            {rule.priority}
+                            {t(`notificationRules.priorities.${rule.priority}`)}
                           </Badge>
                         </div>
                         {rule.description && (
@@ -375,26 +375,26 @@ export function NotificationRulesManager() {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Trigger</p>
+                        <p className="text-muted-foreground">{t('notificationRules.trigger')}</p>
                         <p className="font-medium capitalize">{rule.triggerEvent.replace('-', ' ')}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Channel</p>
+                        <p className="text-muted-foreground">{t('notificationRules.channel')}</p>
                         <p className="font-medium capitalize">{rule.channel.replace('-', ' ')}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Delay</p>
-                        <p className="font-medium">{rule.delayMinutes || 0} min</p>
+                        <p className="text-muted-foreground">{t('notificationRules.delay')}</p>
+                        <p className="font-medium">{t('notificationRules.minLabel', { value: rule.delayMinutes || 0 })}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Recipients</p>
-                        <p className="font-medium">{rule.recipients.length || 'All'}</p>
+                        <p className="text-muted-foreground">{t('notificationRules.recipients')}</p>
+                        <p className="font-medium">{rule.recipients.length ? t('notificationRules.recipientCount', { count: rule.recipients.length }) : t('notificationRules.allRecipients')}</p>
                       </div>
                     </div>
 
                     <details className="text-sm">
                       <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                        View message template
+                        {t('notificationRules.viewMessageTemplate')}
                       </summary>
                       <p className="mt-2 p-3 bg-muted rounded-lg font-mono text-xs">
                         {rule.messageTemplate}

@@ -473,22 +473,22 @@ export function ShiftPatternManager() {
                     <div className="flex flex-wrap gap-1">
                       {pattern.daysOfWeek.map(day => (
                         <Badge key={day} variant="outline" className="text-xs">
-                          {day.substring(0, 3).toUpperCase()}
+                          {t(`shiftPatterns.daysOfWeekShort.${day}`)}
                         </Badge>
                       ))}
                     </div>
 
                     <div className="bg-muted/30 rounded-lg p-3 text-xs space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Weekly hours:</span>
-                        <span className="font-mono font-medium">{(hours * pattern.daysOfWeek.length).toFixed(2)}h</span>
+                        <span className="text-muted-foreground">{t('shiftPatterns.weeklyHours')}:</span>
+                        <span className="font-mono font-medium">{t('shiftPatterns.hoursLabel', { hours: (hours * pattern.daysOfWeek.length).toFixed(2) })}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Break time:</span>
+                        <span className="text-muted-foreground">{t('shiftPatterns.breakTime')}:</span>
                         <span className="font-mono font-medium">{pattern.defaultBreakMinutes} mins</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Times used:</span>
+                        <span className="text-muted-foreground">{t('shiftPatterns.timesUsed')}:</span>
                         <span className="font-mono font-medium">{pattern.usageCount}</span>
                       </div>
                     </div>
@@ -501,7 +501,7 @@ export function ShiftPatternManager() {
                         onClick={() => handleEditPattern(pattern)}
                       >
                         <PencilSimple size={16} className="mr-2" />
-                        Edit
+                        {t('shiftPatterns.edit')}
                       </Button>
                       <Button 
                         size="sm" 
@@ -509,7 +509,7 @@ export function ShiftPatternManager() {
                         onClick={() => handleDuplicatePattern(pattern)}
                       >
                         <Copy size={16} className="mr-2" />
-                        Duplicate
+                        {t('shiftPatterns.duplicate')}
                       </Button>
                       <Button 
                         size="sm" 
