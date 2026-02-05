@@ -11,7 +11,8 @@ import {
   Trash,
   Stack as StackIcon,
   CheckCircle,
-  FileText
+  FileText,
+  Eye
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -22,6 +23,8 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
 import { MetricCard } from '@/components/ui/metric-card'
+import { AdvancedDataTable } from '@/components/AdvancedDataTable'
+import { TableColumn } from '@/hooks/use-advanced-table'
 import { PayrollDetailDialog } from '@/components/PayrollDetailDialog'
 import { OneClickPayroll } from '@/components/OneClickPayroll'
 import { CreatePayrollDialog } from '@/components/CreatePayrollDialog'
@@ -147,6 +150,95 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
       toast.error(t('payroll.payrollDeleteError'))
     }
   }, [deletePayrollRun, viewingPayroll, t])
+
+  const payrollColumns: TableColumn<any>[] = useMemo(() => [
+    {
+      key: 'periodEnding',
+      label: t('payroll.periodEnding'),
+      sortable: true,
+      render: (value) => new Date(value as string).toLocaleDateString()
+    },
+    {
+      key: 'workersCount',
+      label: t('payroll.workers'),
+      sortable: true,
+    },
+    {
+      key: 'totalAmount',
+      label: t('payroll.totalAmount'),
+      sortable: true,
+      render: (value) => <span className="font-mono font-semibold">£{(value as number).toLocaleString()}</span>
+    },
+    {
+      key: 'processedDate',
+      label: t('payroll.processed'),
+      sortable: true,
+      render: (value) => value ? new Date(value as string).toLocaleDateString() : t('payroll.notYet')
+    },
+    {
+      key: 'status',
+      label: t('common.status'),
+      sortable: true,
+      render: (value) => (
+        <Badge variant={
+          value === 'completed' ? 'success' : 
+          value === 'failed' ? 'destructive' : 
+          'warning'
+        }>
+          {t(`payroll.status.${value}`)}
+        </Badge>
+      )
+    },
+    {
+      key: 'id',
+      label: t('common.actions'),
+      sortable: false,
+      render: (_, row) => (
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setViewingPayroll(row)}
+            title={t('payroll.viewDetails')}
+          >
+            <Eye size={16} />
+          </Button>
+          {row.status === 'completed' && (
+            <>
+              <Button 
+                size="sm" 
+                variant="ghost"
+                className="text-primary hover:text-primary"
+                onClick={() => {
+                  setSelectedPayrollForPAYE(row.id)
+                  setShowCreatePAYE(true)
+                }}
+                title={t('payroll.createPAYE')}
+              >
+                <FileText size={16} />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost"
+                title={t('payroll.export')}
+              >
+                <Download size={16} />
+              </Button>
+            </>
+          )}
+          <Button 
+            size="sm" 
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            onClick={() => handleDeletePayrollRun(row.id)}
+            title={t('common.delete')}
+          >
+            <Trash size={16} />
+          </Button>
+        </div>
+      )
+    }
+  ], [t, handleDeletePayrollRun])
   
   return (
     <Stack spacing={6}>
@@ -354,88 +446,16 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
             />
           </Grid>
 
-          <Stack spacing={3}>
-            {payrollRuns.map(run => (
-              <Card 
-                key={run.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setViewingPayroll(run)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <Stack spacing={2} className="flex-1">
-                      <Stack direction="horizontal" spacing={3} align="center">
-                        <CurrencyDollar size={20} weight="fill" className="text-primary" />
-                        <h3 className="font-semibold text-lg">{t('payroll.payrollRun')}</h3>
-                        <Badge variant={run.status === 'completed' ? 'success' : run.status === 'failed' ? 'destructive' : 'warning'}>
-                          {t(`payroll.status.${run.status}`)}
-                        </Badge>
-                      </Stack>
-                      <Grid cols={4} gap={4} className="text-sm">
-                        <div>
-                          <p className="text-muted-foreground">{t('payroll.periodEnding')}</p>
-                          <p className="font-medium">{new Date(run.periodEnding).toLocaleDateString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">{t('payroll.workers')}</p>
-                          <p className="font-medium">{run.workersCount}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">{t('payroll.totalAmount')}</p>
-                          <p className="font-semibold font-mono text-lg">£{run.totalAmount.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">{t('payroll.processed')}</p>
-                          <p className="font-medium">
-                            {run.processedDate ? new Date(run.processedDate).toLocaleDateString() : t('payroll.notYet')}
-                          </p>
-                        </div>
-                      </Grid>
-                    </Stack>
-                    <Stack direction="horizontal" spacing={2} className="ml-4" onClick={(e) => e.stopPropagation()}>
-                      <Button size="sm" variant="outline" onClick={() => setViewingPayroll(run)}>
-                        {t('payroll.viewDetails')}
-                      </Button>
-                      {run.status === 'completed' && (
-                        <>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              setSelectedPayrollForPAYE(run.id)
-                              setShowCreatePAYE(true)
-                            }}
-                          >
-                            <FileText size={16} className="mr-2" />
-                            {t('payroll.createPAYE')}
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Download size={16} className="mr-2" />
-                            {t('payroll.export')}
-                          </Button>
-                        </>
-                      )}
-                      <Button 
-                        size="sm" 
-                        variant="destructive"
-                        onClick={() => handleDeletePayrollRun(run.id)}
-                      >
-                        <Trash size={16} />
-                      </Button>
-                    </Stack>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {payrollRuns.length === 0 && (
-              <Card className="p-12 text-center">
-                <CurrencyDollar size={48} className="mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{t('payroll.noPayrollRunsYet')}</h3>
-                <p className="text-muted-foreground">{t('payroll.createFirstPayroll')}</p>
-              </Card>
-            )}
-          </Stack>
+          <AdvancedDataTable
+            data={payrollRuns}
+            columns={payrollColumns}
+            rowKey="id"
+            onRowClick={(run) => setViewingPayroll(run)}
+            emptyMessage={t('payroll.noPayrollRunsYet')}
+            showSearch={true}
+            showPagination={true}
+            initialPageSize={20}
+          />
         </TabsContent>
 
         <TabsContent value="batch-processing" className="space-y-6">
