@@ -7,7 +7,8 @@ import {
   ClockCounterClockwise,
   XCircle,
   Camera,
-  CurrencyDollar
+  CurrencyDollar,
+  CaretDown
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +19,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PageHeader } from '@/components/ui/page-header'
 import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
@@ -27,6 +29,7 @@ import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
 import { usePermissions } from '@/hooks/use-permissions'
 import { useTranslation } from '@/hooks/use-translation'
+import { useDataExport } from '@/hooks/use-data-export'
 import type { Expense, ExpenseStatus } from '@/lib/types'
 
 interface ExpensesViewProps {
@@ -56,6 +59,7 @@ export function ExpensesView({
 }: ExpensesViewProps) {
   const { t } = useTranslation()
   const { hasPermission } = usePermissions()
+  const { exportData } = useDataExport()
   const [statusFilter, setStatusFilter] = useState<'all' | ExpenseStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [viewingExpense, setViewingExpense] = useState<Expense | null>(null)
@@ -76,6 +80,33 @@ export function ExpensesView({
   const handleResultsChange = useCallback((results: Expense[]) => {
     setFilteredExpenses(results)
   }, [])
+  
+  const handleExport = useCallback((format: 'csv' | 'json' | 'xlsx') => {
+    try {
+      const exportData_ = filteredExpenses.map(expense => ({
+        workerName: expense.workerName,
+        clientName: expense.clientName,
+        date: expense.date,
+        category: expense.category,
+        description: expense.description,
+        amount: expense.amount,
+        currency: expense.currency,
+        status: expense.status,
+        billable: expense.billable,
+        submittedDate: expense.submittedDate,
+        approvedDate: expense.approvedDate || ''
+      }))
+      
+      exportData(exportData_, {
+        filename: `expenses-${new Date().toISOString().split('T')[0]}`,
+        format,
+      })
+      
+      toast.success(t('common.exportSuccess', { format: format.toUpperCase() }))
+    } catch (error) {
+      toast.error(t('common.exportError'))
+    }
+  }, [filteredExpenses, exportData, t])
 
   const pendingExpenses = useMemo(() => 
     expenses.filter(e => e.status === 'pending'),
@@ -319,10 +350,26 @@ export function ExpensesView({
             <SelectItem value="paid">{t('expenses.status.paid')}</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline">
-          <Download size={18} className="mr-2" />
-          {t('expenses.export')}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Download size={18} className="mr-2" />
+              {t('common.export')}
+              <CaretDown size={16} className="ml-2" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleExport('csv')}>
+              {t('common.exportAs', { format: 'CSV' })}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport('xlsx')}>
+              {t('common.exportAs', { format: 'Excel' })}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport('json')}>
+              {t('common.exportAs', { format: 'JSON' })}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </Stack>
 
       <Tabs defaultValue="pending" className="space-y-4">

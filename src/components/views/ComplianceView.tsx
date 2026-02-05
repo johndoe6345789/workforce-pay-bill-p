@@ -4,7 +4,9 @@ import {
   Warning,
   XCircle,
   CheckCircle,
-  FileText
+  FileText,
+  Download,
+  CaretDown
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { PageHeader } from '@/components/ui/page-header'
 import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
@@ -21,6 +24,7 @@ import { MetricCard } from '@/components/ui/metric-card'
 import { toast } from 'sonner'
 import { ComplianceDetailDialog } from '@/components/ComplianceDetailDialog'
 import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
+import { useDataExport } from '@/hooks/use-data-export'
 import { cn } from '@/lib/utils'
 import type { ComplianceDocument } from '@/lib/types'
 import { useTranslation } from '@/hooks/use-translation'
@@ -37,6 +41,7 @@ interface ComplianceViewProps {
 
 export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceViewProps) {
   const { t } = useTranslation()
+  const { exportData } = useDataExport()
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [viewingDocument, setViewingDocument] = useState<ComplianceDocument | null>(null)
   const [filteredDocs, setFilteredDocs] = useState<ComplianceDocument[]>([])
@@ -48,6 +53,28 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
   const handleResultsChange = useCallback((results: ComplianceDocument[]) => {
     setFilteredDocs(results)
   }, [])
+  
+  const handleExport = useCallback((format: 'csv' | 'json' | 'xlsx') => {
+    try {
+      const exportData_ = filteredDocs.map(doc => ({
+        workerId: doc.workerId,
+        workerName: doc.workerName,
+        documentType: doc.documentType,
+        status: doc.status,
+        expiryDate: doc.expiryDate,
+        daysUntilExpiry: doc.daysUntilExpiry
+      }))
+      
+      exportData(exportData_, {
+        filename: `compliance-documents-${new Date().toISOString().split('T')[0]}`,
+        format,
+      })
+      
+      toast.success(t('common.exportSuccess', { format: format.toUpperCase() }))
+    } catch (error) {
+      toast.error(t('common.exportError'))
+    }
+  }, [filteredDocs, exportData, t])
   
   const expiringDocs = filteredDocs.filter(d => d.status === 'expiring')
   const expiredDocs = filteredDocs.filter(d => d.status === 'expired')
@@ -180,6 +207,29 @@ export function ComplianceView({ complianceDocs, onUploadDocument }: ComplianceV
         onResultsChange={handleResultsChange}
         placeholder={t('compliance.searchPlaceholder')}
       />
+
+      <Stack direction="horizontal" spacing={2} justify="end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Download size={18} className="mr-2" />
+              {t('common.export')}
+              <CaretDown size={16} className="ml-2" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleExport('csv')}>
+              {t('common.exportAs', { format: 'CSV' })}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport('xlsx')}>
+              {t('common.exportAs', { format: 'Excel' })}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport('json')}>
+              {t('common.exportAs', { format: 'JSON' })}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </Stack>
 
       <Grid cols={3} gap={4}>
         <MetricCard
