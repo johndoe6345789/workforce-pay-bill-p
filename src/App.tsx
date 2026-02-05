@@ -33,6 +33,7 @@ function App() {
   const currentEntity = useAppSelector(state => state.auth.currentEntity)
   const currentView = useAppSelector(state => state.ui.currentView)
   const searchQuery = useAppSelector(state => state.ui.searchQuery)
+  const translationsReady = useAppSelector(state => state.ui.translationsReady)
   const isDevelopment = import.meta.env.DEV
   const mainContentRef = useRef<HTMLElement>(null)
   const [showShortcuts, setShowShortcuts] = useState(false)
@@ -41,7 +42,7 @@ function App() {
   useSampleData()
   useSampleWorkflowTemplates()
   useViewPreload()
-  useLocaleInit()
+  const { isPreloading } = useLocaleInit()
   useSkipLink(mainContentRef, 'Skip to main content')
   const { destroySession } = useSessionStorage()
   const { preferences: timeoutPreferences } = useSessionTimeoutPreferences()
@@ -131,6 +132,10 @@ function App() {
 
   if (!isAuthenticated) {
     return <LoginScreen />
+  }
+
+  if (isPreloading || !translationsReady) {
+    return null
   }
 
   return (

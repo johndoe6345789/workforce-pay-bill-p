@@ -9,6 +9,7 @@ interface UIState {
   searchQuery: string
   sidebarCollapsed: boolean
   locale: Locale
+  translationsReady: boolean
 }
 
 const initialState: UIState = {
@@ -16,6 +17,7 @@ const initialState: UIState = {
   searchQuery: '',
   sidebarCollapsed: false,
   locale: 'en',
+  translationsReady: false,
 }
 
 const uiSlice = createSlice({
@@ -34,8 +36,11 @@ const uiSlice = createSlice({
     setLocale: (state, action: PayloadAction<Locale>) => {
       state.locale = action.payload
     },
+    setTranslationsReady: (state, action: PayloadAction<boolean>) => {
+      state.translationsReady = action.payload
+    },
   },
 })
 
-export const { setCurrentView, setSearchQuery, toggleSidebar, setLocale } = uiSlice.actions
+export const { setCurrentView, setSearchQuery, toggleSidebar, setLocale, setTranslationsReady } = uiSlice.actions
 export default uiSlice.reducer

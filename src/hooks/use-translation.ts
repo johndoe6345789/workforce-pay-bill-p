@@ -9,32 +9,68 @@ type Locale = 'en' | 'es' | 'fr'
 const AVAILABLE_LOCALES: Locale[] = ['en', 'es', 'fr']
 const DEFAULT_LOCALE: Locale = 'en'
 
+const translationsCache: Map<Locale, Translations> = new Map()
+const loadingPromises: Map<Locale, Promise<Translations>> = new Map()
+
+async function loadTranslationFile(locale: Locale): Promise<Translations> {
+  if (translationsCache.has(locale)) {
+    return translationsCache.get(locale)!
+  }
+
+  if (loadingPromises.has(locale)) {
+    return loadingPromises.get(locale)!
+  }
+
+  const promise = import(`@/data/translations/${locale}.json`)
+    .then(response => {
+      const translations = response.default || response
+      translationsCache.set(locale, translations)
+      loadingPromises.delete(locale)
+      return translations
+    })
+    .catch(err => {
+      loadingPromises.delete(locale)
+      throw err
+    })
+
+  loadingPromises.set(locale, promise)
+  return promise
+}
+
 export function useTranslation() {
   const dispatch = useAppDispatch()
   const reduxLocale = useAppSelector(state => state.ui.locale)
   const [, setDBLocale] = useIndexedDBState<Locale>('app-locale', DEFAULT_LOCALE)
-  const [translations, setTranslations] = useState<Translations>({})
-  const [isLoading, setIsLoading] = useState(true)
+  const [translations, setTranslations] = useState<Translations>(() => 
+    translationsCache.get(reduxLocale) || {}
+  )
+  const [isLoading, setIsLoading] = useState(!translationsCache.has(reduxLocale))
   const [error, setError] = useState<Error | null>(null)
 
   const locale = reduxLocale
 
   useEffect(() => {
     const loadTranslations = async () => {
+      if (translationsCache.has(locale)) {
+        setTranslations(translationsCache.get(locale)!)
+        setIsLoading(false)
+        return
+      }
+
       try {
         setIsLoading(true)
         setError(null)
         
-        const response = await import(`@/data/translations/${locale}.json`)
-        setTranslations(response.default || response)
+        const loadedTranslations = await loadTranslationFile(locale)
+        setTranslations(loadedTranslations)
       } catch (err) {
         console.error(`Failed to load translations for locale: ${locale}`, err)
         setError(err as Error)
         
         if (locale !== DEFAULT_LOCALE) {
           try {
-            const fallbackResponse = await import(`@/data/translations/${DEFAULT_LOCALE}.json`)
-            setTranslations(fallbackResponse.default || fallbackResponse)
+            const fallbackTranslations = await loadTranslationFile(DEFAULT_LOCALE)
+            setTranslations(fallbackTranslations)
           } catch (fallbackErr) {
             console.error('Failed to load fallback translations', fallbackErr)
           }
@@ -72,10 +108,15 @@ export function useTranslation() {
     return value
   }, [translations])
 
-  const changeLocale = useCallback((newLocale: Locale) => {
+  const changeLocale = useCallback(async (newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
-      dispatch(setReduxLocale(newLocale))
-      setDBLocale(newLocale)
+      try {
+        await loadTranslationFile(newLocale)
+        dispatch(setReduxLocale(newLocale))
+        setDBLocale(newLocale)
+      } catch (err) {
+        console.error(`Failed to change locale to ${newLocale}`, err)
+      }
     }
   }, [dispatch, setDBLocale])
 
@@ -98,10 +139,16 @@ export function useChangeLocale() {
   const dispatch = useAppDispatch()
   const [, setDBLocale] = useIndexedDBState<Locale>('app-locale', DEFAULT_LOCALE)
   
-  return useCallback((newLocale: Locale) => {
+  return useCallback(async (newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
       dispatch(setReduxLocale(newLocale))
       setDBLocale(newLocale)
+      
+      try {
+        await loadTranslationFile(newLocale)
+      } catch (err) {
+        console.error(`Failed to load translations for ${newLocale}`, err)
+      }
     }
   }, [dispatch, setDBLocale])
 }
