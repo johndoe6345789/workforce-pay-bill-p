@@ -108,6 +108,13 @@ export function ReportsNav({ currentView, setCurrentView, expandedGroups, toggle
         view="custom-reports"
       />
       <NavItem
+        icon={<Clock size={20} />}
+        label="Scheduled Reports"
+        active={currentView === 'scheduled-reports'}
+        onClick={() => setCurrentView('scheduled-reports')}
+        view="scheduled-reports"
+      />
+      <NavItem
         icon={<ClockCounterClockwise size={20} />}
         label="Missing Timesheets"
         active={currentView === 'missing-timesheets'}

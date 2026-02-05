@@ -50,6 +50,7 @@ const ProfileView = lazy(() => import('@/components/views/profile-view').then(m 
 const RolesPermissionsView = lazy(() => import('@/components/views/roles-permissions-view').then(m => ({ default: m.RolesPermissionsView })))
 const ApprovalWorkflowTemplateManager = lazy(() => import('@/components/ApprovalWorkflowTemplateManager').then(m => ({ default: m.ApprovalWorkflowTemplateManager })))
 const ParallelApprovalDemo = lazy(() => import('@/components/ParallelApprovalDemo').then(m => ({ default: m.ParallelApprovalDemo })))
+const ScheduledReportsManager = lazy(() => import('@/components/ScheduledReportsManager').then(m => ({ default: m.ScheduledReportsManager })))
 
 interface ViewRouterProps {
   currentView: View
@@ -269,6 +270,9 @@ export function ViewRouter({
 
     case 'parallel-approval-demo':
       return <ParallelApprovalDemo />
+
+    case 'scheduled-reports':
+      return <ScheduledReportsManager />
 
     default:
       return <DashboardView metrics={metrics} />

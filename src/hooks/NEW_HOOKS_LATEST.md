@@ -422,3 +422,59 @@ useIsomorphicLayoutEffect(() => {
 3. **Use `useBreakpoint`** for responsive logic instead of multiple media queries
 4. **Use `useEvent`** for stable callbacks in performance-critical scenarios
 5. **Use `useFavorites`** with the Spark KV store for persistence across sessions
+
+## Report Generation Hooks
+
+### `useScheduledReports`
+Comprehensive hook for managing scheduled automatic report generation with configurable schedules, formats, and delivery.
+
+```tsx
+const {
+  schedules,
+  executions,
+  createSchedule,
+  updateSchedule,
+  deleteSchedule,
+  pauseSchedule,
+  resumeSchedule,
+  runScheduleNow,
+  getSchedulesByType,
+  getExecutionHistory
+} = useScheduledReports()
+
+// Create a new scheduled report
+createSchedule({
+  name: 'Monthly Revenue Report',
+  type: 'revenue-summary',
+  frequency: 'monthly',
+  format: 'excel',
+  status: 'active',
+  recipients: ['manager@company.com'],
+  createdBy: 'user@company.com'
+})
+
+// Run a schedule immediately
+await runScheduleNow(scheduleId)
+
+// Pause/resume schedules
+pauseSchedule(scheduleId)
+resumeSchedule(scheduleId)
+
+// View execution history
+const history = getExecutionHistory(scheduleId)
+```
+
+**Report Types:**
+- `margin-analysis` - Monthly margin and profitability analysis
+- `revenue-summary` - Complete revenue breakdown
+- `payroll-summary` - Payroll run summaries
+- `timesheet-summary` - Timesheet status and hours
+- `expense-summary` - Expense submissions and approvals
+- `cash-flow` - Income vs expenses overview
+- `compliance-status` - Compliance metrics and rates
+- `worker-utilization` - Worker hours and utilization
+
+**Frequencies:** `daily`, `weekly`, `monthly`, `quarterly`
+
+**Formats:** `csv`, `excel`, `json`, `pdf` (pdf planned)
+

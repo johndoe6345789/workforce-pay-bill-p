@@ -88,6 +88,7 @@ This roadmap outlines the phased development plan for WorkForce Pro, a cloud-bas
 - ✅ Margin analysis and forecasting
 - ✅ Advanced reports view with multiple report types
 - ✅ Data export capabilities
+- ✅ Scheduled automatic report generation
 
 ---
 

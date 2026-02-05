@@ -123,7 +123,8 @@
             { "status": "completed", "text": "Missing timesheets report" },
             { "status": "completed", "text": "Margin analysis and forecasting" },
             { "status": "completed", "text": "Advanced reports view with multiple report types" },
-            { "status": "completed", "text": "Data export capabilities" }
+            { "status": "completed", "text": "Data export capabilities" },
+            { "status": "completed", "text": "Scheduled automatic report generation" }
           ]
         }
       ]
