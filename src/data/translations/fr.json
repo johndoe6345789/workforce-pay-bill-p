@@ -31,7 +31,16 @@
     "componentShowcase": "Composants",
     "businessLogicDemo": "Démo de Logique",
     "dataAdmin": "Admin de Données",
-    "roadmap": "Feuille de Route"
+    "roadmap": "Feuille de Route",
+    "scheduledReports": "Rapports Programmés",
+    "coreOperations": "Opérations Principales",
+    "reportsAnalytics": "Rapports et Analyses",
+    "configuration": "Configuration",
+    "toolsUtilities": "Outils et Utilitaires",
+    "rolesPermissions": "Rôles et Permissions",
+    "workflowTemplates": "Modèles de Flux de Travail",
+    "parallelApprovals": "Approbations Parallèles",
+    "translations": "Traductions"
   },
   "common": {
     "search": "Rechercher",

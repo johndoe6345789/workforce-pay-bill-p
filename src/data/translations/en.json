@@ -32,7 +32,15 @@
     "businessLogicDemo": "Business Logic Demo",
     "dataAdmin": "Data Admin",
     "roadmap": "Roadmap",
-    "scheduledReports": "Scheduled Reports"
+    "scheduledReports": "Scheduled Reports",
+    "coreOperations": "Core Operations",
+    "reportsAnalytics": "Reports & Analytics",
+    "configuration": "Configuration",
+    "toolsUtilities": "Tools & Utilities",
+    "rolesPermissions": "Roles & Permissions",
+    "workflowTemplates": "Workflow Templates",
+    "parallelApprovals": "Parallel Approvals",
+    "translations": "Translations"
   },
   "common": {
     "search": "Search",
