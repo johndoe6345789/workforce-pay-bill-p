@@ -30,6 +30,7 @@ async function loadTranslationFile(locale: Locale): Promise<Translations> {
     })
     .catch(err => {
       loadingPromises.delete(locale)
+      console.error(`Failed to load translations for ${locale}:`, err)
       throw err
     })
 
@@ -37,14 +38,25 @@ async function loadTranslationFile(locale: Locale): Promise<Translations> {
   return promise
 }
 
+export async function preloadAllTranslations(): Promise<void> {
+  await Promise.all(
+    AVAILABLE_LOCALES.map(locale => 
+      loadTranslationFile(locale).catch(err => {
+        console.error(`Failed to preload ${locale}:`, err)
+      })
+    )
+  )
+}
+
 export function useTranslation() {
   const dispatch = useAppDispatch()
   const reduxLocale = useAppSelector(state => state.ui.locale)
+  const translationsReady = useAppSelector(state => state.ui.translationsReady)
   const [, setDBLocale] = useIndexedDBState<Locale>('app-locale', DEFAULT_LOCALE)
   const [translations, setTranslations] = useState<Translations>(() => 
     translationsCache.get(reduxLocale) || {}
   )
-  const [isLoading, setIsLoading] = useState(!translationsCache.has(reduxLocale))
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
   const locale = reduxLocale
@@ -80,8 +92,10 @@ export function useTranslation() {
       }
     }
 
-    loadTranslations()
-  }, [locale])
+    if (translationsReady) {
+      loadTranslations()
+    }
+  }, [locale, translationsReady])
 
   const t = useCallback((key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.')
@@ -110,12 +124,17 @@ export function useTranslation() {
 
   const changeLocale = useCallback(async (newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
-      try {
-        await loadTranslationFile(newLocale)
+      if (translationsCache.has(newLocale)) {
         dispatch(setReduxLocale(newLocale))
         setDBLocale(newLocale)
-      } catch (err) {
-        console.error(`Failed to change locale to ${newLocale}`, err)
+      } else {
+        try {
+          await loadTranslationFile(newLocale)
+          dispatch(setReduxLocale(newLocale))
+          setDBLocale(newLocale)
+        } catch (err) {
+          console.error(`Failed to change locale to ${newLocale}`, err)
+        }
       }
     }
   }, [dispatch, setDBLocale])
@@ -141,13 +160,17 @@ export function useChangeLocale() {
   
   return useCallback(async (newLocale: Locale) => {
     if (AVAILABLE_LOCALES.includes(newLocale)) {
-      dispatch(setReduxLocale(newLocale))
-      setDBLocale(newLocale)
-      
-      try {
-        await loadTranslationFile(newLocale)
-      } catch (err) {
-        console.error(`Failed to load translations for ${newLocale}`, err)
+      if (translationsCache.has(newLocale)) {
+        dispatch(setReduxLocale(newLocale))
+        setDBLocale(newLocale)
+      } else {
+        try {
+          await loadTranslationFile(newLocale)
+          dispatch(setReduxLocale(newLocale))
+          setDBLocale(newLocale)
+        } catch (err) {
+          console.error(`Failed to load translations for ${newLocale}`, err)
+        }
       }
     }
   }, [dispatch, setDBLocale])

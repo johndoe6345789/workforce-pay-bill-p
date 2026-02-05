@@ -2,16 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useIndexedDBState } from '@/hooks/use-indexed-db-state'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { setLocale, setTranslationsReady } from '@/store/slices/uiSlice'
+import { preloadAllTranslations } from '@/hooks/use-translation'
 
 type Locale = 'en' | 'es' | 'fr'
-
-async function preloadTranslations(locale: Locale): Promise<void> {
-  try {
-    await import(`@/data/translations/${locale}.json`)
-  } catch (err) {
-    console.error(`Failed to preload translations for ${locale}`, err)
-  }
-}
 
 export function useLocaleInit() {
   const dispatch = useAppDispatch()
@@ -26,7 +19,7 @@ export function useLocaleInit() {
       
       const localeToUse = dbLocale || 'en'
       
-      await preloadTranslations(localeToUse)
+      await preloadAllTranslations()
       
       if (localeToUse !== reduxLocale) {
         dispatch(setLocale(localeToUse))

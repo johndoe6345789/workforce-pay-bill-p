@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 
 interface TranslationCache {
   [locale: string]: Record<string, any>
@@ -23,16 +23,14 @@ export function useTranslationCache() {
     setIsLoading(true)
     setError(null)
 
-    const loadPromise = fetch(`/src/data/translations/${locale}.json`)
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to load translations for ${locale}`)
-        }
-        const data = await response.json()
+    const loadPromise = import(`@/data/translations/${locale}.json`)
+      .then((module) => {
+        const data = module.default || module
         cache[locale] = data
         return data
       })
       .catch((err) => {
+        console.error(`Failed to load translations for ${locale}:`, err)
         setError(err)
         throw err
       })
@@ -46,7 +44,13 @@ export function useTranslationCache() {
   }, [])
 
   const preloadTranslations = useCallback(async (locales: string[]) => {
-    await Promise.all(locales.map(locale => loadTranslations(locale)))
+    await Promise.all(
+      locales.map(locale => 
+        loadTranslations(locale).catch(err => {
+          console.error(`Failed to preload ${locale}:`, err)
+        })
+      )
+    )
   }, [loadTranslations])
 
   const clearCache = useCallback((locale?: string) => {
