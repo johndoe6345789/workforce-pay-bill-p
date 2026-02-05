@@ -1,15 +1,20 @@
 import { useCallback } from 'react'
+import { usePDFExport, type PDFTableColumn } from './use-pdf-export'
 
-export type ExportFormat = 'csv' | 'json' | 'xlsx'
+export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf'
 
 export interface ExportOptions {
   filename?: string
   format?: ExportFormat
   columns?: string[]
   includeHeaders?: boolean
+  title?: string
+  columnHeaders?: { [key: string]: string }
 }
 
 export function useDataExport() {
+  const { exportTableToPDF } = usePDFExport()
+
   const exportToCSV = useCallback(
     (data: any[], options: ExportOptions = {}) => {
       const {
@@ -121,6 +126,45 @@ export function useDataExport() {
     []
   )
 
+  const exportToPDF = useCallback(
+    (data: any[], options: ExportOptions = {}) => {
+      const {
+        filename = 'export',
+        columns,
+        includeHeaders = true,
+        title = 'Data Export',
+        columnHeaders = {}
+      } = options
+
+      if (data.length === 0) {
+        throw new Error('No data to export')
+      }
+
+      const keys = columns || Object.keys(data[0])
+      
+      const pdfColumns: PDFTableColumn[] = keys.map((key) => ({
+        header: columnHeaders[key] || key,
+        key,
+        align: 'left' as const,
+        format: (value: any) => {
+          if (value === null || value === undefined) return ''
+          if (typeof value === 'number') {
+            return value.toLocaleString()
+          }
+          return String(value)
+        }
+      }))
+
+      exportTableToPDF(data, pdfColumns, {
+        filename,
+        title,
+        includeTimestamp: true,
+        includePageNumbers: true
+      })
+    },
+    [exportTableToPDF]
+  )
+
   const exportData = useCallback(
     (data: any[], options: ExportOptions = {}) => {
       const { format = 'csv' } = options
@@ -135,17 +179,21 @@ export function useDataExport() {
         case 'xlsx':
           exportToExcel(data, options)
           break
+        case 'pdf':
+          exportToPDF(data, options)
+          break
         default:
           throw new Error(`Unsupported export format: ${format}`)
       }
     },
-    [exportToCSV, exportToJSON, exportToExcel]
+    [exportToCSV, exportToJSON, exportToExcel, exportToPDF]
   )
 
   return {
     exportToCSV,
     exportToJSON,
     exportToExcel,
+    exportToPDF,
     exportData,
   }
 }

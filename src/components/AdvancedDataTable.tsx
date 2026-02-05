@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { useAdvancedTable, TableColumn } from '@/hooks/use-advanced-table'
 import { useDataExport } from '@/hooks/use-data-export'
-import { CaretUp, CaretDown, CaretUpDown, MagnifyingGlass, Export, FileCsv, FileXls, FileCode } from '@phosphor-icons/react'
+import { CaretUp, CaretDown, CaretUpDown, MagnifyingGlass, Export, FileCsv, FileXls, FileCode, FilePdf } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 interface AdvancedDataTableProps<T> {
@@ -51,9 +51,9 @@ export function AdvancedDataTable<T>({
     filteredCount,
   } = useAdvancedTable(data, columns, initialPageSize)
 
-  const { exportToCSV, exportToExcel, exportToJSON } = useDataExport()
+  const { exportToCSV, exportToExcel, exportToJSON, exportToPDF } = useDataExport()
 
-  const handleExport = (format: 'csv' | 'xlsx' | 'json') => {
+  const handleExport = (format: 'csv' | 'xlsx' | 'json' | 'pdf') => {
     try {
       const exportData = items.length > 0 ? items : data
       
@@ -87,6 +87,17 @@ export function AdvancedDataTable<T>({
       } else if (format === 'json') {
         exportToJSON(formattedData, options)
         toast.success(`Exported ${formattedData.length} rows to JSON`)
+      } else if (format === 'pdf') {
+        const columnHeaders: { [key: string]: string } = {}
+        columns.forEach(col => {
+          columnHeaders[col.label] = col.label
+        })
+        exportToPDF(formattedData, {
+          ...options,
+          title: `${exportFilename} Report`,
+          columnHeaders
+        })
+        toast.success(`Exported ${formattedData.length} rows to PDF`)
       }
     } catch (error) {
       toast.error('Failed to export data')
@@ -153,6 +164,10 @@ export function AdvancedDataTable<T>({
                 <DropdownMenuItem onClick={() => handleExport('json')}>
                   <FileCode className="mr-2" size={18} />
                   Export as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                  <FilePdf className="mr-2" size={18} />
+                  Export as PDF
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

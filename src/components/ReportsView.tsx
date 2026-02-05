@@ -13,12 +13,14 @@ import {
   ArrowUp,
   ArrowDown,
   ChartLine,
-  Lightning
+  Lightning,
+  FilePdf
 } from '@phosphor-icons/react'
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
 import { usePayrollCrud } from '@/hooks/use-payroll-crud'
 import { useTranslation } from '@/hooks/use-translation'
 import { useDataExport } from '@/hooks/use-data-export'
+import { usePDFExport, type PDFSection } from '@/hooks/use-pdf-export'
 import type { MarginAnalysis, ForecastData } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -30,7 +32,8 @@ export function ReportsView() {
   
   const { invoices } = useInvoicesCrud()
   const { payrollRuns } = usePayrollCrud()
-  const { exportToCSV, exportToExcel } = useDataExport()
+  const { exportToCSV, exportToExcel, exportData } = useDataExport()
+  const { exportReportToPDF } = usePDFExport()
 
   const calculateMarginAnalysis = (): MarginAnalysis[] => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -179,6 +182,130 @@ export function ReportsView() {
     }
   }
 
+  const handleExportPDF = () => {
+    try {
+      const sections: PDFSection[] = [
+        {
+          type: 'heading',
+          content: 'Financial Summary'
+        },
+        {
+          type: 'spacer',
+          height: 10
+        },
+        {
+          type: 'paragraph',
+          content: `Total Revenue: $${totalRevenue.toLocaleString()}`
+        },
+        {
+          type: 'paragraph',
+          content: `Total Costs: $${totalCosts.toLocaleString()}`
+        },
+        {
+          type: 'paragraph',
+          content: `Total Margin: $${totalMargin.toLocaleString()}`
+        },
+        {
+          type: 'paragraph',
+          content: `Average Margin: ${avgMarginPercentage.toFixed(2)}%`
+        },
+        {
+          type: 'spacer',
+          height: 20
+        },
+        {
+          type: 'divider'
+        },
+        {
+          type: 'spacer',
+          height: 15
+        },
+        {
+          type: 'heading',
+          content: 'Margin Analysis'
+        },
+        {
+          type: 'spacer',
+          height: 10
+        },
+        {
+          type: 'table',
+          data: marginAnalysis.map(item => ({
+            period: item.period,
+            revenue: `$${item.revenue.toLocaleString()}`,
+            costs: `$${item.costs.toLocaleString()}`,
+            margin: `$${item.margin.toLocaleString()}`,
+            percentage: `${item.marginPercentage.toFixed(2)}%`
+          })),
+          columns: [
+            { header: 'Period', key: 'period', align: 'left' },
+            { header: 'Revenue', key: 'revenue', align: 'right' },
+            { header: 'Costs', key: 'costs', align: 'right' },
+            { header: 'Margin', key: 'margin', align: 'right' },
+            { header: 'Margin %', key: 'percentage', align: 'right' }
+          ]
+        }
+      ]
+
+      if (forecast.length > 0) {
+        sections.push(
+          {
+            type: 'spacer',
+            height: 20
+          },
+          {
+            type: 'divider'
+          },
+          {
+            type: 'spacer',
+            height: 15
+          },
+          {
+            type: 'heading',
+            content: 'Financial Forecast'
+          },
+          {
+            type: 'spacer',
+            height: 10
+          },
+          {
+            type: 'table',
+            data: forecast.map(item => ({
+              period: item.period,
+              revenue: `$${item.predictedRevenue.toLocaleString()}`,
+              costs: `$${item.predictedCosts.toLocaleString()}`,
+              margin: `$${item.predictedMargin.toLocaleString()}`,
+              confidence: `${item.confidence}%`
+            })),
+            columns: [
+              { header: 'Period', key: 'period', align: 'left' },
+              { header: 'Predicted Revenue', key: 'revenue', align: 'right' },
+              { header: 'Predicted Costs', key: 'costs', align: 'right' },
+              { header: 'Predicted Margin', key: 'margin', align: 'right' },
+              { header: 'Confidence', key: 'confidence', align: 'right' }
+            ]
+          }
+        )
+      }
+
+      exportReportToPDF(
+        {
+          title: `Financial Report ${selectedYear}`,
+          summary: `Comprehensive financial analysis for the year ${selectedYear}`,
+          sections
+        },
+        {
+          filename: `financial-report-${selectedYear}`,
+          orientation: 'portrait',
+          pageSize: 'a4'
+        }
+      )
+      toast.success(t('reports.exportSuccess') || 'PDF report exported successfully')
+    } catch (error) {
+      toast.error(t('reports.exportError') || 'Failed to export PDF report')
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -198,6 +325,10 @@ export function ReportsView() {
               <SelectItem value="2023">2023</SelectItem>
             </SelectContent>
           </Select>
+          <Button variant="outline" onClick={handleExportPDF}>
+            <FilePdf size={18} className="mr-2" />
+            Export PDF
+          </Button>
           <Button variant="outline" onClick={handleExportAll}>
             <Download size={18} className="mr-2" />
             {t('reports.exportReport')}

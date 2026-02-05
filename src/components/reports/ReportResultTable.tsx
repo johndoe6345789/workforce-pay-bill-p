@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { CardDescription } from '@/components/ui/card'
-import { Download } from '@phosphor-icons/react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Download, FileCsv, FilePdf } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { usePDFExport, type PDFTableColumn } from '@/hooks/use-pdf-export'
 
 type ReportType = 'timesheet' | 'invoice' | 'payroll' | 'expense' | 'margin'
 type GroupByField = 'worker' | 'client' | 'date' | 'status' | 'month' | 'week'
@@ -31,6 +33,8 @@ interface ReportResultTableProps {
 }
 
 export function ReportResultTable({ reportResult, reportConfig }: ReportResultTableProps) {
+  const { exportTableToPDF } = usePDFExport()
+
   const exportReport = () => {
     const csvLines: string[] = []
     
@@ -85,6 +89,63 @@ export function ReportResultTable({ reportResult, reportConfig }: ReportResultTa
     toast.success('Report exported to CSV')
   }
 
+  const exportPDFReport = () => {
+    const pdfData: any[] = []
+    const columns: PDFTableColumn[] = []
+
+    if (reportConfig.groupBy) {
+      columns.push({
+        header: reportConfig.groupBy.charAt(0).toUpperCase() + reportConfig.groupBy.slice(1),
+        key: reportConfig.groupBy,
+        align: 'left'
+      })
+
+      reportConfig.metrics.forEach(metric => {
+        columns.push(
+          { header: `${metric} Sum`, key: `${metric}_sum`, align: 'right' },
+          { header: `${metric} Avg`, key: `${metric}_avg`, align: 'right' },
+          { header: `${metric} Count`, key: `${metric}_count`, align: 'right' }
+        )
+      })
+
+      reportResult.data.forEach((row: any) => {
+        const pdfRow: any = { [reportConfig.groupBy!]: row[reportConfig.groupBy!] }
+        reportConfig.metrics.forEach(metric => {
+          pdfRow[`${metric}_sum`] = row[metric].sum.toFixed(2)
+          pdfRow[`${metric}_avg`] = row[metric].average.toFixed(2)
+          pdfRow[`${metric}_count`] = row[metric].count
+        })
+        pdfData.push(pdfRow)
+      })
+    } else {
+      reportConfig.metrics.forEach(metric => {
+        columns.push(
+          { header: `${metric} Sum`, key: `${metric}_sum`, align: 'right' },
+          { header: `${metric} Avg`, key: `${metric}_avg`, align: 'right' },
+          { header: `${metric} Count`, key: `${metric}_count`, align: 'right' }
+        )
+      })
+
+      const row = reportResult.data[0]
+      const pdfRow: any = {}
+      reportConfig.metrics.forEach(metric => {
+        pdfRow[`${metric}_sum`] = row[metric].sum.toFixed(2)
+        pdfRow[`${metric}_avg`] = row[metric].average.toFixed(2)
+        pdfRow[`${metric}_count`] = row[metric].count
+      })
+      pdfData.push(pdfRow)
+    }
+
+    exportTableToPDF(pdfData, columns, {
+      filename: `${reportConfig.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`,
+      title: reportResult.name,
+      includeTimestamp: true,
+      includePageNumbers: true
+    })
+
+    toast.success('Report exported to PDF')
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -94,10 +155,24 @@ export function ReportResultTable({ reportResult, reportConfig }: ReportResultTa
             Generated on {new Date(reportResult.generatedAt).toLocaleString()} • {reportResult.totalRecords} records
           </CardDescription>
         </div>
-        <Button variant="outline" onClick={exportReport}>
-          <Download size={18} className="mr-2" />
-          Export CSV
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Download size={18} className="mr-2" />
+              Export
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={exportReport}>
+              <FileCsv className="mr-2" size={18} />
+              Export as CSV
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={exportPDFReport}>
+              <FilePdf className="mr-2" size={18} />
+              Export as PDF
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="rounded-lg border overflow-x-auto">
