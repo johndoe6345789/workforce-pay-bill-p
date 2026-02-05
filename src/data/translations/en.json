@@ -42,6 +42,18 @@
     "parallelApprovals": "Parallel Approvals",
     "translations": "Translations"
   },
+  "sidebar": {
+    "backOfficePlatform": "Back Office Platform",
+    "selectEntity": "Select entity",
+    "componentLibrary": "Component Library",
+    "businessLogicHooks": "Business Logic Hooks",
+    "logOut": "Log Out"
+  },
+  "entities": {
+    "mainAgency": "Main Agency",
+    "northDivision": "North Division",
+    "southDivision": "South Division"
+  },
   "common": {
     "search": "Search",
     "filter": "Filter",

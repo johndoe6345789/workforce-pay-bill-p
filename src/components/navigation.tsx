@@ -32,6 +32,19 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['core']))
   const { user, logout } = useAuth()
   
+  const getEntityTranslation = (entity: string) => {
+    switch (entity) {
+      case 'Main Agency':
+        return t('entities.mainAgency')
+      case 'North Division':
+        return t('entities.northDivision')
+      case 'South Division':
+        return t('entities.southDivision')
+      default:
+        return entity
+    }
+  }
+  
   const toggleGroup = (groupId: string) => {
     setExpandedGroups(prev => {
       const next = new Set(prev)
@@ -66,13 +79,13 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
           <SelectTrigger className="w-full" aria-label={t('sidebar.selectEntity')}>
             <div className="flex items-center gap-2">
               <Buildings size={16} weight="fill" className="text-primary" aria-hidden="true" />
-              <SelectValue />
+              <span>{getEntityTranslation(currentEntity)}</span>
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Main Agency">Main Agency</SelectItem>
-            <SelectItem value="North Division">North Division</SelectItem>
-            <SelectItem value="South Division">South Division</SelectItem>
+            <SelectItem value="Main Agency">{t('entities.mainAgency')}</SelectItem>
+            <SelectItem value="North Division">{t('entities.northDivision')}</SelectItem>
+            <SelectItem value="South Division">{t('entities.southDivision')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
