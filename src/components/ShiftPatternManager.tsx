@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
+import { useTranslation } from '@/hooks/use-translation'
 import {
   Clock,
   Plus,
@@ -24,15 +25,7 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { ShiftPatternTemplate, ShiftType, DayOfWeek, RecurrencePattern } from '@/lib/types'
 
-const DAYS_OF_WEEK: { value: DayOfWeek; label: string }[] = [
-  { value: 'monday', label: 'Monday' },
-  { value: 'tuesday', label: 'Tuesday' },
-  { value: 'wednesday', label: 'Wednesday' },
-  { value: 'thursday', label: 'Thursday' },
-  { value: 'friday', label: 'Friday' },
-  { value: 'saturday', label: 'Saturday' },
-  { value: 'sunday', label: 'Sunday' }
-]
+const DAYS_OF_WEEK: DayOfWeek[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
 const SHIFT_TYPES: { value: ShiftType; label: string; icon: any; color: string }[] = [
   { value: 'night', label: 'Night Shift', icon: Moon, color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
@@ -46,6 +39,7 @@ const SHIFT_TYPES: { value: ShiftType; label: string; icon: any; color: string }
 ]
 
 export function ShiftPatternManager() {
+  const { t } = useTranslation()
   const [patterns = [], setPatterns] = useKV<ShiftPatternTemplate[]>('shift-patterns', [])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingPattern, setEditingPattern] = useState<ShiftPatternTemplate | null>(null)
@@ -63,7 +57,7 @@ export function ShiftPatternManager() {
 
   const handleCreatePattern = () => {
     if (!formData.name || !formData.shiftType || !formData.daysOfWeek || formData.daysOfWeek.length === 0) {
-      toast.error('Please fill in all required fields')
+      toast.error(t('shiftPatterns.fillAllFields'))
       return
     }
 
@@ -86,14 +80,14 @@ export function ShiftPatternManager() {
     }
 
     setPatterns(current => [...(current || []), newPattern])
-    toast.success('Shift pattern template created')
+    toast.success(t('shiftPatterns.patternCreated'))
     resetForm()
     setIsCreateDialogOpen(false)
   }
 
   const handleUpdatePattern = () => {
     if (!editingPattern || !formData.name || !formData.shiftType || !formData.daysOfWeek || formData.daysOfWeek.length === 0) {
-      toast.error('Please fill in all required fields')
+      toast.error(t('shiftPatterns.fillAllFields'))
       return
     }
 
@@ -117,7 +111,7 @@ export function ShiftPatternManager() {
           : p
       )
     })
-    toast.success('Shift pattern template updated')
+    toast.success(t('shiftPatterns.patternUpdated'))
     resetForm()
     setEditingPattern(null)
   }
@@ -127,7 +121,7 @@ export function ShiftPatternManager() {
       if (!current) return []
       return current.filter(p => p.id !== id)
     })
-    toast.success('Shift pattern template deleted')
+    toast.success(t('shiftPatterns.patternDeleted'))
   }
 
   const handleDuplicatePattern = (pattern: ShiftPatternTemplate) => {
@@ -139,7 +133,7 @@ export function ShiftPatternManager() {
       usageCount: 0
     }
     setPatterns(current => [...(current || []), duplicated])
-    toast.success('Shift pattern template duplicated')
+    toast.success(t('shiftPatterns.patternDuplicated'))
   }
 
   const handleEditPattern = (pattern: ShiftPatternTemplate) => {
@@ -204,8 +198,8 @@ export function ShiftPatternManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Shift Pattern Templates</h2>
-          <p className="text-muted-foreground mt-1">Create reusable templates for recurring shift schedules</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('shiftPatterns.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('shiftPatterns.subtitle')}</p>
         </div>
         <Dialog 
           open={isCreateDialogOpen || editingPattern !== null} 
@@ -222,32 +216,32 @@ export function ShiftPatternManager() {
           <DialogTrigger asChild>
             <Button>
               <Plus size={18} className="mr-2" />
-              Create Template
+              {t('shiftPatterns.createTemplate')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingPattern ? 'Edit' : 'Create'} Shift Pattern Template</DialogTitle>
+              <DialogTitle>{editingPattern ? t('shiftPatterns.createDialog.editTitle') : t('shiftPatterns.createDialog.title')}</DialogTitle>
               <DialogDescription>
-                Define a reusable template for recurring shift schedules
+                {t('shiftPatterns.createDialog.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="pattern-name">Template Name *</Label>
+                <Label htmlFor="pattern-name">{t('shiftPatterns.patternNameLabel')}</Label>
                 <Input
                   id="pattern-name"
-                  placeholder="e.g. Night Shift - Mon-Fri"
+                  placeholder={t('shiftPatterns.patternNamePlaceholder')}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="pattern-description">Description</Label>
+                <Label htmlFor="pattern-description">{t('shiftPatterns.descriptionLabel')}</Label>
                 <Textarea
                   id="pattern-description"
-                  placeholder="Optional description of the shift pattern"
+                  placeholder={t('shiftPatterns.descriptionPlaceholder')}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={2}
@@ -255,7 +249,7 @@ export function ShiftPatternManager() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="shift-type">Shift Type *</Label>
+                <Label htmlFor="shift-type">{t('shiftPatterns.shiftTypeLabel')}</Label>
                 <Select
                   value={formData.shiftType}
                   onValueChange={(value) => setFormData({ ...formData, shiftType: value as ShiftType })}
@@ -266,7 +260,7 @@ export function ShiftPatternManager() {
                   <SelectContent>
                     {SHIFT_TYPES.map(type => (
                       <SelectItem key={type.value} value={type.value}>
-                        {type.label}
+                        {t(`shiftPatterns.shiftTypes.${type.value}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -275,7 +269,7 @@ export function ShiftPatternManager() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="start-time">Start Time *</Label>
+                  <Label htmlFor="start-time">{t('shiftPatterns.startTimeLabel')}</Label>
                   <Input
                     id="start-time"
                     type="time"
@@ -284,7 +278,7 @@ export function ShiftPatternManager() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="end-time">End Time *</Label>
+                  <Label htmlFor="end-time">{t('shiftPatterns.endTimeLabel')}</Label>
                   <Input
                     id="end-time"
                     type="time"
@@ -293,7 +287,7 @@ export function ShiftPatternManager() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="break-minutes">Break (mins)</Label>
+                  <Label htmlFor="break-minutes">{t('shiftPatterns.breakMinutesLabel')}</Label>
                   <Input
                     id="break-minutes"
                     type="number"
@@ -306,7 +300,7 @@ export function ShiftPatternManager() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="rate-multiplier">Rate Multiplier</Label>
+                <Label htmlFor="rate-multiplier">{t('shiftPatterns.rateMultiplierLabel')}</Label>
                 <Input
                   id="rate-multiplier"
                   type="number"
@@ -316,25 +310,25 @@ export function ShiftPatternManager() {
                   onChange={(e) => setFormData({ ...formData, rateMultiplier: parseFloat(e.target.value) || 1.0 })}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Standard rate × {formData.rateMultiplier || 1.0} = {((formData.rateMultiplier || 1.0) * 25).toFixed(2)} per hour (example at £25/hr)
+                  {t('shiftPatterns.rateMultiplierHelper', { multiplier: formData.rateMultiplier || 1.0, rate: ((formData.rateMultiplier || 1.0) * 25).toFixed(2) })}
                 </p>
               </div>
 
               <Separator />
 
               <div className="space-y-3">
-                <Label>Days of Week *</Label>
+                <Label>{t('shiftPatterns.daysOfWeekLabel')}</Label>
                 <div className="grid grid-cols-4 gap-2">
                   {DAYS_OF_WEEK.map(day => (
                     <Button
-                      key={day.value}
+                      key={day}
                       type="button"
-                      variant={formData.daysOfWeek?.includes(day.value) ? 'default' : 'outline'}
+                      variant={formData.daysOfWeek?.includes(day) ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => toggleDayOfWeek(day.value)}
+                      onClick={() => toggleDayOfWeek(day)}
                       className="w-full"
                     >
-                      {day.label.substring(0, 3)}
+                      {t(`shiftPatterns.daysOfWeekShort.${day}`)}
                     </Button>
                   ))}
                 </div>
@@ -342,20 +336,20 @@ export function ShiftPatternManager() {
 
               {formData.defaultStartTime && formData.defaultEndTime && (
                 <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                  <p className="text-sm font-medium">Pattern Summary</p>
+                  <p className="text-sm font-medium">{t('shiftPatterns.patternSummary')}</p>
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p>
-                      Hours per shift: {calculateHours(
+                      {t('shiftPatterns.hoursPerShift')}: {calculateHours(
                         formData.defaultStartTime,
                         formData.defaultEndTime,
                         formData.defaultBreakMinutes || 0
                       ).toFixed(2)}h
                     </p>
                     <p>
-                      Days per week: {formData.daysOfWeek?.length || 0}
+                      {t('shiftPatterns.daysPerWeek')}: {formData.daysOfWeek?.length || 0}
                     </p>
                     <p>
-                      Total weekly hours: {(
+                      {t('shiftPatterns.totalWeeklyHours')}: {(
                         calculateHours(
                           formData.defaultStartTime,
                           formData.defaultEndTime,
@@ -376,10 +370,10 @@ export function ShiftPatternManager() {
                   resetForm()
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button onClick={editingPattern ? handleUpdatePattern : handleCreatePattern}>
-                {editingPattern ? 'Update' : 'Create'} Template
+                {editingPattern ? t('common.edit') : t('common.save')} {t('shiftPatterns.createTemplate')}
               </Button>
             </div>
           </DialogContent>
@@ -389,35 +383,35 @@ export function ShiftPatternManager() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Total Templates</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('shiftPatterns.totalTemplates')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{patterns.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">Active shift patterns</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('shiftPatterns.activeShiftPatterns')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Most Used</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('shiftPatterns.mostUsed')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
               {patterns.length > 0 ? Math.max(...patterns.map(p => p.usageCount)) : 0}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Times applied</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('shiftPatterns.timesApplied')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Night Shifts</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('shiftPatterns.nightShifts')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
               {patterns.filter(p => p.shiftType === 'night').length}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Night shift templates</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('shiftPatterns.nightShiftTemplates')}</p>
           </CardContent>
         </Card>
       </div>
@@ -425,11 +419,11 @@ export function ShiftPatternManager() {
       {patterns.length === 0 ? (
         <Card className="p-12 text-center">
           <Clock size={48} className="mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No shift patterns yet</h3>
-          <p className="text-muted-foreground mb-4">Create your first template to streamline recurring shift scheduling</p>
+          <h3 className="text-lg font-semibold mb-2">{t('shiftPatterns.noPatterns')}</h3>
+          <p className="text-muted-foreground mb-4">{t('shiftPatterns.noPatternsDescription')}</p>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus size={18} className="mr-2" />
-            Create Template
+            {t('shiftPatterns.createTemplate')}
           </Button>
         </Card>
       ) : (

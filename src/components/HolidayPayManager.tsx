@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
+import { useTranslation } from '@/hooks/use-translation'
 import { 
   Calendar, 
   Plus,
@@ -42,6 +43,7 @@ interface HolidayRequest {
 }
 
 export function HolidayPayManager() {
+  const { t } = useTranslation()
   const [accruals = [], setAccruals] = useKV<HolidayAccrual[]>('holiday-accruals', [])
   const [requests = [], setRequests] = useKV<HolidayRequest[]>('holiday-requests', [])
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false)
@@ -90,7 +92,7 @@ export function HolidayPayManager() {
 
   const handleRequestHoliday = () => {
     if (!formData.workerName || !formData.startDate || !formData.endDate || formData.days <= 0) {
-      toast.error('Please fill in all fields')
+      toast.error(t('holidayPay.fillAllFields'))
       return
     }
 
@@ -106,7 +108,7 @@ export function HolidayPayManager() {
     }
 
     setRequests((current) => [...(current || []), newRequest])
-    toast.success('Holiday request submitted')
+    toast.success(t('holidayPay.requestCreated'))
     
     setFormData({
       workerId: '',
@@ -124,7 +126,7 @@ export function HolidayPayManager() {
 
     const accrual = accruals.find(a => a.workerId === request.workerId)
     if (!accrual || accrual.remainingDays < request.days) {
-      toast.error('Insufficient holiday balance')
+      toast.error(t('holidayPay.insufficientBalance'))
       return
     }
 
@@ -149,7 +151,7 @@ export function HolidayPayManager() {
       )
     )
 
-    toast.success('Holiday request approved')
+    toast.success(t('holidayPay.requestApproved'))
   }
 
   const handleRejectRequest = (requestId: string) => {
@@ -158,7 +160,7 @@ export function HolidayPayManager() {
         r.id === requestId ? { ...r, status: 'rejected' as const } : r
       )
     )
-    toast.error('Holiday request rejected')
+    toast.error(t('holidayPay.requestRejected'))
   }
 
   const calculateDaysBetweenDates = (start: string, end: string) => {
@@ -174,36 +176,36 @@ export function HolidayPayManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Holiday Pay Management</h2>
-          <p className="text-muted-foreground mt-1">Track accruals, requests, and balances</p>
+          <h2 className="text-3xl font-semibold tracking-tight">{t('holidayPay.title')}</h2>
+          <p className="text-muted-foreground mt-1">{t('holidayPay.subtitle')}</p>
         </div>
         <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus size={18} className="mr-2" />
-              New Holiday Request
+              {t('holidayPay.newHolidayRequest')}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Holiday Request</DialogTitle>
+              <DialogTitle>{t('holidayPay.createDialog.title')}</DialogTitle>
               <DialogDescription>
-                Submit a new holiday request for approval
+                {t('holidayPay.createDialog.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="reqWorker">Worker Name</Label>
+                <Label htmlFor="reqWorker">{t('holidayPay.workerNameLabel')}</Label>
                 <Input
                   id="reqWorker"
-                  placeholder="Enter worker name"
+                  placeholder={t('holidayPay.workerNamePlaceholder')}
                   value={formData.workerName}
                   onChange={(e) => setFormData({ ...formData, workerName: e.target.value })}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date</Label>
+                  <Label htmlFor="startDate">{t('holidayPay.startDateLabel')}</Label>
                   <Input
                     id="startDate"
                     type="date"
@@ -218,7 +220,7 @@ export function HolidayPayManager() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date</Label>
+                  <Label htmlFor="endDate">{t('holidayPay.endDateLabel')}</Label>
                   <Input
                     id="endDate"
                     type="date"
@@ -234,7 +236,7 @@ export function HolidayPayManager() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="days">Days Requested</Label>
+                <Label htmlFor="days">{t('holidayPay.daysRequestedLabel')}</Label>
                 <Input
                   id="days"
                   type="number"
@@ -244,8 +246,8 @@ export function HolidayPayManager() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleRequestHoliday}>Submit Request</Button>
+              <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)}>{t('common.cancel')}</Button>
+              <Button onClick={handleRequestHoliday}>{t('holidayPay.submitRequest')}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -254,18 +256,18 @@ export function HolidayPayManager() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Total Accrued</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('holidayPay.totalAccruedLabel')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
-              {accruals.reduce((sum, a) => sum + a.accruedDays, 0).toFixed(1)} days
+              {t('holidayPay.daysLabel', { count: accruals.reduce((sum, a) => sum + a.accruedDays, 0).toFixed(1) })}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Pending Requests</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('holidayPay.pendingRequests')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
@@ -276,11 +278,11 @@ export function HolidayPayManager() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Days Taken (YTD)</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('holidayPay.daysTakenYTD')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">
-              {accruals.reduce((sum, a) => sum + a.takenDays, 0).toFixed(1)} days
+              {t('holidayPay.daysLabel', { count: accruals.reduce((sum, a) => sum + a.takenDays, 0).toFixed(1) })}
             </div>
           </CardContent>
         </Card>
@@ -289,10 +291,10 @@ export function HolidayPayManager() {
       <Tabs defaultValue="accruals" className="space-y-4">
         <TabsList>
           <TabsTrigger value="accruals">
-            Accruals ({accruals.length})
+            {t('holidayPay.tabs.accruals', { count: accruals.length })}
           </TabsTrigger>
           <TabsTrigger value="requests">
-            Requests ({requests.filter(r => r.status === 'pending').length} pending)
+            {t('holidayPay.tabs.requests', { count: requests.filter(r => r.status === 'pending').length })}
           </TabsTrigger>
         </TabsList>
 
@@ -300,8 +302,8 @@ export function HolidayPayManager() {
           {accruals.length === 0 ? (
             <Card className="p-12 text-center">
               <Calendar size={48} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No holiday accruals</h3>
-              <p className="text-muted-foreground">Accruals are calculated automatically from timesheets</p>
+              <h3 className="text-lg font-semibold mb-2">{t('holidayPay.noAccruals')}</h3>
+              <p className="text-muted-foreground">{t('holidayPay.noAccrualsDescription')}</p>
             </Card>
           ) : (
             accruals.map((accrual) => (

@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Warning, CheckCircle, XCircle, ShieldCheck } from '@phosphor-icons/react'
+import { useTranslation } from '@/hooks/use-translation'
 import type { Timesheet, RateCard, ValidationRule } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +13,7 @@ interface ContractValidatorProps {
 }
 
 export function ContractValidator({ timesheets, rateCards }: ContractValidatorProps) {
+  const { t } = useTranslation()
   const validateTimesheet = (timesheet: Timesheet): {
     isValid: boolean
     errors: string[]
@@ -23,7 +25,7 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
     const rateCard = rateCards.find(rc => rc.id === timesheet.rateCardId)
     
     if (!rateCard) {
-      errors.push('No rate card assigned')
+      errors.push(t('contractValidator.noRateCard'))
       return { isValid: false, errors, warnings }
     }
 
@@ -41,11 +43,11 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
     }
 
     if (!timesheet.rate || timesheet.rate < rateCard.standardRate * 0.5) {
-      errors.push(`Rate £${timesheet.rate || 0} is below minimum allowed (£${rateCard.standardRate * 0.5})`)
+      errors.push(t('contractValidator.rateTooLow', { rate: timesheet.rate || 0, minimum: (rateCard.standardRate * 0.5).toFixed(2) }))
     }
 
     if (timesheet.rate && timesheet.rate > rateCard.standardRate * 3) {
-      warnings.push(`Rate £${timesheet.rate} exceeds 3x standard rate`)
+      warnings.push(t('contractValidator.rateTooHigh', { rate: timesheet.rate }))
     }
 
     return {
@@ -94,8 +96,8 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-semibold tracking-tight">Contract Validation</h2>
-        <p className="text-muted-foreground mt-1">Validate timesheets against rate cards and compliance rules</p>
+        <h2 className="text-3xl font-semibold tracking-tight">{t('contractValidator.title')}</h2>
+        <p className="text-muted-foreground mt-1">{t('contractValidator.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -103,12 +105,12 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <XCircle size={18} className="text-destructive" weight="fill" />
-              Validation Errors
+              {t('contractValidator.validationErrors')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{withErrors.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">Timesheets blocked from processing</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('contractValidator.validationErrorsBlocked')}</p>
           </CardContent>
         </Card>
 
@@ -116,12 +118,12 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <Warning size={18} className="text-warning" weight="fill" />
-              Warnings
+              {t('contractValidator.warnings')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{withWarnings.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">Review recommended</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('contractValidator.warningsReview')}</p>
           </CardContent>
         </Card>
 
@@ -129,12 +131,12 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
               <CheckCircle size={18} className="text-success" weight="fill" />
-              Compliant
+              {t('contractValidator.compliant')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{compliant.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">Ready for processing</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('contractValidator.compliantReady')}</p>
           </CardContent>
         </Card>
       </div>
@@ -144,10 +146,10 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <XCircle size={20} className="text-destructive" weight="fill" />
-              Validation Errors - Action Required
+              {t('contractValidator.errorDescription')}
             </CardTitle>
             <CardDescription>
-              These timesheets have critical validation errors and cannot be processed
+              {t('contractValidator.errorDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -158,19 +160,19 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-3">
                         <h3 className="font-semibold">{timesheet.workerName}</h3>
-                        <Badge variant="destructive">Error</Badge>
+                        <Badge variant="destructive">{t('contractValidator.error')}</Badge>
                       </div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Client</p>
+                          <p className="text-muted-foreground">{t('contractValidator.client')}</p>
                           <p className="font-medium">{timesheet.clientName}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Week Ending</p>
+                          <p className="text-muted-foreground">{t('contractValidator.weekEnding')}</p>
                           <p className="font-medium">{new Date(timesheet.weekEnding).toLocaleDateString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Hours</p>
+                          <p className="text-muted-foreground">{t('contractValidator.hours')}</p>
                           <p className="font-medium font-mono">{timesheet.hours}</p>
                         </div>
                       </div>
@@ -183,7 +185,7 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
                       </div>
                     </div>
                     <Button size="sm" variant="outline">
-                      Fix Issues
+                      {t('contractValidator.fixIssues')}
                     </Button>
                   </div>
                 </CardContent>
@@ -198,10 +200,10 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Warning size={20} className="text-warning" weight="fill" />
-              Warnings - Review Recommended
+              {t('contractValidator.reviewRecommended')}
             </CardTitle>
             <CardDescription>
-              These timesheets have potential issues but can be processed
+              {t('contractValidator.warningDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -212,7 +214,7 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-3">
                         <h3 className="font-semibold">{timesheet.workerName}</h3>
-                        <Badge variant="warning">Warning</Badge>
+                        <Badge variant="warning">{t('contractValidator.warning')}</Badge>
                       </div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
@@ -238,10 +240,10 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline">
-                        Review
+                        {t('contractValidator.review')}
                       </Button>
                       <Button size="sm" style={{ backgroundColor: 'var(--success)', color: 'var(--success-foreground)' }}>
-                        Approve Anyway
+                        {t('contractValidator.approveAnyway')}
                       </Button>
                     </div>
                   </div>
@@ -257,10 +259,10 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <CheckCircle size={20} className="text-success" weight="fill" />
-              Compliant Timesheets - Ready to Process
+              {t('contractValidator.readyToProcess')}
             </CardTitle>
             <CardDescription>
-              These timesheets passed all validation checks
+              {t('contractValidator.compliantDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -282,7 +284,7 @@ export function ContractValidator({ timesheets, rateCards }: ContractValidatorPr
               ))}
               {compliant.length > 5 && (
                 <p className="text-sm text-muted-foreground text-center py-2">
-                  + {compliant.length - 5} more compliant timesheets
+                  {t('contractValidator.moreCompliantTimesheets', { count: compliant.length - 5 })}
                 </p>
               )}
             </div>
