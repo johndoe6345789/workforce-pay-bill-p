@@ -18,8 +18,10 @@ import {
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
 import { usePayrollCrud } from '@/hooks/use-payroll-crud'
 import { useTranslation } from '@/hooks/use-translation'
+import { useDataExport } from '@/hooks/use-data-export'
 import type { MarginAnalysis, ForecastData } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export function ReportsView() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month')
@@ -28,6 +30,7 @@ export function ReportsView() {
   
   const { invoices } = useInvoicesCrud()
   const { payrollRuns } = usePayrollCrud()
+  const { exportToCSV, exportToExcel } = useDataExport()
 
   const calculateMarginAnalysis = (): MarginAnalysis[] => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -111,6 +114,71 @@ export function ReportsView() {
     ...forecast.map(f => Math.max(f.predictedRevenue, f.predictedCosts))
   )
 
+  const handleExportMarginAnalysis = () => {
+    try {
+      const exportData = marginAnalysis.map(item => ({
+        Period: item.period,
+        Year: selectedYear,
+        Revenue: item.revenue,
+        Costs: item.costs,
+        Margin: item.margin,
+        'Margin %': item.marginPercentage.toFixed(2)
+      }))
+      exportToCSV(exportData, { filename: `margin-analysis-${selectedYear}` })
+      toast.success(t('reports.exportSuccess') || 'Margin analysis exported successfully')
+    } catch (error) {
+      toast.error(t('reports.exportError') || 'Failed to export margin analysis')
+    }
+  }
+
+  const handleExportForecast = () => {
+    try {
+      const exportData = forecast.map(item => ({
+        Period: item.period,
+        Year: selectedYear,
+        'Predicted Revenue': item.predictedRevenue,
+        'Predicted Costs': item.predictedCosts,
+        'Predicted Margin': item.predictedMargin,
+        'Confidence %': item.confidence
+      }))
+      exportToCSV(exportData, { filename: `forecast-${selectedYear}` })
+      toast.success(t('reports.exportSuccess') || 'Forecast data exported successfully')
+    } catch (error) {
+      toast.error(t('reports.exportError') || 'Failed to export forecast data')
+    }
+  }
+
+  const handleExportAll = () => {
+    try {
+      const combinedData = [
+        ...marginAnalysis.map(item => ({
+          Type: 'Actual',
+          Period: item.period,
+          Year: selectedYear,
+          Revenue: item.revenue,
+          Costs: item.costs,
+          Margin: item.margin,
+          'Margin %': item.marginPercentage.toFixed(2),
+          Confidence: 100
+        })),
+        ...forecast.map(item => ({
+          Type: 'Forecast',
+          Period: item.period,
+          Year: selectedYear,
+          Revenue: item.predictedRevenue,
+          Costs: item.predictedCosts,
+          Margin: item.predictedMargin,
+          'Margin %': ((item.predictedMargin / item.predictedRevenue) * 100).toFixed(2),
+          Confidence: item.confidence
+        }))
+      ]
+      exportToExcel(combinedData, { filename: `financial-report-${selectedYear}` })
+      toast.success(t('reports.exportSuccess') || 'Complete report exported successfully')
+    } catch (error) {
+      toast.error(t('reports.exportError') || 'Failed to export complete report')
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -130,7 +198,7 @@ export function ReportsView() {
               <SelectItem value="2023">2023</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportAll}>
             <Download size={18} className="mr-2" />
             {t('reports.exportReport')}
           </Button>
@@ -214,8 +282,16 @@ export function ReportsView() {
         <TabsContent value="margin-analysis" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t('reports.marginAnalysisTitle')}</CardTitle>
-              <CardDescription>{t('reports.marginAnalysisDescription', { year: selectedYear })}</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>{t('reports.marginAnalysisTitle')}</CardTitle>
+                  <CardDescription>{t('reports.marginAnalysisDescription', { year: selectedYear })}</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleExportMarginAnalysis}>
+                  <Download size={16} className="mr-2" />
+                  Export CSV
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -305,13 +381,21 @@ export function ReportsView() {
         <TabsContent value="forecasting" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightning size={20} weight="fill" className="text-accent" />
-                {t('reports.forecastingTitle')}
-              </CardTitle>
-              <CardDescription>
-                {t('reports.forecastingDescription')}
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightning size={20} weight="fill" className="text-accent" />
+                    {t('reports.forecastingTitle')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('reports.forecastingDescription')}
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleExportForecast} disabled={forecast.length === 0}>
+                  <Download size={16} className="mr-2" />
+                  Export CSV
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {forecast.length === 0 ? (

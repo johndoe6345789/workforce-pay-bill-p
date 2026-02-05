@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { usePurchaseOrdersCrud } from '@/hooks/use-purchase-orders-crud'
 import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
 import { useTranslation } from '@/hooks/use-translation'
+import { useDataExport } from '@/hooks/use-data-export'
 import { 
   FileText, 
   Plus, 
@@ -18,7 +19,8 @@ import {
   Trash,
   PencilSimple,
   Eye,
-  X
+  X,
+  Download
 } from '@phosphor-icons/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -37,6 +39,7 @@ export function PurchaseOrderTracking() {
   const { t } = useTranslation()
   const { entities: purchaseOrders, create, update, remove } = usePurchaseOrdersCrud()
   const { invoices } = useInvoicesCrud()
+  const { exportToCSV, exportToExcel } = useDataExport()
   const [searchQuery, setSearchQuery] = useState('')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -297,6 +300,30 @@ export function PurchaseOrderTracking() {
     )
   }, [invoices, selectedPO])
 
+  const handleExportPOs = () => {
+    try {
+      const exportData = filteredPOs.map(po => ({
+        'PO Number': po.poNumber,
+        'Client': po.clientName,
+        'Status': po.status,
+        'Issue Date': new Date(po.issueDate).toLocaleDateString(),
+        'Expiry Date': po.expiryDate ? new Date(po.expiryDate).toLocaleDateString() : 'N/A',
+        'Currency': po.currency,
+        'Total Value': po.totalValue,
+        'Utilised Value': po.utilisedValue,
+        'Remaining Value': po.remainingValue,
+        'Utilization %': ((po.utilisedValue / po.totalValue) * 100).toFixed(2),
+        'Linked Invoices': po.linkedInvoices.length,
+        'Created By': po.createdBy,
+        'Created Date': new Date(po.createdDate).toLocaleDateString()
+      }))
+      exportToExcel(exportData, { filename: `purchase-orders-${new Date().toISOString().split('T')[0]}` })
+      toast.success(t('purchaseOrders.messages.exportSuccess') || 'Purchase orders exported successfully')
+    } catch (error) {
+      toast.error(t('purchaseOrders.messages.exportError') || 'Failed to export purchase orders')
+    }
+  }
+
   if (isLoadingState) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -315,10 +342,16 @@ export function PurchaseOrderTracking() {
           <h2 className="text-3xl font-semibold tracking-tight">{t('purchaseOrders.title')}</h2>
           <p className="text-muted-foreground mt-1">{t('purchaseOrders.subtitle')}</p>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)}>
-          <Plus size={18} className="mr-2" />
-          {t('purchaseOrders.createPO')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportPOs} disabled={filteredPOs.length === 0}>
+            <Download size={18} className="mr-2" />
+            {t('purchaseOrders.export') || 'Export'}
+          </Button>
+          <Button onClick={() => setIsCreateOpen(true)}>
+            <Plus size={18} className="mr-2" />
+            {t('purchaseOrders.createPO')}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
