@@ -3,21 +3,22 @@ import { PerformanceTestPanel } from '@/components/PerformanceTestPanel'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Flask, Info } from '@phosphor-icons/react'
+import { useTranslation } from '@/hooks/use-translation'
 
 export default function PerformanceTestView() {
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Performance Testing"
-        description="Test system performance with large datasets and measure response times"
+        title={t('performanceTest.title')}
+        description={t('performanceTest.subtitle')}
       />
 
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription>
-          This testing suite helps identify performance bottlenecks by generating large datasets
-          and measuring rendering times, memory usage, and system responsiveness. Use this to
-          validate optimizations like virtual scrolling and adaptive polling.
+          {t('performanceTest.alertDescription')}
         </AlertDescription>
       </Alert>
 
@@ -25,42 +26,52 @@ export default function PerformanceTestView() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Performance Optimization Features</CardTitle>
+          <CardTitle>{t('performanceTest.optimizationFeatures')}</CardTitle>
           <CardDescription>
-            Features implemented to improve performance at scale
+            {t('performanceTest.optimizationFeaturesDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <h4 className="font-medium">Virtual Scrolling</h4>
+              <h4 className="font-medium">{t('performanceTest.virtualScrolling')}</h4>
               <p className="text-sm text-muted-foreground">
-                Only renders visible items in large lists, dramatically reducing DOM nodes and
-                improving render performance for lists with 10,000+ items.
+                {t('performanceTest.virtualScrollingDescription')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium">Adaptive Polling</h4>
+              <h4 className="font-medium">{t('performanceTest.adaptivePolling')}</h4>
               <p className="text-sm text-muted-foreground">
-                Intelligently adjusts polling intervals based on success/error rates and network
-                status, reducing unnecessary requests and battery usage.
+                {t('performanceTest.adaptivePollingDescription')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium">Performance Monitoring</h4>
+              <h4 className="font-medium">{t('performanceTest.memoizedComponents')}</h4>
               <p className="text-sm text-muted-foreground">
-                Built-in performance measurement tools track render times, memory usage, and
-                operation durations to identify bottlenecks.
+                {t('performanceTest.memoizedComponentsDescription')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium">Batch Data Generation</h4>
+              <h4 className="font-medium">{t('performanceTest.lazyLoading')}</h4>
               <p className="text-sm text-muted-foreground">
-                Generates large datasets in batches to prevent UI blocking, allowing for smooth
-                testing of 100,000+ records.
+                {t('performanceTest.lazyLoadingDescription')}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium">{t('performanceTest.indexedDB')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('performanceTest.indexedDBDescription')}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium">{t('performanceTest.debouncing')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('performanceTest.debouncingDescription')}
               </p>
             </div>
           </div>

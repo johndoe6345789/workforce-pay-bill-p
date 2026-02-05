@@ -1,61 +1,66 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { useTranslation } from '@/hooks/use-translation'
 
 export function QueryLanguageGuide() {
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold mb-2">Query Language Guide</h2>
+        <h2 className="text-2xl font-semibold mb-2">{t('queryGuide.title')}</h2>
         <p className="text-muted-foreground">
-          Use our powerful query language to filter and sort data across all listing views
+          {t('queryGuide.subtitle')}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Basic Syntax</CardTitle>
-          <CardDescription>Combine field, operator, and value to create filters</CardDescription>
+          <CardTitle>{t('queryGuide.basicSyntax')}</CardTitle>
+          <CardDescription>{t('queryGuide.basicSyntaxDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-muted p-4 rounded-lg font-mono text-sm">
             field operator value
           </div>
           <p className="text-sm text-muted-foreground">
-            Separate multiple filters with spaces. Use quotes for values with spaces.
+            {t('queryGuide.combiningFiltersDescription')}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Operators</CardTitle>
+          <CardTitle>{t('queryGuide.operators')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2 text-sm">Text Operators</h4>
+              <h4 className="font-semibold mb-2 text-sm">{t('queryGuide.textOperators')}</h4>
               <div className="space-y-2">
-                <OperatorRow operator=":" description="Contains text (case-insensitive)" />
-                <OperatorRow operator="=" description="Equals exactly" />
-                <OperatorRow operator="starts" description="Starts with text" />
-                <OperatorRow operator="ends" description="Ends with text" />
+                <OperatorRow operator=":" description={t('queryGuide.contains')} />
+                <OperatorRow operator="=" description={t('queryGuide.equals')} />
+                <OperatorRow operator="starts" description={t('queryGuide.startsWith')} />
+                <OperatorRow operator="ends" description={t('queryGuide.endsWith')} />
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2 text-sm">Number Operators</h4>
+              <h4 className="font-semibold mb-2 text-sm">{t('queryGuide.numberOperators')}</h4>
               <div className="space-y-2">
-                <OperatorRow operator="=" description="Equals number" />
-                <OperatorRow operator=">" description="Greater than" />
-                <OperatorRow operator=">=" description="Greater than or equal" />
-                <OperatorRow operator="<" description="Less than" />
-                <OperatorRow operator="<=" description="Less than or equal" />
+                <OperatorRow operator="=" description={t('queryGuide.equals')} />
+                <OperatorRow operator=">" description={t('queryGuide.greaterThan')} />
+                <OperatorRow operator=">=" description={t('queryGuide.greaterThanOrEqual')} />
+                <OperatorRow operator="<" description={t('queryGuide.lessThan')} />
+                <OperatorRow operator="<=" description={t('queryGuide.lessThanOrEqual')} />
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2 text-sm">List Operators</h4>
+              <h4 className="font-semibold mb-2 text-sm">{t('queryGuide.dateOperators')}</h4>
               <div className="space-y-2">
-                <OperatorRow operator="in" description="Value in comma-separated list" />
+                <OperatorRow operator="before" description={t('queryGuide.before')} />
+                <OperatorRow operator="after" description={t('queryGuide.after')} />
+                <OperatorRow operator="between" description={t('queryGuide.between')} />
               </div>
             </div>
           </div>
@@ -64,30 +69,28 @@ export function QueryLanguageGuide() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Sorting</CardTitle>
-          <CardDescription>Order results by any field</CardDescription>
+          <CardTitle>{t('queryGuide.combiningFilters')}</CardTitle>
+          <CardDescription>{t('queryGuide.combiningFiltersDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="bg-muted p-3 rounded-lg font-mono text-sm">
-            sort fieldName asc
-          </div>
-          <div className="bg-muted p-3 rounded-lg font-mono text-sm">
-            sort fieldName desc
-          </div>
           <p className="text-sm text-muted-foreground">
-            Add sorting at the end of your query to order results ascending (asc) or descending (desc)
+            {t('queryGuide.quotedValues')}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {t('queryGuide.fieldNames')}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Examples by View</CardTitle>
+          <CardTitle>{t('queryGuide.examples')}</CardTitle>
+          <CardDescription>{t('queryGuide.examplesDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
             <h4 className="font-semibold mb-3 flex items-center gap-2">
-              Timesheets
+              {t('navigation.timesheets')}
               <Badge variant="outline">status, hours, amount</Badge>
             </h4>
             <div className="space-y-2">
