@@ -3,8 +3,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { useAdvancedTable, TableColumn } from '@/hooks/use-advanced-table'
-import { CaretUp, CaretDown, CaretUpDown, MagnifyingGlass } from '@phosphor-icons/react'
+import { useDataExport } from '@/hooks/use-data-export'
+import { CaretUp, CaretDown, CaretUpDown, MagnifyingGlass, Export, FileCsv, FileXls, FileCode } from '@phosphor-icons/react'
+import { toast } from 'sonner'
 
 interface AdvancedDataTableProps<T> {
   data: T[]
@@ -12,6 +15,8 @@ interface AdvancedDataTableProps<T> {
   initialPageSize?: number
   showSearch?: boolean
   showPagination?: boolean
+  showExport?: boolean
+  exportFilename?: string
   emptyMessage?: string
   rowKey: keyof T
   onRowClick?: (row: T) => void
@@ -24,6 +29,8 @@ export function AdvancedDataTable<T>({
   initialPageSize = 20,
   showSearch = true,
   showPagination = true,
+  showExport = true,
+  exportFilename = 'export',
   emptyMessage = 'No data available',
   rowKey,
   onRowClick,
@@ -44,6 +51,49 @@ export function AdvancedDataTable<T>({
     filteredCount,
   } = useAdvancedTable(data, columns, initialPageSize)
 
+  const { exportToCSV, exportToExcel, exportToJSON } = useDataExport()
+
+  const handleExport = (format: 'csv' | 'xlsx' | 'json') => {
+    try {
+      const exportData = items.length > 0 ? items : data
+      
+      if (exportData.length === 0) {
+        toast.error('No data to export')
+        return
+      }
+
+      const exportColumns = columns.map(col => String(col.key))
+      const formattedData = exportData.map(row => {
+        const formattedRow: any = {}
+        columns.forEach(col => {
+          const key = String(col.key)
+          const value = row[col.key]
+          formattedRow[col.label] = value
+        })
+        return formattedRow
+      })
+
+      const options = {
+        filename: exportFilename,
+        includeHeaders: true,
+      }
+
+      if (format === 'csv') {
+        exportToCSV(formattedData, options)
+        toast.success(`Exported ${formattedData.length} rows to CSV`)
+      } else if (format === 'xlsx') {
+        exportToExcel(formattedData, options)
+        toast.success(`Exported ${formattedData.length} rows to Excel`)
+      } else if (format === 'json') {
+        exportToJSON(formattedData, options)
+        toast.success(`Exported ${formattedData.length} rows to JSON`)
+      }
+    } catch (error) {
+      toast.error('Failed to export data')
+      console.error('Export error:', error)
+    }
+  }
+
   const getSortIcon = (columnKey: keyof T) => {
     if (!state.sortConfig || state.sortConfig.key !== columnKey) {
       return <CaretUpDown size={16} className="text-muted-foreground" />
@@ -56,27 +106,56 @@ export function AdvancedDataTable<T>({
 
   return (
     <div className="space-y-4">
-      {showSearch && (
+      {(showSearch || showExport) && (
         <div className="flex items-center gap-4">
-          <div className="relative flex-1">
-            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input
-              type="text"
-              placeholder="Search..."
-              value={state.searchQuery}
-              onChange={(e) => actions.setSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          {state.searchQuery && (
-            <Button 
-              variant="outline" 
-              onClick={() => actions.setSearch('')}
-              size="sm"
-            >
-              Clear Search
-            </Button>
+          {showSearch && (
+            <>
+              <div className="relative flex-1">
+                <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <Input
+                  type="text"
+                  placeholder="Search..."
+                  value={state.searchQuery}
+                  onChange={(e) => actions.setSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              {state.searchQuery && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => actions.setSearch('')}
+                  size="sm"
+                >
+                  Clear Search
+                </Button>
+              )}
+            </>
+          )}
+
+          {showExport && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Export className="mr-2" size={18} />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExport('csv')}>
+                  <FileCsv className="mr-2" size={18} />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('xlsx')}>
+                  <FileXls className="mr-2" size={18} />
+                  Export as Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('json')}>
+                  <FileCode className="mr-2" size={18} />
+                  Export as JSON
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       )}

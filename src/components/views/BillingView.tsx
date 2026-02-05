@@ -337,13 +337,6 @@ export function BillingView({
         placeholder={t('billing.searchPlaceholder')}
       />
 
-      <Stack direction="horizontal" spacing={4}>
-        <Button variant="outline">
-          <Download size={18} className="mr-2" />
-          {t('billing.export')}
-        </Button>
-      </Stack>
-
       <AdvancedDataTable
         data={filteredInvoices}
         columns={invoiceColumns}
@@ -352,6 +345,8 @@ export function BillingView({
         emptyMessage={t('billing.noInvoicesFound')}
         showSearch={true}
         showPagination={true}
+        showExport={true}
+        exportFilename={`invoices-${new Date().toISOString().split('T')[0]}`}
         initialPageSize={20}
       />
 

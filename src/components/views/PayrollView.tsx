@@ -454,6 +454,8 @@ export function PayrollView({ timesheets, workers }: PayrollViewProps) {
             emptyMessage={t('payroll.noPayrollRunsYet')}
             showSearch={true}
             showPagination={true}
+            showExport={true}
+            exportFilename={`payroll-runs-${new Date().toISOString().split('T')[0]}`}
             initialPageSize={20}
           />
         </TabsContent>
