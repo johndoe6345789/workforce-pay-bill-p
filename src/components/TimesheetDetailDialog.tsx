@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Clock, User, Building, CalendarBlank, CurrencyDollar, CheckCircle, XCircle, ClockCounterClockwise } from '@phosphor-icons/react'
 import type { Timesheet } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface TimesheetDetailDialogProps {
   timesheet: Timesheet | null
@@ -14,6 +15,8 @@ interface TimesheetDetailDialogProps {
 }
 
 export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: TimesheetDetailDialogProps) {
+  const { t } = useTranslation()
+  
   if (!timesheet) return null
 
   const statusConfig = {
@@ -49,7 +52,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span>Timesheet Details</span>
+                <span>{t('timesheetDetailDialog.title')}</span>
                 <Badge variant={timesheet.status === 'approved' ? 'success' : timesheet.status === 'rejected' ? 'destructive' : 'warning'}>
                   {timesheet.status}
                 </Badge>
@@ -64,9 +67,9 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
         <ScrollArea className="max-h-[calc(90vh-120px)]">
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="shifts">Shifts ({timesheet.shifts?.length || 0})</TabsTrigger>
-              <TabsTrigger value="history">History</TabsTrigger>
+              <TabsTrigger value="overview">{t('timesheetDetailDialog.overview')}</TabsTrigger>
+              <TabsTrigger value="shifts">{t('timesheetDetailDialog.shiftsCount', { count: timesheet.shifts?.length || 0 })}</TabsTrigger>
+              <TabsTrigger value="history">{t('timesheetDetailDialog.history')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4 mt-4">
@@ -74,7 +77,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <User size={16} />
-                    <span>Worker</span>
+                    <span>{t('timesheetDetailDialog.worker')}</span>
                   </div>
                   <p className="font-medium">{timesheet.workerName}</p>
                   <p className="text-xs text-muted-foreground">ID: {timesheet.workerId}</p>
@@ -83,7 +86,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <Building size={16} />
-                    <span>Client</span>
+                    <span>{t('timesheetDetailDialog.client')}</span>
                   </div>
                   <p className="font-medium">{timesheet.clientName}</p>
                 </div>
@@ -91,7 +94,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <CalendarBlank size={16} />
-                    <span>Week Ending</span>
+                    <span>{t('timesheetDetailDialog.weekEnding')}</span>
                   </div>
                   <p className="font-medium">{new Date(timesheet.weekEnding).toLocaleDateString()}</p>
                 </div>
@@ -99,7 +102,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <Clock size={16} />
-                    <span>Total Hours</span>
+                    <span>{t('timesheetDetailDialog.totalHours')}</span>
                   </div>
                   <p className="font-medium font-mono text-lg">{timesheet.hours.toFixed(2)}</p>
                 </div>
@@ -107,7 +110,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <CurrencyDollar size={16} />
-                    <span>Amount</span>
+                    <span>{t('timesheetDetailDialog.amount')}</span>
                   </div>
                   <p className="font-semibold font-mono text-lg">£{timesheet.amount.toFixed(2)}</p>
                 </div>
@@ -116,7 +119,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
                       <CurrencyDollar size={16} />
-                      <span>Hourly Rate</span>
+                      <span>{t('timesheetDetailDialog.hourlyRate')}</span>
                     </div>
                     <p className="font-medium font-mono">£{timesheet.rate.toFixed(2)}/hr</p>
                   </div>
@@ -126,27 +129,27 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
               <Separator />
 
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Submission Details</h4>
+                <h4 className="font-semibold text-sm">{t('timesheetDetailDialog.submissionDetails')}</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground">Submitted Date</p>
+                    <p className="text-muted-foreground">{t('timesheetDetailDialog.submittedDate')}</p>
                     <p className="font-medium">{new Date(timesheet.submittedDate).toLocaleString()}</p>
                   </div>
                   {timesheet.submissionMethod && (
                     <div>
-                      <p className="text-muted-foreground">Submission Method</p>
+                      <p className="text-muted-foreground">{t('timesheetDetailDialog.submissionMethod')}</p>
                       <Badge variant="outline">{timesheet.submissionMethod}</Badge>
                     </div>
                   )}
                   {timesheet.approvedDate && (
                     <div>
-                      <p className="text-muted-foreground">Approved Date</p>
+                      <p className="text-muted-foreground">{t('timesheetDetailDialog.approvedDate')}</p>
                       <p className="font-medium">{new Date(timesheet.approvedDate).toLocaleString()}</p>
                     </div>
                   )}
                   {timesheet.currentApprovalStep && (
                     <div>
-                      <p className="text-muted-foreground">Current Step</p>
+                      <p className="text-muted-foreground">{t('timesheetDetailDialog.currentStep')}</p>
                       <Badge variant="outline">{timesheet.currentApprovalStep}</Badge>
                     </div>
                   )}
@@ -157,7 +160,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                 <>
                   <Separator />
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Adjustments</h4>
+                    <h4 className="font-semibold text-sm">{t('timesheetDetailDialog.adjustments')}</h4>
                     <div className="space-y-2">
                       {timesheet.adjustments.map((adj) => (
                         <div key={adj.id} className="bg-muted/30 rounded p-3 text-sm">
@@ -169,14 +172,14 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <p className="text-muted-foreground">Hours</p>
+                              <p className="text-muted-foreground">{t('timesheetDetailDialog.hours')}</p>
                               <p className="font-mono">
                                 {adj.previousHours} → {adj.newHours}
                               </p>
                             </div>
                             {adj.previousRate && adj.newRate && (
                               <div>
-                                <p className="text-muted-foreground">Rate</p>
+                                <p className="text-muted-foreground">{t('timesheetDetailDialog.rate')}</p>
                                 <p className="font-mono">
                                   £{adj.previousRate} → £{adj.newRate}
                                 </p>
@@ -184,7 +187,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground mt-2">{adj.reason}</p>
-                          <p className="text-xs text-muted-foreground">By: {adj.adjustedBy}</p>
+                          <p className="text-xs text-muted-foreground">{t('timesheetDetailDialog.adjustedBy')}: {adj.adjustedBy}</p>
                         </div>
                       ))}
                     </div>
@@ -196,7 +199,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                 <>
                   <Separator />
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-sm text-destructive">Validation Errors</h4>
+                    <h4 className="font-semibold text-sm text-destructive">{t('timesheetDetailDialog.validationErrors')}</h4>
                     <div className="space-y-1">
                       {timesheet.validationErrors.map((error, idx) => (
                         <div key={idx} className="bg-destructive/10 text-destructive rounded p-2 text-sm">
@@ -216,7 +219,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Badge className={getShiftBadgeColor(shift.shiftType)}>
-                          {shift.shiftType}
+                          {t(`timesheetDetailDialog.shiftTypes.${shift.shiftType}`) || shift.shiftType}
                         </Badge>
                         <span className="font-medium">
                           {new Date(shift.date).toLocaleDateString('en-GB', { 
@@ -229,48 +232,48 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                       </div>
                       {shift.rateMultiplier > 1.0 && (
                         <Badge variant="outline" className="font-mono">
-                          {shift.rateMultiplier}x multiplier
+                          {t('timesheetDetailDialog.rateMultiplier', { multiplier: shift.rateMultiplier })}
                         </Badge>
                       )}
                     </div>
 
                     <div className="grid grid-cols-4 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Start Time</p>
+                        <p className="text-muted-foreground">{t('timesheetDetailDialog.startTime')}</p>
                         <p className="font-mono font-medium">{shift.startTime}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">End Time</p>
+                        <p className="text-muted-foreground">{t('timesheetDetailDialog.endTime')}</p>
                         <p className="font-mono font-medium">{shift.endTime}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Break (mins)</p>
+                        <p className="text-muted-foreground">{t('timesheetDetailDialog.breakMinutes')}</p>
                         <p className="font-mono font-medium">{shift.breakMinutes}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Hours</p>
+                        <p className="text-muted-foreground">{t('timesheetDetailDialog.hours')}</p>
                         <p className="font-mono font-medium">{shift.hours.toFixed(2)}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4 text-sm pt-2 border-t border-border">
                       <div>
-                        <p className="text-muted-foreground">Rate</p>
+                        <p className="text-muted-foreground">{t('timesheetDetailDialog.rate')}</p>
                         <p className="font-mono font-medium">£{shift.rate.toFixed(2)}/hr</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Day of Week</p>
+                        <p className="text-muted-foreground">{t('timesheetDetailDialog.dayOfWeek')}</p>
                         <p className="font-medium capitalize">{shift.dayOfWeek}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Amount</p>
+                        <p className="text-muted-foreground">{t('timesheetDetailDialog.amount')}</p>
                         <p className="font-mono font-semibold text-base">£{shift.amount.toFixed(2)}</p>
                       </div>
                     </div>
 
                     {shift.notes && (
                       <div className="pt-2 border-t border-border">
-                        <p className="text-muted-foreground text-sm">Notes</p>
+                        <p className="text-muted-foreground text-sm">{t('timesheetDetailDialog.notes')}</p>
                         <p className="text-sm">{shift.notes}</p>
                       </div>
                     )}
@@ -279,8 +282,8 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Clock size={32} className="mx-auto mb-2 opacity-50" />
-                  <p>No shift details available</p>
-                  <p className="text-sm">This timesheet uses simple hour entry</p>
+                  <p>{t('timesheetDetailDialog.noShiftDetails')}</p>
+                  <p className="text-sm">{t('timesheetDetailDialog.simpleHourEntry')}</p>
                 </div>
               )}
             </TabsContent>
@@ -307,14 +310,14 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
                       </div>
                       <div className="text-sm space-y-1">
                         <p className="text-muted-foreground">
-                          Approver: <span className="text-foreground">{entry.approverName}</span>
+                          {t('timesheetDetailDialog.approverName')}: <span className="text-foreground">{entry.approverName}</span>
                         </p>
                         <p className="text-muted-foreground">
-                          Email: <span className="text-foreground font-mono text-xs">{entry.approverEmail}</span>
+                          {t('timesheetDetailDialog.approverEmail')}: <span className="text-foreground font-mono text-xs">{entry.approverEmail}</span>
                         </p>
                         {entry.notes && (
                           <div className="mt-2 pt-2 border-t border-border">
-                            <p className="text-muted-foreground">Notes:</p>
+                            <p className="text-muted-foreground">{t('timesheetDetailDialog.approvalNotes')}:</p>
                             <p className="text-foreground">{entry.notes}</p>
                           </div>
                         )}
@@ -325,7 +328,7 @@ export function TimesheetDetailDialog({ timesheet, open, onOpenChange }: Timeshe
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <ClockCounterClockwise size={32} className="mx-auto mb-2 opacity-50" />
-                  <p>No approval history available</p>
+                  <p>{t('timesheetDetailDialog.noApprovalHistory')}</p>
                 </div>
               )}
             </TabsContent>
