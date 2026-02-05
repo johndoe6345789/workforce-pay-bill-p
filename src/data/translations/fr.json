@@ -1336,6 +1336,22 @@
     "hours2": "2 heures",
     "hours4": "4 heures"
   },
+  "sessionExpiry": {
+    "title": "Session Expirant Bientôt",
+    "description": "Votre session expirera automatiquement en raison de l'inactivité. Vous serez déconnecté dans :",
+    "timeRemainingLabel": "Temps restant :",
+    "stayLoggedIn": "Rester Connecté",
+    "logOut": "Se Déconnecter",
+    "instructionClickStay": "Cliquez sur",
+    "instructionStayLoggedIn": "Rester Connecté",
+    "instructionToContinue": "pour continuer votre session, ou",
+    "instructionLogOut": "Se Déconnecter",
+    "instructionToEnd": "pour terminer votre session maintenant.",
+    "instructionFull": "Cliquez sur <strong>Rester Connecté</strong> pour continuer votre session, ou <strong>Se Déconnecter</strong> pour terminer votre session maintenant.",
+    "minutes": "{{minutes}} minutes",
+    "seconds": "{{seconds}} secondes",
+    "timeFormat": "{{minutes}}:{{seconds}}"
+  },
   "roles": {
     "title": "Rôles et Permissions",
     "subtitle": "Gérez les rôles utilisateur et les permissions d'accès sur la plateforme",

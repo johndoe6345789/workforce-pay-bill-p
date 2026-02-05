@@ -11,6 +11,7 @@ import {
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Clock, Warning } from '@phosphor-icons/react'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface SessionExpiryDialogProps {
   open: boolean
@@ -27,6 +28,7 @@ export function SessionExpiryDialog({
   onExtend,
   onLogout,
 }: SessionExpiryDialogProps) {
+  const { t } = useTranslation()
   const minutes = Math.floor(timeRemaining / 60)
   const seconds = timeRemaining % 60
   const progressPercentage = (timeRemaining / totalWarningTime) * 100
@@ -35,7 +37,7 @@ export function SessionExpiryDialog({
     if (minutes > 0) {
       return `${minutes}:${seconds.toString().padStart(2, '0')}`
     }
-    return `${seconds} seconds`
+    return t('sessionExpiry.seconds', { seconds })
   }
 
   return (
@@ -46,10 +48,10 @@ export function SessionExpiryDialog({
             <div className="p-2 rounded-lg bg-warning/10 text-warning">
               <Warning size={24} weight="fill" aria-hidden="true" />
             </div>
-            <AlertDialogTitle className="text-xl">Session Expiring Soon</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">{t('sessionExpiry.title')}</AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-base">
-            Your session will automatically expire due to inactivity. You will be logged out in:
+            {t('sessionExpiry.description')}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -64,23 +66,23 @@ export function SessionExpiryDialog({
           <Progress 
             value={progressPercentage} 
             className="h-2"
-            aria-label={`Time remaining: ${formatTime()}`}
+            aria-label={`${t('sessionExpiry.timeRemainingLabel')} ${formatTime()}`}
           />
 
           <Alert className="bg-muted border-border">
-            <AlertDescription className="text-sm">
-              Click <strong>Stay Logged In</strong> to continue your session, or{' '}
-              <strong>Log Out</strong> to end your session now.
-            </AlertDescription>
+            <AlertDescription 
+              className="text-sm"
+              dangerouslySetInnerHTML={{ __html: t('sessionExpiry.instructionFull') }}
+            />
           </Alert>
         </div>
 
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onLogout} className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground">
-            Log Out
+            {t('sessionExpiry.logOut')}
           </AlertDialogCancel>
           <AlertDialogAction onClick={onExtend} autoFocus>
-            Stay Logged In
+            {t('sessionExpiry.stayLoggedIn')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

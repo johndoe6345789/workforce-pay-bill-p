@@ -1336,6 +1336,22 @@
     "hours2": "2 horas",
     "hours4": "4 horas"
   },
+  "sessionExpiry": {
+    "title": "Sesión Expirando Pronto",
+    "description": "Tu sesión expirará automáticamente debido a inactividad. Cerrarás sesión en:",
+    "timeRemainingLabel": "Tiempo restante:",
+    "stayLoggedIn": "Mantener Sesión Activa",
+    "logOut": "Cerrar Sesión",
+    "instructionClickStay": "Haz clic en",
+    "instructionStayLoggedIn": "Mantener Sesión Activa",
+    "instructionToContinue": "para continuar tu sesión, o",
+    "instructionLogOut": "Cerrar Sesión",
+    "instructionToEnd": "para terminar tu sesión ahora.",
+    "instructionFull": "Haz clic en <strong>Mantener Sesión Activa</strong> para continuar tu sesión, o <strong>Cerrar Sesión</strong> para terminar tu sesión ahora.",
+    "minutes": "{{minutes}} minutos",
+    "seconds": "{{seconds}} segundos",
+    "timeFormat": "{{minutes}}:{{seconds}}"
+  },
   "roles": {
     "title": "Roles y Permisos",
     "subtitle": "Gestiona roles de usuario y permisos de acceso en la plataforma",

@@ -1425,6 +1425,22 @@
     "hours2": "2 hours",
     "hours4": "4 hours"
   },
+  "sessionExpiry": {
+    "title": "Session Expiring Soon",
+    "description": "Your session will automatically expire due to inactivity. You will be logged out in:",
+    "timeRemainingLabel": "Time remaining:",
+    "stayLoggedIn": "Stay Logged In",
+    "logOut": "Log Out",
+    "instructionClickStay": "Click",
+    "instructionStayLoggedIn": "Stay Logged In",
+    "instructionToContinue": "to continue your session, or",
+    "instructionLogOut": "Log Out",
+    "instructionToEnd": "to end your session now.",
+    "instructionFull": "Click <strong>Stay Logged In</strong> to continue your session, or <strong>Log Out</strong> to end your session now.",
+    "minutes": "{{minutes}} minutes",
+    "seconds": "{{seconds}} seconds",
+    "timeFormat": "{{minutes}}:{{seconds}}"
+  },
   "roles": {
     "title": "Roles & Permissions",
     "subtitle": "Manage user roles and access permissions across the platform",
