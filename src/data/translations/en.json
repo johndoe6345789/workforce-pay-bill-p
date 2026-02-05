@@ -47,7 +47,9 @@
     "selectEntity": "Select entity",
     "componentLibrary": "Component Library",
     "businessLogicHooks": "Business Logic Hooks",
-    "logOut": "Log Out"
+    "logOut": "Log Out",
+    "viewProfile": "View profile",
+    "viewProfileFor": "View profile for {{name}}"
   },
   "entities": {
     "mainAgency": "Main Agency",
@@ -100,7 +102,8 @@
     "and": "and",
     "of": "of",
     "to": "to",
-    "from": "from"
+    "from": "from",
+    "user": "User"
   },
   "dashboard": {
     "title": "Dashboard",

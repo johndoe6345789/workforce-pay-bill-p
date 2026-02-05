@@ -47,7 +47,9 @@
     "selectEntity": "Sélectionner l'entité",
     "componentLibrary": "Bibliothèque de Composants",
     "businessLogicHooks": "Hooks de Logique Métier",
-    "logOut": "Se Déconnecter"
+    "logOut": "Se Déconnecter",
+    "viewProfile": "Voir le profil",
+    "viewProfileFor": "Voir le profil de {{name}}"
   },
   "entities": {
     "mainAgency": "Agence Principale",
@@ -100,7 +102,8 @@
     "and": "et",
     "of": "de",
     "to": "à",
-    "from": "de"
+    "from": "de",
+    "user": "Utilisateur"
   },
   "dashboard": {
     "title": "Tableau de Bord",

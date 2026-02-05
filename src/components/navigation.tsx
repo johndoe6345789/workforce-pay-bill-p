@@ -171,13 +171,13 @@ export function Sidebar({ currentView, setCurrentView, currentEntity, setCurrent
         <button
           onClick={() => setCurrentView('profile')}
           className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-secondary/50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          aria-label={`View profile for ${user?.name || 'User'}`}
+          aria-label={t('sidebar.viewProfileFor', { name: user?.name || t('common.user') || 'User' })}
         >
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium" aria-hidden="true">
             {getUserInitials()}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>
+            <p className="text-sm font-medium truncate">{user?.name || t('common.user') || 'User'}</p>
             <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
           </div>
         </button>

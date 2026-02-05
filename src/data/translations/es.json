@@ -47,7 +47,9 @@
     "selectEntity": "Seleccionar entidad",
     "componentLibrary": "Biblioteca de Componentes",
     "businessLogicHooks": "Hooks de Lógica de Negocio",
-    "logOut": "Cerrar Sesión"
+    "logOut": "Cerrar Sesión",
+    "viewProfile": "Ver perfil",
+    "viewProfileFor": "Ver perfil de {{name}}"
   },
   "entities": {
     "mainAgency": "Agencia Principal",
@@ -101,6 +103,7 @@
     "of": "de",
     "to": "a",
     "from": "desde"
+    "user": "Usuario",
   },
   "dashboard": {
     "title": "Panel de Control",
