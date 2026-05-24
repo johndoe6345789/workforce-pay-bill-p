@@ -95,5 +95,10 @@
     "packages": [
       "packages/*"
     ]
+  },
+  "overrides": {
+    "@github/spark": {
+      "vite": "$vite"
+    }
   }
 }

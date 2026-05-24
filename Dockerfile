@@ -3,7 +3,7 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 COPY . .
 ENV NODE_OPTIONS=--max-old-space-size=2048
 RUN npm run build
