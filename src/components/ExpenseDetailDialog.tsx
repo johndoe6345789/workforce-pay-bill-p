@@ -3,13 +3,14 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
-import { Camera, CheckCircle, XCircle, ClockCounterClockwise } from '@phosphor-icons/react'
+import { Camera, CheckCircle, XCircle } from '@phosphor-icons/react'
 import type { Expense } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { currencySymbol } from '@/components/invoice-detail/currencySymbol'
 import { ExpenseInfoGrid } from '@/components/expenses/ExpenseInfoGrid'
 import { ExpenseSummaryBox } from '@/components/expenses/ExpenseSummaryBox'
-import type React from 'react'
+import { ExpenseSubmissionDetails } from '@/components/expenses/ExpenseSubmissionDetails'
+import { STATUS_CONFIG, BADGE_VARIANT } from '@/data/expense-detail-config'
 
 interface Props {
   expense: Expense | null
@@ -17,17 +18,6 @@ interface Props {
   onOpenChange: (open: boolean) => void
   onApprove?: (id: string) => void
   onReject?: (id: string) => void
-}
-
-const STATUS_CONFIG: Record<string, { Icon: React.ElementType; color: string; bgColor: string }> = {
-  pending:  { Icon: ClockCounterClockwise, color: 'text-warning',     bgColor: 'bg-warning/10' },
-  approved: { Icon: CheckCircle,           color: 'text-success',     bgColor: 'bg-success/10' },
-  rejected: { Icon: XCircle,              color: 'text-destructive',  bgColor: 'bg-destructive/10' },
-  paid:     { Icon: CheckCircle,           color: 'text-success',     bgColor: 'bg-success/10' },
-}
-
-const BADGE_VARIANT: Record<string, 'success' | 'destructive' | 'warning'> = {
-  approved: 'success', paid: 'success', rejected: 'destructive', pending: 'warning',
 }
 
 export function ExpenseDetailDialog({ expense, open, onOpenChange, onApprove, onReject }: Props) {
@@ -62,31 +52,7 @@ export function ExpenseDetailDialog({ expense, open, onOpenChange, onApprove, on
               <p className="text-sm text-muted-foreground">{expense.description || 'No description provided'}</p>
             </div>
             <Separator />
-            <div className="space-y-2">
-              <h4 className="font-semibold text-sm">Submission Details</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Submitted Date</p>
-                  <p className="font-medium">{new Date(expense.submittedDate).toLocaleString()}</p>
-                </div>
-                {expense.approvedDate && (
-                  <div>
-                    <p className="text-muted-foreground">Approved Date</p>
-                    <p className="font-medium">{new Date(expense.approvedDate).toLocaleString()}</p>
-                  </div>
-                )}
-                <div>
-                  <p className="text-muted-foreground">Currency</p>
-                  <p className="font-mono font-medium">{expense.currency}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Billable Status</p>
-                  <Badge variant={expense.billable ? 'default' : 'outline'}>
-                    {expense.billable ? 'Billable to Client' : 'Not Billable'}
-                  </Badge>
-                </div>
-              </div>
-            </div>
+            <ExpenseSubmissionDetails expense={expense} />
             <Separator />
             <div className="space-y-2">
               <h4 className="font-semibold text-sm">Receipt</h4>

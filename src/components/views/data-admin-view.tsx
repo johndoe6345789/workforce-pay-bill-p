@@ -1,42 +1,19 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Database, Download, ArrowClockwise, FileJs } from '@phosphor-icons/react'
+import { Database, FileJs } from '@phosphor-icons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { PermissionGate } from '@/components/PermissionGate'
 import { IndexedDBDemo } from '@/components/IndexedDBDemo'
+import { DataFlowCard } from '@/components/admin/DataFlowCard'
 import { useTranslation } from '@/hooks/use-translation'
 import { useDataAdminView } from '@/hooks/useDataAdminView'
-import type React from 'react'
-
-const STORAGE_ENTITIES: { labelKey: string; kvKey: string }[] = [
-  { labelKey: 'navigation.timesheets',      kvKey: 'timesheets' },
-  { labelKey: 'navigation.billing',         kvKey: 'invoices' },
-  { labelKey: 'navigation.payroll',         kvKey: 'payroll-runs' },
-  { labelKey: 'auditTrail.entities.workers', kvKey: 'workers' },
-  { labelKey: 'navigation.compliance',      kvKey: 'compliance-docs' },
-  { labelKey: 'navigation.expenses',        kvKey: 'expenses' },
-  { labelKey: 'navigation.rateTemplates',   kvKey: 'rate-cards' },
-  { labelKey: 'billing.client',             kvKey: 'clients' },
-]
-
-const ACTION_CARDS: { Icon: React.ElementType; titleKey: string; descKey: string; infoKey: string; btnKey: string; variant?: 'destructive' | undefined; action: 'export' | 'reset' }[] = [
-  { Icon: Download,       titleKey: 'dataAdmin.exportCurrentData', descKey: 'dataAdmin.exportCurrentDataDescription', infoKey: 'dataAdmin.exportDataInfo', btnKey: 'dataAdmin.exportData', action: 'export' },
-  { Icon: ArrowClockwise, titleKey: 'dataAdmin.resetToDefault',    descKey: 'dataAdmin.resetToDefaultDescription',    infoKey: 'dataAdmin.resetDataInfo',   btnKey: 'dataAdmin.resetData',   variant: 'destructive', action: 'reset' },
-]
-
-const DATA_FLOW_STEPS: { titleKey: string; descKey: string }[] = [
-  { titleKey: 'dataAdmin.loadFromJson',    descKey: 'dataAdmin.loadFromJsonDescription' },
-  { titleKey: 'dataAdmin.storeInKv',      descKey: 'dataAdmin.storeInKvDescription' },
-  { titleKey: 'dataAdmin.useInApp',       descKey: 'dataAdmin.useInAppDescription' },
-  { titleKey: 'dataAdmin.persistChanges', descKey: 'dataAdmin.persistChangesDescription' },
-]
+import { STORAGE_ENTITIES, ACTION_CARDS } from '@/data/data-admin-view-data'
 
 export function DataAdminView() {
   const { t } = useTranslation()
   const { resetAllData, exportData, viewAllKeys } = useDataAdminView()
-
   const actionHandlers = { export: exportData, reset: resetAllData }
 
   return (
@@ -58,9 +35,9 @@ export function DataAdminView() {
             <Card key={action}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Icon className="h-5 w-5" />{t(titleKey)}</CardTitle>
-                <CardDescription>{t(descKey)}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">{t(descKey)}</p>
                 <p className="text-sm text-muted-foreground">{t(infoKey)}</p>
                 <Button onClick={actionHandlers[action]} variant={variant} className="w-full">
                   <Icon className="mr-2 h-4 w-4" />{t(btnKey)}
@@ -96,24 +73,7 @@ export function DataAdminView() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('dataAdmin.dataFlow')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {DATA_FLOW_STEPS.map(({ titleKey, descKey }, i) => (
-                <div key={titleKey} className="flex items-start gap-3">
-                  <Badge className="mt-0.5">{i + 1}</Badge>
-                  <div>
-                    <p className="font-medium text-sm">{t(titleKey)}</p>
-                    <p className="text-xs text-muted-foreground">{t(descKey)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <DataFlowCard t={t} />
 
         <IndexedDBDemo />
       </div>

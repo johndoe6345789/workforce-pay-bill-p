@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { ShieldCheck, FileText, Warning, CheckCircle, XCircle, UploadSimple } from '@phosphor-icons/react'
 import { ComplianceInfoGrid } from '@/components/compliance/ComplianceInfoGrid'
+import { ComplianceDocumentDetails } from '@/components/compliance/ComplianceDocumentDetails'
 import type { ComplianceDocument } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import type React from 'react'
@@ -33,7 +34,6 @@ export function ComplianceDetailDialog({ document, open, onOpenChange }: Props) 
   const cfg = STATUS_CONFIG[document.status] ?? STATUS_CONFIG.expired
   const { Icon, color, bgColor, message, messageColor } = cfg
   const badgeVariant = BADGE_VARIANT[document.status] ?? 'destructive'
-  const days = document.daysUntilExpiry
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,24 +74,7 @@ export function ComplianceDetailDialog({ document, open, onOpenChange }: Props) 
 
             <Separator />
 
-            <div className="space-y-2">
-              <h4 className="font-semibold text-sm">Document Details</h4>
-              <div className="bg-muted/30 rounded-lg p-4">
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div><p className="text-muted-foreground">Document ID</p><p className="font-mono">{document.id}</p></div>
-                  <div><p className="text-muted-foreground">Worker ID</p><p className="font-mono">{document.workerId}</p></div>
-                  <div><p className="text-muted-foreground">Worker Name</p><p className="font-medium">{document.workerName}</p></div>
-                  <div><p className="text-muted-foreground">Type</p><p className="font-medium">{document.documentType}</p></div>
-                  <div><p className="text-muted-foreground">Expiry Date</p><p className="font-medium">{new Date(document.expiryDate).toLocaleDateString()}</p></div>
-                  <div><p className="text-muted-foreground">Status</p><Badge variant={badgeVariant}>{document.status}</Badge></div>
-                  <div><p className="text-muted-foreground">Days Remaining</p>
-                    <p className={cn('font-mono font-semibold', days < 0 ? 'text-destructive' : days < 30 ? 'text-warning' : 'text-success')}>
-                      {days < 0 ? `${Math.abs(days)} days overdue` : `${days} days`}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ComplianceDocumentDetails document={document} badgeVariant={badgeVariant} />
 
             <Separator />
 
