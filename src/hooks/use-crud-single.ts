@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
 import { indexedDB, type BaseEntity } from '@/lib/indexed-db'
+import type { SetEntities } from './use-crud-single.types'
 
-type SetEntities<T> = (updater: (prev: T[]) => T[]) => void
+export type { SetEntities, CrudSingleRead, CrudSingleWrite } from './use-crud-single.types'
 
 export function useCrudSingle<T extends BaseEntity>(
   storeName: string,

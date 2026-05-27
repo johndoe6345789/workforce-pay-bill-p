@@ -5,8 +5,8 @@ import { useTranslation } from '@/hooks/use-translation'
 import {
   calculateMarginAnalysis,
   generateForecast,
-  deriveReportsSummary,
 } from './use-reports-calculations'
+import { deriveReportsSummary } from './use-reports-summary'
 import { useReportsExports } from './use-reports-exports'
 
 export function useReportsView() {
