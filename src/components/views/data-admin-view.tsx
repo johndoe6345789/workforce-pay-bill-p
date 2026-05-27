@@ -1,253 +1,121 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { toast } from 'sonner'
 import { Database, Download, ArrowClockwise, FileJs } from '@phosphor-icons/react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { PermissionGate } from '@/components/PermissionGate'
 import { IndexedDBDemo } from '@/components/IndexedDBDemo'
 import { useTranslation } from '@/hooks/use-translation'
+import { useDataAdminView } from '@/hooks/useDataAdminView'
+import type React from 'react'
+
+const STORAGE_ENTITIES: { labelKey: string; kvKey: string }[] = [
+  { labelKey: 'navigation.timesheets',      kvKey: 'timesheets' },
+  { labelKey: 'navigation.billing',         kvKey: 'invoices' },
+  { labelKey: 'navigation.payroll',         kvKey: 'payroll-runs' },
+  { labelKey: 'auditTrail.entities.workers', kvKey: 'workers' },
+  { labelKey: 'navigation.compliance',      kvKey: 'compliance-docs' },
+  { labelKey: 'navigation.expenses',        kvKey: 'expenses' },
+  { labelKey: 'navigation.rateTemplates',   kvKey: 'rate-cards' },
+  { labelKey: 'billing.client',             kvKey: 'clients' },
+]
+
+const ACTION_CARDS: { Icon: React.ElementType; titleKey: string; descKey: string; infoKey: string; btnKey: string; variant?: 'destructive' | undefined; action: 'export' | 'reset' }[] = [
+  { Icon: Download,       titleKey: 'dataAdmin.exportCurrentData', descKey: 'dataAdmin.exportCurrentDataDescription', infoKey: 'dataAdmin.exportDataInfo', btnKey: 'dataAdmin.exportData', action: 'export' },
+  { Icon: ArrowClockwise, titleKey: 'dataAdmin.resetToDefault',    descKey: 'dataAdmin.resetToDefaultDescription',    infoKey: 'dataAdmin.resetDataInfo',   btnKey: 'dataAdmin.resetData',   variant: 'destructive', action: 'reset' },
+]
+
+const DATA_FLOW_STEPS: { titleKey: string; descKey: string }[] = [
+  { titleKey: 'dataAdmin.loadFromJson',    descKey: 'dataAdmin.loadFromJsonDescription' },
+  { titleKey: 'dataAdmin.storeInKv',      descKey: 'dataAdmin.storeInKvDescription' },
+  { titleKey: 'dataAdmin.useInApp',       descKey: 'dataAdmin.useInAppDescription' },
+  { titleKey: 'dataAdmin.persistChanges', descKey: 'dataAdmin.persistChangesDescription' },
+]
 
 export function DataAdminView() {
   const { t } = useTranslation()
+  const { resetAllData, exportData, viewAllKeys } = useDataAdminView()
 
-  const resetAllData = async () => {
-    try {
-      await window.spark.kv.delete('sample-data-initialized')
-      await window.spark.kv.delete('timesheets')
-      await window.spark.kv.delete('invoices')
-      await window.spark.kv.delete('payroll-runs')
-      await window.spark.kv.delete('workers')
-      await window.spark.kv.delete('compliance-docs')
-      await window.spark.kv.delete('expenses')
-      await window.spark.kv.delete('rate-cards')
-      await window.spark.kv.delete('clients')
-
-      toast.success(t('dataAdmin.dataClearedSuccess'), {
-        description: t('dataAdmin.dataClearedSuccessDescription')
-      })
-    } catch (error) {
-      toast.error(t('dataAdmin.dataClearFailed'))
-    }
-  }
-
-  const exportData = async () => {
-    try {
-      const timesheets = await window.spark.kv.get('timesheets')
-      const invoices = await window.spark.kv.get('invoices')
-      const payrollRuns = await window.spark.kv.get('payroll-runs')
-      const workers = await window.spark.kv.get('workers')
-      const complianceDocs = await window.spark.kv.get('compliance-docs')
-      const expenses = await window.spark.kv.get('expenses')
-      const rateCards = await window.spark.kv.get('rate-cards')
-      const clients = await window.spark.kv.get('clients')
-
-      const data = {
-        timesheets,
-        invoices,
-        payrollRuns,
-        workers,
-        complianceDocs,
-        expenses,
-        rateCards,
-        clients
-      }
-
-      const dataStr = JSON.stringify(data, null, 2)
-      const blob = new Blob([dataStr], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `workforce-data-${new Date().toISOString().split('T')[0]}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-
-      toast.success(t('dataAdmin.dataExportedSuccess'), {
-        description: t('dataAdmin.dataExportedSuccessDescription')
-      })
-    } catch (error) {
-      toast.error(t('dataAdmin.dataExportFailed'))
-    }
-  }
-
-  const viewAllKeys = async () => {
-    try {
-      const keys = await window.spark.kv.keys()
-      console.log('All KV Storage Keys:', keys)
-      toast.success(t('dataAdmin.foundKeys', { count: keys.length }), {
-        description: t('dataAdmin.foundKeysDescription')
-      })
-    } catch (error) {
-      toast.error(t('dataAdmin.keysFailed'))
-    }
-  }
+  const actionHandlers = { export: exportData, reset: resetAllData }
 
   return (
     <PermissionGate permission="settings.edit">
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-semibold mb-2">{t('dataAdmin.title')}</h1>
-          <p className="text-muted-foreground">
-            {t('dataAdmin.subtitle')}
-          </p>
+          <p className="text-muted-foreground">{t('dataAdmin.subtitle')}</p>
         </div>
 
         <Alert>
           <FileJs className="h-4 w-4" />
           <AlertTitle>{t('dataAdmin.jsonBasedData')}</AlertTitle>
-          <AlertDescription>
-            {t('dataAdmin.jsonBasedDataDescription')}
-          </AlertDescription>
+          <AlertDescription>{t('dataAdmin.jsonBasedDataDescription')}</AlertDescription>
         </Alert>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+          {ACTION_CARDS.map(({ Icon, titleKey, descKey, infoKey, btnKey, variant, action }) => (
+            <Card key={action}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Icon className="h-5 w-5" />{t(titleKey)}</CardTitle>
+                <CardDescription>{t(descKey)}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">{t(infoKey)}</p>
+                <Button onClick={actionHandlers[action]} variant={variant} className="w-full">
+                  <Icon className="mr-2 h-4 w-4" />{t(btnKey)}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
-              {t('dataAdmin.exportCurrentData')}
-            </CardTitle>
-            <CardDescription>
-              {t('dataAdmin.exportCurrentDataDescription')}
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2"><Database className="h-5 w-5" />{t('dataAdmin.storageInformation')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t('dataAdmin.exportDataInfo')}
-            </p>
-            <Button onClick={exportData} className="w-full">
-              <Download className="mr-2 h-4 w-4" />
-              {t('dataAdmin.exportData')}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">{t('dataAdmin.dataEntities')}</span>
+                <Badge variant="secondary">{STORAGE_ENTITIES.length}</Badge>
+              </div>
+              <Separator />
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                {STORAGE_ENTITIES.map(({ labelKey, kvKey }) => (
+                  <div key={kvKey} className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t(labelKey)}</span>
+                    <Badge variant="outline">{kvKey}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <Button onClick={viewAllKeys} variant="outline" className="w-full">
+              <Database className="mr-2 h-4 w-4" />{t('dataAdmin.viewAllKeys')}
             </Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ArrowClockwise className="h-5 w-5" />
-              {t('dataAdmin.resetToDefault')}
-            </CardTitle>
-            <CardDescription>
-              {t('dataAdmin.resetToDefaultDescription')}
-            </CardDescription>
+            <CardTitle>{t('dataAdmin.dataFlow')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t('dataAdmin.resetDataInfo')}
-            </p>
-            <Button onClick={resetAllData} variant="destructive" className="w-full">
-              <ArrowClockwise className="mr-2 h-4 w-4" />
-              {t('dataAdmin.resetData')}
-            </Button>
+          <CardContent>
+            <div className="space-y-3">
+              {DATA_FLOW_STEPS.map(({ titleKey, descKey }, i) => (
+                <div key={titleKey} className="flex items-start gap-3">
+                  <Badge className="mt-0.5">{i + 1}</Badge>
+                  <div>
+                    <p className="font-medium text-sm">{t(titleKey)}</p>
+                    <p className="text-xs text-muted-foreground">{t(descKey)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            {t('dataAdmin.storageInformation')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t('dataAdmin.dataEntities')}</span>
-              <Badge variant="secondary">8</Badge>
-            </div>
-            <Separator />
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.timesheets')}</span>
-                <Badge variant="outline">timesheets</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.billing')}</span>
-                <Badge variant="outline">invoices</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.payroll')}</span>
-                <Badge variant="outline">payroll-runs</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('auditTrail.entities.workers')}</span>
-                <Badge variant="outline">workers</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.compliance')}</span>
-                <Badge variant="outline">compliance-docs</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.expenses')}</span>
-                <Badge variant="outline">expenses</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('navigation.rateTemplates')}</span>
-                <Badge variant="outline">rate-cards</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t('billing.client')}</span>
-                <Badge variant="outline">clients</Badge>
-              </div>
-            </div>
-          </div>
-          <Button onClick={viewAllKeys} variant="outline" className="w-full">
-            <Database className="mr-2 h-4 w-4" />
-            {t('dataAdmin.viewAllKeys')}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('dataAdmin.dataFlow')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <Badge className="mt-0.5">1</Badge>
-              <div>
-                <p className="font-medium text-sm">{t('dataAdmin.loadFromJson')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('dataAdmin.loadFromJsonDescription')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Badge className="mt-0.5">2</Badge>
-              <div>
-                <p className="font-medium text-sm">{t('dataAdmin.storeInKv')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('dataAdmin.storeInKvDescription')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Badge className="mt-0.5">3</Badge>
-              <div>
-                <p className="font-medium text-sm">{t('dataAdmin.useInApp')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('dataAdmin.useInAppDescription')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Badge className="mt-0.5">4</Badge>
-              <div>
-                <p className="font-medium text-sm">{t('dataAdmin.persistChanges')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('dataAdmin.persistChangesDescription')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <IndexedDBDemo />
+        <IndexedDBDemo />
       </div>
     </PermissionGate>
   )
