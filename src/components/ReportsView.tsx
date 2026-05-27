@@ -1,12 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { TrendUp, TrendDown, ChartBar, Download, Calendar, CurrencyDollar, ChartLine, FilePdf } from '@phosphor-icons/react'
-import { cn } from '@/lib/utils'
+import { ChartBar, Download, Calendar, ChartLine, FilePdf } from '@phosphor-icons/react'
 import { useReportsView } from '@/hooks/useReportsView'
 import { MarginAnalysisTab } from '@/components/reports/MarginAnalysisTab'
 import { ForecastingTab } from '@/components/reports/ForecastingTab'
+import { ReportsMetricsGrid } from '@/components/reports/ReportsMetricsGrid'
 
 export function ReportsView() {
   const vm = useReportsView()
@@ -41,43 +40,14 @@ export function ReportsView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border-l-4 border-success/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">{vm.t('reports.totalRevenueYTD')}</CardTitle></CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold font-mono">£{vm.totalRevenue.toLocaleString()}</div>
-            <div className="flex items-center gap-1 mt-1 text-xs text-success"><TrendUp size={14} weight="bold" /><span>{vm.t('reports.yearToDate')}</span></div>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-warning/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">{vm.t('reports.totalCostsYTD')}</CardTitle></CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold font-mono">£{vm.totalCosts.toLocaleString()}</div>
-            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground"><TrendUp size={14} weight="bold" /><span>{vm.t('reports.yearToDate')}</span></div>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-accent/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">{vm.t('reports.grossMarginYTD')}</CardTitle></CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold font-mono">£{vm.totalMargin.toLocaleString()}</div>
-            <div className="flex items-center gap-1 mt-1 text-xs text-accent"><span className="font-medium">{vm.avgMarginPercentage.toFixed(1)}%</span></div>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-primary/20">
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">{vm.t('reports.momChange')}</CardTitle></CardHeader>
-          <CardContent>
-            <div className={cn('text-2xl font-semibold font-mono', vm.monthOverMonthChange >= 0 ? 'text-success' : 'text-destructive')}>
-              {vm.monthOverMonthChange >= 0 ? '+' : ''}{vm.monthOverMonthChange.toFixed(1)}%
-            </div>
-            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-              {vm.monthOverMonthChange >= 0
-                ? <TrendUp size={14} weight="bold" className="text-success" />
-                : <TrendDown size={14} weight="bold" className="text-destructive" />}
-              <span>{vm.t('reports.vsLastMonth')}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <ReportsMetricsGrid
+        totalRevenue={vm.totalRevenue}
+        totalCosts={vm.totalCosts}
+        totalMargin={vm.totalMargin}
+        avgMarginPercentage={vm.avgMarginPercentage}
+        monthOverMonthChange={vm.monthOverMonthChange}
+        t={vm.t}
+      />
 
       <Tabs defaultValue="margin-analysis" className="space-y-4">
         <TabsList>

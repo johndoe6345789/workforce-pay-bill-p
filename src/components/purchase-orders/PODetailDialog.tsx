@@ -1,11 +1,10 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Receipt, LinkSimple, X } from '@phosphor-icons/react'
 import type { PurchaseOrder, LinkedInvoice } from '@/lib/types'
 import type { Invoice } from '@/lib/types'
 import { LinkInvoiceDialog } from '@/components/purchase-orders/LinkInvoiceDialog'
+import { LinkedInvoicesList } from '@/components/purchase-orders/LinkedInvoicesList'
 
 interface Props {
   open: boolean
@@ -61,36 +60,13 @@ export function PODetailDialog({
               ))}
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold">Linked Invoices ({selectedPO.linkedInvoices.length})</h3>
-                <Button size="sm" onClick={() => setIsLinkInvoiceOpen(true)}>
-                  <LinkSimple size={16} className="mr-2" />
-                  Link Invoice
-                </Button>
-              </div>
-              {selectedPO.linkedInvoices.length > 0 ? (
-                <div className="space-y-2">
-                  {selectedPO.linkedInvoices.map(li => (
-                    <Card key={li.invoiceId}>
-                      <CardContent className="p-4 flex items-center justify-between">
-                        <div className="flex-1 grid grid-cols-3 gap-4">
-                          <div><p className="text-sm text-muted-foreground">Invoice Number</p><p className="font-semibold font-mono">{li.invoiceNumber}</p></div>
-                          <div><p className="text-sm text-muted-foreground">Amount</p><p className="font-semibold font-mono">{selectedPO.currency} {fmt(li.amount)}</p></div>
-                          <div><p className="text-sm text-muted-foreground">Linked On</p><p className="font-medium">{new Date(li.linkedDate).toLocaleDateString()}</p></div>
-                        </div>
-                        <Button size="sm" variant="ghost" onClick={() => handleUnlinkInvoice(li)}><X size={16} /></Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <Card className="p-8 text-center">
-                  <Receipt size={32} className="mx-auto text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground">No invoices linked yet</p>
-                </Card>
-              )}
-            </div>
+            <LinkedInvoicesList
+              linkedInvoices={selectedPO.linkedInvoices}
+              currency={selectedPO.currency}
+              fmt={fmt}
+              onUnlink={handleUnlinkInvoice}
+              onOpenLinkDialog={() => setIsLinkInvoiceOpen(true)}
+            />
 
             {selectedPO.notes && (
               <div>

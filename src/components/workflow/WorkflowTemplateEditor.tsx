@@ -1,16 +1,12 @@
 import { Plus, Trash, ArrowUp, ArrowDown, Check, X, PlusCircle, MinusCircle } from '@phosphor-icons/react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { StepEditorPanel } from './StepEditorPanel'
-import { useWorkflowTemplateEditor, BATCH_TYPES } from '@/hooks/useWorkflowTemplateEditor'
+import { WorkflowTemplateDetailsCard } from './WorkflowTemplateDetailsCard'
+import { useWorkflowTemplateEditor } from '@/hooks/useWorkflowTemplateEditor'
 import type { WorkflowTemplate } from '@/hooks/use-approval-workflow-templates'
 
 interface Props {
@@ -34,40 +30,7 @@ export function WorkflowTemplateEditor({ template, open, onOpenChange, onSave }:
 
         <ScrollArea className="max-h-[calc(90vh-180px)] pr-4">
           <div className="space-y-6 pb-4">
-            <Card>
-              <CardHeader><CardTitle className="text-base">Template Details</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="tmpl-name">Template Name</Label>
-                    <Input id="tmpl-name" value={vm.editedTemplate.name} onChange={e => vm.patch({ name: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="batch-type">Batch Type</Label>
-                    <Select value={vm.editedTemplate.batchType} onValueChange={value => vm.patch({ batchType: value as WorkflowTemplate['batchType'] })}>
-                      <SelectTrigger id="batch-type"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {BATCH_TYPES.map(type => <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" value={vm.editedTemplate.description} onChange={e => vm.patch({ description: e.target.value })} rows={2} />
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <Switch id="is-active" checked={vm.editedTemplate.isActive} onCheckedChange={checked => vm.patch({ isActive: checked })} />
-                    <Label htmlFor="is-active" className="cursor-pointer">Active</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch id="is-default" checked={vm.editedTemplate.isDefault} onCheckedChange={checked => vm.patch({ isDefault: checked })} />
-                    <Label htmlFor="is-default" className="cursor-pointer">Set as Default</Label>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <WorkflowTemplateDetailsCard template={vm.editedTemplate} patch={vm.patch} />
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
