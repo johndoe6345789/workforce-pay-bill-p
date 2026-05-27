@@ -5,24 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { Plus } from '@phosphor-icons/react'
-
-type ReportType = 'timesheet' | 'invoice' | 'payroll' | 'expense' | 'margin'
-type GroupByField = 'worker' | 'client' | 'date' | 'status' | 'month' | 'week'
-
-interface ReportFilter {
-  field: string
-  operator: 'equals' | 'contains' | 'greater' | 'less'
-  value: string
-}
-
-interface ReportConfig {
-  name: string
-  type: ReportType
-  dateRange: { from: string; to: string }
-  groupBy?: GroupByField
-  metrics: string[]
-  filters: ReportFilter[]
-}
+import type { ReportType, GroupByField, ReportFilter, ReportConfig } from '@/hooks/useCustomReportBuilder'
+import { ReportFilterRows } from '@/components/reports/ReportFilterRows'
 
 interface Props {
   reportConfig: ReportConfig
@@ -48,13 +32,6 @@ const GROUP_BY_OPTIONS: { value: string; label: string }[] = [
   { value: 'date',   label: 'Date' },
   { value: 'month',  label: 'Month' },
   { value: 'week',   label: 'Week' },
-]
-
-const FILTER_OPERATORS: { value: string; label: string }[] = [
-  { value: 'equals',   label: 'Equals' },
-  { value: 'contains', label: 'Contains' },
-  { value: 'greater',  label: 'Greater than' },
-  { value: 'less',     label: 'Less than' },
 ]
 
 const DATE_FIELDS: { id: string; label: string; key: 'from' | 'to' }[] = [
@@ -150,36 +127,12 @@ export function ReportConfigForm({ reportConfig, setReportConfig, availableMetri
           <Button size="sm" variant="outline" onClick={addFilter}><Plus size={16} className="mr-2" />Add Filter</Button>
         </div>
 
-        {reportConfig.filters.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No filters applied</p>
-        ) : (
-          <div className="space-y-2">
-            {reportConfig.filters.map((filter, i) => (
-              <div key={i} className="flex items-end gap-2">
-                <div className="flex-1 space-y-2">
-                  <Select value={filter.field} onValueChange={v => updateFilter(i, { field: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {availableFilters[reportConfig.type].map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <Select value={filter.operator} onValueChange={(v: any) => updateFilter(i, { operator: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {FILTER_OPERATORS.map(({ value, label }) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <Input placeholder="Value" value={filter.value} onChange={e => updateFilter(i, { value: e.target.value })} />
-                </div>
-                <Button size="sm" variant="destructive" onClick={() => removeFilter(i)}>Remove</Button>
-              </div>
-            ))}
-          </div>
-        )}
+        <ReportFilterRows
+          filters={reportConfig.filters}
+          availableFilters={availableFilters[reportConfig.type]}
+          onUpdate={updateFilter}
+          onRemove={removeFilter}
+        />
       </div>
 
       <Button className="w-full" size="lg" onClick={onGenerate}>Generate Report</Button>
