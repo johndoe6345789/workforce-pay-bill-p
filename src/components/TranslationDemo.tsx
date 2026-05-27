@@ -2,15 +2,39 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useTranslation } from '@/hooks/use-translation'
-import { 
-  Globe, 
-  CheckCircle, 
-  Warning, 
-  XCircle,
-  Info,
-  Translate
-} from '@phosphor-icons/react'
+import { Globe, XCircle, Translate } from '@phosphor-icons/react'
 import { Separator } from '@/components/ui/separator'
+import { TranslationKeyCard } from '@/components/translation-demo/TranslationKeyCard'
+import { StatusMessagesCard } from '@/components/translation-demo/StatusMessagesCard'
+import { UsageInstructionsCard } from '@/components/translation-demo/UsageInstructionsCard'
+
+const NAV_ITEMS = [
+  { label: 'Dashboard', translationKey: 'navigation.dashboard' },
+  { label: 'Timesheets', translationKey: 'navigation.timesheets' },
+  { label: 'Billing', translationKey: 'navigation.billing' },
+  { label: 'Payroll', translationKey: 'navigation.payroll' },
+  { label: 'Compliance', translationKey: 'navigation.compliance' },
+  { label: 'Expenses', translationKey: 'navigation.expenses' },
+  { label: 'Reports', translationKey: 'navigation.reports' },
+]
+
+const COMMON_ITEMS = [
+  { label: 'Search', translationKey: 'common.search' },
+  { label: 'Filter', translationKey: 'common.filter' },
+  { label: 'Export', translationKey: 'common.export' },
+  { label: 'Save', translationKey: 'common.save' },
+  { label: 'Cancel', translationKey: 'common.cancel' },
+  { label: 'Submit', translationKey: 'common.submit' },
+  { label: 'Delete', translationKey: 'common.delete' },
+]
+
+const UNREAD_COUNTS = [5, 12, 0]
+const PERIOD_CHANGES = ['+15', '-8', '+3.5']
+const VALIDATION_EXAMPLES = [
+  { key: 'validation.minLength', params: { min: 8 } },
+  { key: 'validation.maxLength', params: { max: 50 } },
+  { key: 'validation.minValue', params: { min: 0 } },
+]
 
 export function TranslationDemo() {
   const { t, locale, changeLocale, availableLocales, isLoading, error } = useTranslation()
@@ -36,9 +60,7 @@ export function TranslationDemo() {
               <CardTitle>{t('common.error')}</CardTitle>
             </div>
           </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">{t('errors.loadingFailed')}</p>
-          </CardContent>
+          <CardContent><p className="text-muted-foreground">{t('errors.loadingFailed')}</p></CardContent>
         </Card>
       </div>
     )
@@ -51,131 +73,27 @@ export function TranslationDemo() {
           <Translate size={32} weight="duotone" className="text-primary" />
           Translation System Demo
         </h2>
-        <p className="text-muted-foreground mt-1">
-          Comprehensive i18n with JSON-based translations
-        </p>
+        <p className="text-muted-foreground mt-1">Comprehensive i18n with JSON-based translations</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Globe size={20} />
-            Current Language
-          </CardTitle>
-          <CardDescription>
-            Active locale: <Badge variant="secondary">{locale}</Badge>
-          </CardDescription>
+          <CardTitle className="flex items-center gap-2"><Globe size={20} />Current Language</CardTitle>
+          <CardDescription>Active locale: <Badge variant="secondary">{locale}</Badge></CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           <div className="flex gap-2">
-            {availableLocales.map((loc) => (
-              <Button
-                key={loc}
-                variant={locale === loc ? 'default' : 'outline'}
-                onClick={() => changeLocale(loc)}
-                className="uppercase"
-              >
-                {loc}
-              </Button>
+            {availableLocales.map(loc => (
+              <Button key={loc} variant={locale === loc ? 'default' : 'outline'} onClick={() => changeLocale(loc)} className="uppercase">{loc}</Button>
             ))}
           </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Navigation Translations</CardTitle>
-            <CardDescription>Menu items in current language</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <TranslationItem label="Dashboard" translationKey="navigation.dashboard" />
-              <TranslationItem label="Timesheets" translationKey="navigation.timesheets" />
-              <TranslationItem label="Billing" translationKey="navigation.billing" />
-              <TranslationItem label="Payroll" translationKey="navigation.payroll" />
-              <TranslationItem label="Compliance" translationKey="navigation.compliance" />
-              <TranslationItem label="Expenses" translationKey="navigation.expenses" />
-              <TranslationItem label="Reports" translationKey="navigation.reports" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Common Actions</CardTitle>
-            <CardDescription>Frequently used terms</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <TranslationItem label="Search" translationKey="common.search" />
-              <TranslationItem label="Filter" translationKey="common.filter" />
-              <TranslationItem label="Export" translationKey="common.export" />
-              <TranslationItem label="Save" translationKey="common.save" />
-              <TranslationItem label="Cancel" translationKey="common.cancel" />
-              <TranslationItem label="Submit" translationKey="common.submit" />
-              <TranslationItem label="Delete" translationKey="common.delete" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Status Messages</CardTitle>
-            <CardDescription>System statuses and alerts</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <CheckCircle size={20} className="text-success" />
-                <span className="text-sm">{t('common.success')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Warning size={20} className="text-warning" />
-                <span className="text-sm">{t('common.warning')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <XCircle size={20} className="text-destructive" />
-                <span className="text-sm">{t('common.error')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Info size={20} className="text-info" />
-                <span className="text-sm">{t('common.info')}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Timesheet Statuses</CardTitle>
-            <CardDescription>Document lifecycle states</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Draft</span>
-                <Badge variant="secondary">{t('timesheets.status.draft')}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Submitted</span>
-                <Badge variant="secondary">{t('timesheets.status.submitted')}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Approved</span>
-                <Badge variant="secondary">{t('timesheets.status.approved')}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Rejected</span>
-                <Badge variant="secondary">{t('timesheets.status.rejected')}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Processed</span>
-                <Badge variant="secondary">{t('timesheets.status.processed')}</Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <TranslationKeyCard title="Navigation Translations" description="Menu items in current language" items={NAV_ITEMS} />
+        <TranslationKeyCard title="Common Actions" description="Frequently used terms" items={COMMON_ITEMS} />
+        <StatusMessagesCard />
       </div>
 
       <Card>
@@ -187,128 +105,33 @@ export function TranslationDemo() {
           <div>
             <p className="text-sm font-medium mb-2">Unread count example:</p>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">
-                {t('notifications.unreadCount', { count: 5 })}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t('notifications.unreadCount', { count: 12 })}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t('notifications.unreadCount', { count: 0 })}
-              </p>
+              {UNREAD_COUNTS.map(count => (
+                <p key={count} className="text-sm text-muted-foreground">{t('notifications.unreadCount', { count })}</p>
+              ))}
             </div>
           </div>
-
           <Separator />
-
           <div>
             <p className="text-sm font-medium mb-2">Change from period example:</p>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">
-                {t('metrics.changeFromLastPeriod', { change: '+15' })}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t('metrics.changeFromLastPeriod', { change: '-8' })}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t('metrics.changeFromLastPeriod', { change: '+3.5' })}
-              </p>
+              {PERIOD_CHANGES.map(change => (
+                <p key={change} className="text-sm text-muted-foreground">{t('metrics.changeFromLastPeriod', { change })}</p>
+              ))}
             </div>
           </div>
-
           <Separator />
-
           <div>
             <p className="text-sm font-medium mb-2">Validation messages:</p>
             <div className="space-y-1">
-              <p className="text-sm text-destructive">
-                {t('validation.minLength', { min: 8 })}
-              </p>
-              <p className="text-sm text-destructive">
-                {t('validation.maxLength', { max: 50 })}
-              </p>
-              <p className="text-sm text-destructive">
-                {t('validation.minValue', { min: 0 })}
-              </p>
+              {VALIDATION_EXAMPLES.map(({ key, params }) => (
+                <p key={key} className="text-sm text-destructive">{t(key, params)}</p>
+              ))}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-info/50 bg-info/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info size={20} className="text-info" />
-            Usage Instructions
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div>
-            <p className="text-sm font-medium mb-1">In any component:</p>
-            <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto">
-              <code>{`import { useTranslation } from '@/hooks/use-translation'
-
-function MyComponent() {
-  const { t } = useTranslation()
-  
-  return <h1>{t('navigation.dashboard')}</h1>
-}`}</code>
-            </pre>
-          </div>
-
-          <div>
-            <p className="text-sm font-medium mb-1">With parameters:</p>
-            <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto">
-              <code>{`const unreadText = t('notifications.unreadCount', { count: 5 })
-const changeText = t('metrics.changeFromLastPeriod', { change: '+12' })`}</code>
-            </pre>
-          </div>
-
-          <div>
-            <p className="text-sm font-medium mb-1">Change language:</p>
-            <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto">
-              <code>{`const { changeLocale } = useTranslation()
-changeLocale('es') // Switch to Spanish
-changeLocale('fr') // Switch to French`}</code>
-            </pre>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Translation files location:</p>
-            <ul className="text-xs space-y-1 text-muted-foreground">
-              <li>• <code className="bg-muted px-1 py-0.5 rounded">/src/data/translations/en.json</code> - English</li>
-              <li>• <code className="bg-muted px-1 py-0.5 rounded">/src/data/translations/es.json</code> - Spanish</li>
-              <li>• <code className="bg-muted px-1 py-0.5 rounded">/src/data/translations/fr.json</code> - French</li>
-            </ul>
-          </div>
-
-          <Separator />
-
-          <div>
-            <p className="text-sm font-medium mb-1">Features:</p>
-            <ul className="text-xs space-y-1 text-muted-foreground">
-              <li>✓ Persistent language preference (saved to KV store)</li>
-              <li>✓ Automatic fallback to English if translation missing</li>
-              <li>✓ Parameter interpolation with {`{{variable}}`} syntax</li>
-              <li>✓ Nested translation keys with dot notation</li>
-              <li>✓ Language switcher in header</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-function TranslationItem({ label, translationKey }: { label: string; translationKey: string }) {
-  const { t } = useTranslation()
-  
-  return (
-    <div className="flex items-center justify-between py-1">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium">{t(translationKey)}</span>
+      <UsageInstructionsCard />
     </div>
   )
 }
