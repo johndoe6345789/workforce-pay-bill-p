@@ -4,10 +4,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import { Plus } from '@phosphor-icons/react'
-import { DAYS_OF_WEEK, SHIFT_TYPES, calculateHours } from '@/data/shiftPatternConfig'
+import { SHIFT_TYPES } from '@/data/shiftPatternConfig'
 import type { ShiftPatternTemplate, ShiftType, DayOfWeek } from '@/lib/types'
+import { ShiftDaysAndSummary } from './ShiftDaysAndSummary'
 
 interface Props {
   open: boolean
@@ -73,27 +73,7 @@ export function ShiftPatternDialog({ open, onOpenChange, editingPattern, formDat
             <Input id="rate-multiplier" type="number" min="1.0" step="0.1" value={formData.rateMultiplier} onChange={e => patch({ rateMultiplier: parseFloat(e.target.value) || 1.0 })} />
             <p className="text-xs text-muted-foreground">{t('shiftPatterns.rateMultiplierHelper', { multiplier: formData.rateMultiplier || 1.0, rate: ((formData.rateMultiplier || 1.0) * 25).toFixed(2) })}</p>
           </div>
-          <Separator />
-          <div className="space-y-3">
-            <Label>{t('shiftPatterns.daysOfWeekLabel')}</Label>
-            <div className="grid grid-cols-4 gap-2">
-              {DAYS_OF_WEEK.map(day => (
-                <Button key={day} type="button" variant={formData.daysOfWeek?.includes(day) ? 'default' : 'outline'} size="sm" onClick={() => toggleDayOfWeek(day)} className="w-full">
-                  {t(`shiftPatterns.daysOfWeekShort.${day}`)}
-                </Button>
-              ))}
-            </div>
-          </div>
-          {formData.defaultStartTime && formData.defaultEndTime && (
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <p className="text-sm font-medium">{t('shiftPatterns.patternSummary')}</p>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>{t('shiftPatterns.hoursPerShift')}: {calculateHours(formData.defaultStartTime, formData.defaultEndTime, formData.defaultBreakMinutes || 0).toFixed(2)}h</p>
-                <p>{t('shiftPatterns.daysPerWeek')}: {formData.daysOfWeek?.length || 0}</p>
-                <p>{t('shiftPatterns.totalWeeklyHours')}: {(calculateHours(formData.defaultStartTime, formData.defaultEndTime, formData.defaultBreakMinutes || 0) * (formData.daysOfWeek?.length || 0)).toFixed(2)}h</p>
-              </div>
-            </div>
-          )}
+          <ShiftDaysAndSummary formData={formData} toggleDayOfWeek={toggleDayOfWeek} t={t} />
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onCancel}>{t('common.cancel')}</Button>

@@ -3,6 +3,7 @@ import { CardDescription } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Download, FileCsv, FilePdf } from '@phosphor-icons/react'
 import { useReportExport } from '@/hooks/useReportExport'
+import { METRIC_SUB_COLS, fmtCell } from '@/data/report-result-config'
 
 type ReportType = 'timesheet' | 'invoice' | 'payroll' | 'expense' | 'margin'
 type GroupByField = 'worker' | 'client' | 'date' | 'status' | 'month' | 'week'
@@ -13,31 +14,19 @@ interface ReportConfig {
   dateRange: { from: string; to: string }
   groupBy?: GroupByField
   metrics: string[]
-  filters: any[]
+  filters: unknown[]
 }
 
 interface ReportResult {
   name: string
   generatedAt: string
   totalRecords: number
-  data: any[]
+  data: unknown[]
 }
 
 interface Props {
   reportResult: ReportResult
   reportConfig: ReportConfig
-}
-
-const METRIC_SUB_COLS = [
-  { key: 'sum',   label: 'Sum',   cls: 'border-l' },
-  { key: 'avg',   label: 'Avg',   cls: '' },
-  { key: 'count', label: 'Count', cls: '' },
-  { key: 'min',   label: 'Min',   cls: '' },
-  { key: 'max',   label: 'Max',   cls: '' },
-]
-
-function fmtCell(val: any): string | number {
-  return typeof val === 'number' ? val.toFixed(2) : val ?? 0
 }
 
 export function ReportResultTable({ reportResult, reportConfig }: Props) {

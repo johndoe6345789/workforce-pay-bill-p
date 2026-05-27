@@ -1,12 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { FileText, FileCsv, Download } from '@phosphor-icons/react'
+import { FileText } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { FIELD_DEFINITIONS, SAMPLE_CSV } from '@/data/batchImportConfig'
 import type { ImportType } from '@/data/batchImportConfig'
 import type { ValidationResult } from '@/hooks/useBatchImport'
+import { FormatGuidelinesContent } from './FormatGuidelinesContent'
 
 interface Props {
   type: ImportType
@@ -60,45 +59,7 @@ export function FormatGuidelinesPanel({ type, validationResult }: Props) {
             </div>
           </ScrollArea>
         ) : (
-          <div className="space-y-4">
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <FileCsv size={18} />
-                Required Format
-              </h4>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• First row should contain column headers</li>
-                <li>• Comma-separated values (CSV format)</li>
-                <li>• No special characters in headers</li>
-                <li>• Date format: YYYY-MM-DD</li>
-                <li>• Numbers without currency symbols</li>
-                <li>• Email addresses must be valid format</li>
-              </ul>
-            </div>
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <h4 className="font-semibold mb-3">Required Fields</h4>
-              <div className="flex flex-wrap gap-2">
-                {defs.filter(f => f.required).map(field => (
-                  <Badge key={field.name} variant="outline">
-                    {field.label}
-                    {field.type && <span className="ml-1 text-muted-foreground">({field.type})</span>}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <h4 className="font-semibold mb-3">Optional Fields</h4>
-              <div className="flex flex-wrap gap-2">
-                {defs.filter(f => !f.required).map(field => (
-                  <Badge key={field.name} variant="secondary">{field.label}</Badge>
-                ))}
-              </div>
-            </div>
-            <Button variant="outline" className="w-full" onClick={downloadTemplate}>
-              <Download size={18} className="mr-2" />
-              Download CSV Template
-            </Button>
-          </div>
+          <FormatGuidelinesContent defs={defs} onDownloadTemplate={downloadTemplate} />
         )}
       </CardContent>
     </Card>
