@@ -1,33 +1,16 @@
 import { FileText, CheckCircle } from '@phosphor-icons/react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Stack } from '@/components/ui/stack'
 import { PAYEPendingCard } from '@/components/paye/PAYEPendingCard'
 import { PAYESubmittedCard } from '@/components/paye/PAYESubmittedCard'
 import { PAYEValidationDialog } from '@/components/paye/PAYEValidationDialog'
+import { PAYEPAYEEmptyState } from '@/components/paye/PAYEPAYEEmptyState'
 import { usePAYEManager } from '@/hooks/usePAYEManager'
 
 interface PAYEManagerProps {
   payrollRunId?: string
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <Card>
-      <CardContent className="py-12">
-        <Stack spacing={4} align="center">
-          <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">{icon}</div>
-          <Stack spacing={2} align="center">
-            <h3 className="text-lg font-semibold">{title}</h3>
-            <p className="text-sm text-muted-foreground text-center max-w-md">{description}</p>
-          </Stack>
-        </Stack>
-      </CardContent>
-    </Card>
-  )
 }
 
 export function PAYEManager({ open, onOpenChange }: PAYEManagerProps) {
@@ -50,7 +33,7 @@ export function PAYEManager({ open, onOpenChange }: PAYEManagerProps) {
 
             <TabsContent value="pending" className="mt-6">
               {vm.pendingSubmissions.length === 0 ? (
-                <EmptyState icon={<FileText size={32} className="text-muted-foreground" />} title="No pending submissions" description="Create a new PAYE submission from a completed payroll run to get started" />
+                <PAYEEmptyState icon={<FileText size={32} className="text-muted-foreground" />} title="No pending submissions" description="Create a new PAYE submission from a completed payroll run to get started" />
               ) : (
                 <div className="space-y-4">
                   {vm.pendingSubmissions.map(submission => (
@@ -72,7 +55,7 @@ export function PAYEManager({ open, onOpenChange }: PAYEManagerProps) {
 
             <TabsContent value="submitted" className="mt-6">
               {vm.submittedSubmissions.length === 0 ? (
-                <EmptyState icon={<CheckCircle size={32} className="text-muted-foreground" />} title="No submitted returns" description="Submissions sent to HMRC will appear here" />
+                <PAYEEmptyState icon={<CheckCircle size={32} className="text-muted-foreground" />} title="No submitted returns" description="Submissions sent to HMRC will appear here" />
               ) : (
                 <div className="space-y-4">
                   {vm.submittedSubmissions.map(submission => (

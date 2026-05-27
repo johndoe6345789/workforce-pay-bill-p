@@ -11,17 +11,12 @@ import type { ApprovalStepTemplate } from '@/hooks/use-approval-workflow-templat
 import { useParallelApprovalStepEditor } from '@/hooks/useParallelApprovalStepEditor'
 import { ParallelApproverItem } from './ParallelApproverItem'
 import { AddApproverForm } from './AddApproverForm'
+import { APPROVAL_MODES } from '@/data/parallel-approval-config'
 
 interface Props {
   step: ApprovalStepTemplate
   onChange: (updates: Partial<ApprovalStepTemplate>) => void
 }
-
-const APPROVAL_MODES = [
-  { value: 'all',      label: 'All Approvers', desc: 'All approvers must approve' },
-  { value: 'any',      label: 'Any Approver',  desc: 'At least one approver must approve' },
-  { value: 'majority', label: 'Majority',       desc: 'More than half must approve' },
-]
 
 export function ParallelApprovalStepEditor({ step, onChange }: Props) {
   const vm = useParallelApprovalStepEditor(step, onChange)
