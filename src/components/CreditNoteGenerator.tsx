@@ -1,15 +1,14 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowCounterClockwise } from '@phosphor-icons/react'
 import type { Invoice, CreditNote } from '@/lib/types'
 import { currencySymbol } from '@/components/invoice-detail/currencySymbol'
 import { useCreditNoteGenerator } from '@/hooks/useCreditNoteGenerator'
+import { SelectedInvoiceCard } from '@/components/billing/SelectedInvoiceCard'
 
 interface Props {
   invoices: Invoice[]
@@ -46,32 +45,7 @@ export function CreditNoteGenerator({ invoices, onCreateCreditNote }: Props) {
             </Select>
           </div>
 
-          {vm.selectedInvoice && (
-            <Card className="bg-muted/50">
-              <CardContent className="p-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Invoice Number</p>
-                    <p className="font-medium font-mono">{vm.selectedInvoice.invoiceNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Client</p>
-                    <p className="font-medium">{vm.selectedInvoice.clientName}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Original Amount</p>
-                    <p className="font-semibold font-mono text-lg">{sym}{vm.selectedInvoice.amount.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Status</p>
-                    <Badge variant={vm.selectedInvoice.status === 'paid' ? 'success' : 'warning'}>
-                      {vm.selectedInvoice.status}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {vm.selectedInvoice && <SelectedInvoiceCard invoice={vm.selectedInvoice} sym={sym} />}
 
           <div className="space-y-2">
             <Label htmlFor="cn-amount">Credit Amount ({vm.selectedInvoice?.currency ?? 'GBP'}) *</Label>

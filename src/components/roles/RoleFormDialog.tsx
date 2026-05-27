@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { usePermissions } from '@/hooks/use-permissions'
 import { useTranslation } from '@/hooks/use-translation'
+import { RolePermissionsSection } from './RolePermissionsSection'
 import type { RoleWithUsers } from '@/hooks/useRolesPermissionsView'
 
 interface Props {
@@ -72,35 +71,14 @@ export function RoleFormDialog({ role, open, onOpenChange, onSave }: Props) {
                 </select>
               </div>
             </div>
-            <div className="space-y-3">
-              <h4 className="font-semibold">{t('roles.permissionsTab')}</h4>
-              {modules.map(module => {
-                const modulePerms = allPermissions.filter(p => p.module === module)
-                const selectedCount = modulePerms.filter(p => formData.permissions.includes(p.id)).length
-                return (
-                  <div key={module} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Checkbox checked={selectedCount === modulePerms.length} onCheckedChange={() => toggleModule(module)} />
-                        <label className="font-medium capitalize cursor-pointer">{module}</label>
-                      </div>
-                      <Badge variant="outline">{selectedCount} / {modulePerms.length}</Badge>
-                    </div>
-                    <div className="grid gap-2 pl-6">
-                      {modulePerms.map(permission => (
-                        <div key={permission.id} className="flex items-start gap-2">
-                          <Checkbox checked={formData.permissions.includes(permission.id)} onCheckedChange={() => togglePermission(permission.id)} />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2"><code className="text-xs font-mono">{permission.id}</code></div>
-                            <p className="text-xs text-muted-foreground">{permission.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <RolePermissionsSection
+              modules={modules}
+              allPermissions={allPermissions}
+              selectedPermissions={formData.permissions}
+              onTogglePermission={togglePermission}
+              onToggleModule={toggleModule}
+              t={t}
+            />
           </div>
         </ScrollArea>
         <DialogFooter>
