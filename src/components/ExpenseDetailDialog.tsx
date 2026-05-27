@@ -3,10 +3,12 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
-import { User, Building, CalendarBlank, CurrencyDollar, Camera, CheckCircle, XCircle, ClockCounterClockwise, Tag } from '@phosphor-icons/react'
+import { Camera, CheckCircle, XCircle, ClockCounterClockwise } from '@phosphor-icons/react'
 import type { Expense } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { currencySymbol } from '@/components/invoice-detail/currencySymbol'
+import { ExpenseInfoGrid } from '@/components/expenses/ExpenseInfoGrid'
+import { ExpenseSummaryBox } from '@/components/expenses/ExpenseSummaryBox'
 import type React from 'react'
 
 interface Props {
@@ -25,13 +27,8 @@ const STATUS_CONFIG: Record<string, { Icon: React.ElementType; color: string; bg
 }
 
 const BADGE_VARIANT: Record<string, 'success' | 'destructive' | 'warning'> = {
-  approved: 'success',
-  paid:     'success',
-  rejected: 'destructive',
-  pending:  'warning',
+  approved: 'success', paid: 'success', rejected: 'destructive', pending: 'warning',
 }
-
-const DATE_FORMAT: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
 
 export function ExpenseDetailDialog({ expense, open, onOpenChange, onApprove, onReject }: Props) {
   if (!expense) return null
@@ -44,9 +41,7 @@ export function ExpenseDetailDialog({ expense, open, onOpenChange, onApprove, on
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <div className={cn('p-2 rounded-lg', bgColor)}>
-              <Icon size={24} className={color} />
-            </div>
+            <div className={cn('p-2 rounded-lg', bgColor)}><Icon size={24} className={color} /></div>
             <div>
               <div className="flex items-center gap-2">
                 <span>Expense Details</span>
@@ -60,43 +55,13 @@ export function ExpenseDetailDialog({ expense, open, onOpenChange, onApprove, on
 
         <ScrollArea className="max-h-[calc(90vh-120px)]">
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><User size={16} /><span>Worker</span></div>
-                <p className="font-medium">{expense.workerName}</p>
-                <p className="text-xs text-muted-foreground">ID: {expense.workerId}</p>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><Building size={16} /><span>Client</span></div>
-                <p className="font-medium">{expense.clientName}</p>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><Tag size={16} /><span>Category</span></div>
-                <Badge variant="outline">{expense.category}</Badge>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><CalendarBlank size={16} /><span>Expense Date</span></div>
-                <p className="font-medium">{new Date(expense.date).toLocaleDateString('en-GB', DATE_FORMAT)}</p>
-              </div>
-
-              <div className="space-y-1 col-span-2">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><CurrencyDollar size={16} /><span>Amount</span></div>
-                <p className="font-semibold font-mono text-3xl">{sym}{expense.amount.toFixed(2)}</p>
-              </div>
-            </div>
-
+            <ExpenseInfoGrid expense={expense} currencySymbol={sym} />
             <Separator />
-
             <div className="space-y-2">
               <h4 className="font-semibold text-sm">Description</h4>
               <p className="text-sm text-muted-foreground">{expense.description || 'No description provided'}</p>
             </div>
-
             <Separator />
-
             <div className="space-y-2">
               <h4 className="font-semibold text-sm">Submission Details</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -122,49 +87,23 @@ export function ExpenseDetailDialog({ expense, open, onOpenChange, onApprove, on
                 </div>
               </div>
             </div>
-
             <Separator />
-
             <div className="space-y-2">
               <h4 className="font-semibold text-sm">Receipt</h4>
               <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                 <Camera size={32} className={cn('mx-auto text-muted-foreground mb-2', !expense.receiptUrl && 'opacity-50')} />
                 {expense.receiptUrl ? (
-                  <>
-                    <p className="text-sm text-muted-foreground mb-3">Receipt available</p>
-                    <Button variant="outline" size="sm">View Receipt</Button>
-                  </>
+                  <><p className="text-sm text-muted-foreground mb-3">Receipt available</p><Button variant="outline" size="sm">View Receipt</Button></>
                 ) : (
                   <p className="text-sm text-muted-foreground">No receipt uploaded</p>
                 )}
               </div>
             </div>
-
             <Separator />
-
             <div className="space-y-2">
               <h4 className="font-semibold text-sm">Expense Summary</h4>
-              <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Expense Amount</span>
-                  <span className="font-mono font-medium">{sym}{expense.amount.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Category</span>
-                  <span className="font-medium">{expense.category}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Billing</span>
-                  <span className="font-medium">{expense.billable ? 'Client Billable' : 'Agency Cost'}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between items-center pt-1">
-                  <span className="font-semibold">Status</span>
-                  <Badge variant={BADGE_VARIANT[expense.status] ?? 'warning'}>{expense.status}</Badge>
-                </div>
-              </div>
+              <ExpenseSummaryBox expense={expense} currencySymbol={sym} />
             </div>
-
             {expense.status === 'pending' && onApprove && onReject && (
               <>
                 <Separator />
