@@ -1,27 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNetworkStatus } from './use-network-status'
+import type {
+  AdaptivePollingOptions,
+  AdaptivePollingResult,
+} from './use-adaptive-polling.types'
 
-interface AdaptivePollingOptions<T> {
-  fetcher: () => Promise<T>
-  baseInterval: number
-  maxInterval?: number
-  minInterval?: number
-  backoffMultiplier?: number
-  errorThreshold?: number
-  enabled?: boolean
-  onSuccess?: (data: T) => void
-  onError?: (error: Error) => void
-}
-
-interface AdaptivePollingResult<T> {
-  data: T | null
-  error: Error | null
-  isLoading: boolean
-  currentInterval: number
-  consecutiveErrors: number
-  refetch: () => Promise<void>
-  reset: () => void
-}
+export type { AdaptivePollingOptions, AdaptivePollingResult } from './use-adaptive-polling.types'
 
 export function useAdaptivePolling<T>({
   fetcher,
@@ -43,99 +27,62 @@ export function useAdaptivePolling<T>({
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const mountedRef = useRef(true)
-  const lastSuccessRef = useRef<number>(Date.now())
 
   useEffect(() => {
     mountedRef.current = true
-    return () => {
-      mountedRef.current = false
-    }
+    return () => { mountedRef.current = false }
   }, [])
 
   const fetch = useCallback(async () => {
     if (!enabled || !isOnline) return
-
     setIsLoading(true)
     try {
       const result = await fetcher()
       if (!mountedRef.current) return
-
       setData(result)
       setError(null)
       setConsecutiveErrors(0)
-      lastSuccessRef.current = Date.now()
-
-      setCurrentInterval((prev) => Math.max(minInterval, prev / backoffMultiplier))
-
+      setCurrentInterval(prev => Math.max(minInterval, prev / backoffMultiplier))
       onSuccess?.(result)
     } catch (err) {
       if (!mountedRef.current) return
-
       const errorObj = err instanceof Error ? err : new Error(String(err))
       setError(errorObj)
-      setConsecutiveErrors((prev) => prev + 1)
-
+      setConsecutiveErrors(prev => prev + 1)
       if (consecutiveErrors >= errorThreshold) {
-        setCurrentInterval((prev) => Math.min(maxInterval, prev * backoffMultiplier))
+        setCurrentInterval(prev =>
+          Math.min(maxInterval, prev * backoffMultiplier)
+        )
       }
-
       onError?.(errorObj)
     } finally {
-      if (mountedRef.current) {
-        setIsLoading(false)
-      }
+      if (mountedRef.current) setIsLoading(false)
     }
   }, [
-    enabled,
-    isOnline,
-    fetcher,
-    consecutiveErrors,
-    errorThreshold,
-    maxInterval,
-    minInterval,
-    backoffMultiplier,
-    onSuccess,
-    onError,
+    enabled, isOnline, fetcher, consecutiveErrors, errorThreshold,
+    maxInterval, minInterval, backoffMultiplier, onSuccess, onError,
   ])
 
   const reset = useCallback(() => {
     setCurrentInterval(baseInterval)
     setConsecutiveErrors(0)
     setError(null)
-    lastSuccessRef.current = Date.now()
   }, [baseInterval])
 
   useEffect(() => {
     if (!enabled || !isOnline) {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
       return
     }
-
     const poll = async () => {
       await fetch()
       if (mountedRef.current && enabled && isOnline) {
         timeoutRef.current = setTimeout(poll, currentInterval)
       }
     }
-
     poll()
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) }
   }, [enabled, isOnline, currentInterval, fetch])
 
-  return {
-    data,
-    error,
-    isLoading,
-    currentInterval,
-    consecutiveErrors,
-    refetch: fetch,
-    reset,
-  }
+  return { data, error, isLoading, currentInterval, consecutiveErrors, refetch: fetch, reset }
 }
