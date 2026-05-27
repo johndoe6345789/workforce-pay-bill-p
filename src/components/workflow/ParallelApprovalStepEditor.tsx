@@ -1,91 +1,49 @@
-import { useState } from 'react'
-import { Plus, Trash, UserCircle, Check } from '@phosphor-icons/react'
+import { Plus, Trash, UserCircle } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Stack } from '@/components/ui/stack'
 import { Separator } from '@/components/ui/separator'
-import type { ApprovalStepTemplate, ParallelApprover } from '@/hooks/use-approval-workflow-templates'
+import type { ApprovalStepTemplate } from '@/hooks/use-approval-workflow-templates'
+import { useParallelApprovalStepEditor } from '@/hooks/useParallelApprovalStepEditor'
 
-interface ParallelApprovalStepEditorProps {
+interface Props {
   step: ApprovalStepTemplate
   onChange: (updates: Partial<ApprovalStepTemplate>) => void
 }
 
-export function ParallelApprovalStepEditor({ step, onChange }: ParallelApprovalStepEditorProps) {
-  const [newApproverName, setNewApproverName] = useState('')
-  const [newApproverRole, setNewApproverRole] = useState('')
-  const [newApproverEmail, setNewApproverEmail] = useState('')
+const APPROVAL_MODES: { value: string; label: string; desc: string }[] = [
+  { value: 'all',      label: 'All Approvers', desc: 'All approvers must approve' },
+  { value: 'any',      label: 'Any Approver',  desc: 'At least one approver must approve' },
+  { value: 'majority', label: 'Majority',       desc: 'More than half must approve' },
+]
 
-  const handleAddApprover = () => {
-    if (!newApproverName || !newApproverRole) return
+const NEW_APPROVER_FIELDS = [
+  { id: 'approver-name',  label: 'Name *',     placeholder: 'John Doe',          type: 'text',  key: 'newName'  as const },
+  { id: 'approver-role',  label: 'Role *',     placeholder: 'Manager',           type: 'text',  key: 'newRole'  as const },
+  { id: 'approver-email', label: 'Email',      placeholder: 'john@example.com',  type: 'email', key: 'newEmail' as const },
+]
 
-    const newApprover: ParallelApprover = {
-      id: `APPROVER-${Date.now()}`,
-      name: newApproverName,
-      role: newApproverRole,
-      email: newApproverEmail || undefined,
-      isRequired: true
-    }
-
-    onChange({
-      parallelApprovers: [...(step.parallelApprovers || []), newApprover]
-    })
-
-    setNewApproverName('')
-    setNewApproverRole('')
-    setNewApproverEmail('')
-  }
-
-  const handleRemoveApprover = (approverId: string) => {
-    onChange({
-      parallelApprovers: (step.parallelApprovers || []).filter(a => a.id !== approverId)
-    })
-  }
-
-  const handleUpdateApprover = (approverId: string, updates: Partial<ParallelApprover>) => {
-    onChange({
-      parallelApprovers: (step.parallelApprovers || []).map(a =>
-        a.id === approverId ? { ...a, ...updates } : a
-      )
-    })
-  }
-
-  const handleToggleParallel = (enabled: boolean) => {
-    onChange({
-      isParallel: enabled,
-      parallelApprovalMode: enabled ? 'all' : undefined,
-      parallelApprovers: enabled ? (step.parallelApprovers?.length ? step.parallelApprovers : []) : undefined
-    })
-  }
+export function ParallelApprovalStepEditor({ step, onChange }: Props) {
+  const vm = useParallelApprovalStepEditor(step, onChange)
+  const approvers = step.parallelApprovers ?? []
+  const fieldValues = { newName: vm.newName, newRole: vm.newRole, newEmail: vm.newEmail }
+  const fieldSetters = { newName: vm.setNewName, newRole: vm.setNewRole, newEmail: vm.setNewEmail }
 
   return (
     <Stack spacing={4}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Label htmlFor="parallel-toggle" className="text-sm font-medium">
-            Enable Parallel Approvals
-          </Label>
-          <Switch
-            id="parallel-toggle"
-            checked={step.isParallel || false}
-            onCheckedChange={handleToggleParallel}
-          />
+          <Label htmlFor="parallel-toggle" className="text-sm font-medium">Enable Parallel Approvals</Label>
+          <Switch id="parallel-toggle" checked={step.isParallel ?? false} onCheckedChange={vm.toggleParallel} />
         </div>
         {step.isParallel && (
           <Badge variant="secondary" className="gap-1.5">
-            <UserCircle size={14} />
-            {step.parallelApprovers?.length || 0} Approvers
+            <UserCircle size={14} />{approvers.length} Approvers
           </Badge>
         )}
       </div>
@@ -93,54 +51,38 @@ export function ParallelApprovalStepEditor({ step, onChange }: ParallelApprovalS
       {step.isParallel && (
         <>
           <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Approval Mode</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-sm font-medium">Approval Mode</CardTitle></CardHeader>
             <CardContent>
               <Select
-                value={step.parallelApprovalMode || 'all'}
-                onValueChange={(value) => onChange({ parallelApprovalMode: value as 'all' | 'any' | 'majority' })}
+                value={step.parallelApprovalMode ?? 'all'}
+                onValueChange={value => onChange({ parallelApprovalMode: value as 'all' | 'any' | 'majority' })}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">
-                    <div className="flex flex-col items-start gap-1">
-                      <span className="font-medium">All Approvers</span>
-                      <span className="text-xs text-muted-foreground">All approvers must approve</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="any">
-                    <div className="flex flex-col items-start gap-1">
-                      <span className="font-medium">Any Approver</span>
-                      <span className="text-xs text-muted-foreground">At least one approver must approve</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="majority">
-                    <div className="flex flex-col items-start gap-1">
-                      <span className="font-medium">Majority</span>
-                      <span className="text-xs text-muted-foreground">More than half must approve</span>
-                    </div>
-                  </SelectItem>
+                  {APPROVAL_MODES.map(({ value, label, desc }) => (
+                    <SelectItem key={value} value={value}>
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="font-medium">{label}</span>
+                        <span className="text-xs text-muted-foreground">{desc}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Parallel Approvers</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-sm font-medium">Parallel Approvers</CardTitle></CardHeader>
             <CardContent>
               <Stack spacing={4}>
-                {(step.parallelApprovers || []).length === 0 ? (
+                {approvers.length === 0 ? (
                   <div className="text-center py-8 text-sm text-muted-foreground">
                     No approvers added yet. Add approvers below to enable parallel reviews.
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {(step.parallelApprovers || []).map((approver) => (
+                    {approvers.map(approver => (
                       <Card key={approver.id} className="bg-muted/30">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between gap-4">
@@ -148,9 +90,7 @@ export function ParallelApprovalStepEditor({ step, onChange }: ParallelApprovalS
                               <div className="flex items-center gap-2">
                                 <UserCircle size={20} className="text-muted-foreground" />
                                 <span className="font-medium text-sm">{approver.name}</span>
-                                {approver.isRequired && (
-                                  <Badge variant="destructive" className="text-xs">Required</Badge>
-                                )}
+                                {approver.isRequired && <Badge variant="destructive" className="text-xs">Required</Badge>}
                               </div>
                               <div className="text-xs text-muted-foreground space-y-1">
                                 <div>Role: {approver.role}</div>
@@ -162,16 +102,10 @@ export function ParallelApprovalStepEditor({ step, onChange }: ParallelApprovalS
                                 <Label className="text-xs text-muted-foreground">Required</Label>
                                 <Switch
                                   checked={approver.isRequired}
-                                  onCheckedChange={(checked) =>
-                                    handleUpdateApprover(approver.id, { isRequired: checked })
-                                  }
+                                  onCheckedChange={checked => vm.updateApprover(approver.id, { isRequired: checked })}
                                 />
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleRemoveApprover(approver.id)}
-                              >
+                              <Button variant="ghost" size="sm" onClick={() => vm.removeApprover(approver.id)}>
                                 <Trash size={16} />
                               </Button>
                             </div>
@@ -187,42 +121,21 @@ export function ParallelApprovalStepEditor({ step, onChange }: ParallelApprovalS
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Add New Approver</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="approver-name" className="text-xs">Name *</Label>
-                      <Input
-                        id="approver-name"
-                        placeholder="John Doe"
-                        value={newApproverName}
-                        onChange={(e) => setNewApproverName(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="approver-role" className="text-xs">Role *</Label>
-                      <Input
-                        id="approver-role"
-                        placeholder="Manager"
-                        value={newApproverRole}
-                        onChange={(e) => setNewApproverRole(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="approver-email" className="text-xs">Email</Label>
-                      <Input
-                        id="approver-email"
-                        type="email"
-                        placeholder="john@example.com"
-                        value={newApproverEmail}
-                        onChange={(e) => setNewApproverEmail(e.target.value)}
-                      />
-                    </div>
+                    {NEW_APPROVER_FIELDS.map(({ id, label, placeholder, type, key }) => (
+                      <div key={id} className="space-y-2">
+                        <Label htmlFor={id} className="text-xs">{label}</Label>
+                        <Input
+                          id={id}
+                          type={type}
+                          placeholder={placeholder}
+                          value={fieldValues[key]}
+                          onChange={e => fieldSetters[key](e.target.value)}
+                        />
+                      </div>
+                    ))}
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={handleAddApprover}
-                    disabled={!newApproverName || !newApproverRole}
-                  >
-                    <Plus className="mr-2" size={16} />
-                    Add Approver
+                  <Button size="sm" onClick={vm.addApprover} disabled={!vm.newName || !vm.newRole}>
+                    <Plus className="mr-2" size={16} />Add Approver
                   </Button>
                 </div>
               </Stack>
