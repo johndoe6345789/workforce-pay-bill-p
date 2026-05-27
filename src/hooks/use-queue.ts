@@ -1,23 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+import { QueueItem, QueueOptions } from './use-queue.types'
+import { useQueueProcessor } from './use-queue-processor'
 
-export interface QueueItem<T> {
-  id: string
-  data: T
-  priority?: number
-  addedAt: number
-  startedAt?: number
-  completedAt?: number
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  error?: Error
-  retries: number
-}
-
-export interface QueueOptions {
-  concurrency?: number
-  maxRetries?: number
-  retryDelay?: number
-  autoStart?: boolean
-}
+export type { QueueItem, QueueOptions } from './use-queue.types'
 
 export function useQueue<T, R = void>(
   processor: (data: T) => Promise<R>,
@@ -30,14 +15,10 @@ export function useQueue<T, R = void>(
     autoStart = true
   } = options
 
-  const [queue, setQueue] = useState<QueueItem<T>[]>([])
-  const [processing, setProcessing] = useState<QueueItem<T>[]>([])
-  const [completed, setCompleted] = useState<QueueItem<T>[]>([])
-  const [failed, setFailed] = useState<QueueItem<T>[]>([])
   const [isRunning, setIsRunning] = useState(autoStart)
 
-  const processingRef = useRef<Set<string>>(new Set())
-  const mountedRef = useRef(true)
+  const { queue, setQueue, processing, completed, setCompleted, failed, setFailed } =
+    useQueueProcessor<T, R>(processor, { concurrency, maxRetries, retryDelay, isRunning })
 
   const enqueue = useCallback((data: T, priority: number = 0) => {
     const item: QueueItem<T> = {
@@ -48,116 +29,23 @@ export function useQueue<T, R = void>(
       status: 'pending',
       retries: 0
     }
-
     setQueue(prev => {
       const next = [...prev, item]
       next.sort((a, b) => (b.priority || 0) - (a.priority || 0))
       return next
     })
-
     return item.id
-  }, [])
+  }, [setQueue])
 
-  const processItem = useCallback(async (item: QueueItem<T>) => {
-    if (!mountedRef.current) return
-
-    processingRef.current.add(item.id)
-    
-    setQueue(prev => prev.filter(i => i.id !== item.id))
-    setProcessing(prev => [...prev, { ...item, status: 'processing', startedAt: Date.now() }])
-
-    try {
-      await processor(item.data)
-
-      if (!mountedRef.current) return
-
-      const completedItem = { ...item, status: 'completed' as const, completedAt: Date.now() }
-      
-      setProcessing(prev => prev.filter(i => i.id !== item.id))
-      setCompleted(prev => [...prev, completedItem])
-    } catch (error) {
-      if (!mountedRef.current) return
-
-      const err = error instanceof Error ? error : new Error('Processing failed')
-      
-      if (item.retries < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, retryDelay))
-        
-        if (!mountedRef.current) return
-
-        const retryItem = { ...item, retries: item.retries + 1 }
-        setProcessing(prev => prev.filter(i => i.id !== item.id))
-        setQueue(prev => {
-          const next = [...prev, retryItem]
-          next.sort((a, b) => (b.priority || 0) - (a.priority || 0))
-          return next
-        })
-      } else {
-        const failedItem = {
-          ...item,
-          status: 'failed' as const,
-          completedAt: Date.now(),
-          error: err
-        }
-        
-        setProcessing(prev => prev.filter(i => i.id !== item.id))
-        setFailed(prev => [...prev, failedItem])
-      }
-    } finally {
-      processingRef.current.delete(item.id)
-    }
-  }, [processor, maxRetries, retryDelay])
-
-  const processNext = useCallback(async () => {
-    if (!isRunning || processingRef.current.size >= concurrency) return
-
-    setQueue(prev => {
-      if (prev.length === 0) return prev
-
-      const nextItem = prev[0]
-      processItem(nextItem)
-      
-      return prev
-    })
-  }, [isRunning, concurrency, processItem])
-
-  useEffect(() => {
-    if (!isRunning) return
-
-    const interval = setInterval(() => {
-      if (processingRef.current.size < concurrency && queue.length > 0) {
-        processNext()
-      }
-    }, 100)
-
-    return () => clearInterval(interval)
-  }, [isRunning, concurrency, queue.length, processNext])
-
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false
-    }
-  }, [])
-
-  const start = useCallback(() => {
-    setIsRunning(true)
-  }, [])
-
-  const pause = useCallback(() => {
-    setIsRunning(false)
-  }, [])
-
-  const clear = useCallback(() => {
-    setQueue([])
-  }, [])
-
-  const clearCompleted = useCallback(() => {
-    setCompleted([])
-  }, [])
-
-  const clearFailed = useCallback(() => {
-    setFailed([])
-  }, [])
+  const start = useCallback(() => setIsRunning(true), [])
+  const pause = useCallback(() => setIsRunning(false), [])
+  const clear = useCallback(() => setQueue([]), [setQueue])
+  const clearCompleted = useCallback(() => setCompleted([]), [setCompleted])
+  const clearFailed = useCallback(() => setFailed([]), [setFailed])
+  const remove = useCallback(
+    (id: string) => setQueue(prev => prev.filter(item => item.id !== id)),
+    [setQueue]
+  )
 
   const retryFailed = useCallback(() => {
     setFailed(prev => {
@@ -167,20 +55,14 @@ export function useQueue<T, R = void>(
         retries: 0,
         error: undefined
       }))
-      
       setQueue(q => {
         const next = [...q, ...items]
         next.sort((a, b) => (b.priority || 0) - (a.priority || 0))
         return next
       })
-      
       return []
     })
-  }, [])
-
-  const remove = useCallback((id: string) => {
-    setQueue(prev => prev.filter(item => item.id !== id))
-  }, [])
+  }, [setFailed, setQueue])
 
   return {
     queue,

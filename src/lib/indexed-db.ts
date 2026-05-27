@@ -7,19 +7,9 @@ import {
 import { dbSaveAppState, dbGetAppState, dbDeleteAppState, dbClearAppState } from './indexed-db.appstate'
 import { dbCreate, dbRead, dbReadAll, dbReadByIndex, dbUpdate, dbDelete, dbDeleteAll } from './indexed-db.crud'
 import { dbBulkCreate, dbBulkUpdate } from './indexed-db.bulk'
-import {
-  SESSION_STORE, APP_STATE_STORE, TIMESHEETS_STORE, INVOICES_STORE, PAYROLL_RUNS_STORE,
-  WORKERS_STORE, COMPLIANCE_DOCS_STORE, EXPENSES_STORE, RATE_CARDS_STORE, PURCHASE_ORDERS_STORE,
-} from './indexed-db.types'
 import type { SessionData, AppStateData, BaseEntity } from './indexed-db.types'
 export type { SessionData, AppStateData, BaseEntity }
-
-export const STORES = {
-  SESSIONS: SESSION_STORE, APP_STATE: APP_STATE_STORE, TIMESHEETS: TIMESHEETS_STORE,
-  INVOICES: INVOICES_STORE, PAYROLL_RUNS: PAYROLL_RUNS_STORE, WORKERS: WORKERS_STORE,
-  COMPLIANCE_DOCS: COMPLIANCE_DOCS_STORE, EXPENSES: EXPENSES_STORE,
-  RATE_CARDS: RATE_CARDS_STORE, PURCHASE_ORDERS: PURCHASE_ORDERS_STORE,
-} as const
+export { STORES } from './indexed-db.types'
 
 class IndexedDBManager {
   private db: IDBDatabase | null = null
@@ -107,5 +97,4 @@ class IndexedDBManager {
     return (await this.readAll<T>(storeName)).filter(predicate)
   }
 }
-
 export const indexedDB = new IndexedDBManager()
