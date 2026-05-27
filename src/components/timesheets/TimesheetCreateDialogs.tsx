@@ -1,13 +1,9 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Plus } from '@phosphor-icons/react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DetailedTimesheetEntry } from '@/components/DetailedTimesheetEntry'
 import { usePermissions } from '@/hooks/use-permissions'
 import { TimesheetBulkImportDialog } from '@/components/timesheets/TimesheetBulkImportDialog'
-import type { ShiftEntry } from '@/lib/types'
+import { TimesheetEntryTabs } from '@/components/timesheets/TimesheetEntryTabs'
 
 interface FormData {
   workerName: string
@@ -30,14 +26,6 @@ interface Props {
   onCreateDetailedTimesheet: (data: any) => void
   onBulkImport: (csvData: string) => void
 }
-
-const SIMPLE_FIELDS: { id: keyof FormData; label: string; type?: string }[] = [
-  { id: 'workerName',  label: 'Worker Name' },
-  { id: 'clientName',  label: 'Client Name' },
-  { id: 'hours',       label: 'Total Hours',   type: 'number' },
-  { id: 'rate',        label: 'Rate (£/hour)', type: 'number' },
-  { id: 'weekEnding',  label: 'Week Ending',   type: 'date' },
-]
 
 const EMPTY_FORM: FormData = { workerName: '', clientName: '', hours: '', rate: '', weekEnding: '' }
 
@@ -82,42 +70,13 @@ export function TimesheetCreateDialogs({
             <DialogTitle>Create Timesheet</DialogTitle>
             <DialogDescription>Choose between simple or detailed timesheet entry</DialogDescription>
           </DialogHeader>
-          <Tabs defaultValue="simple" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="simple">Simple Entry</TabsTrigger>
-              <TabsTrigger value="detailed">Detailed Entry</TabsTrigger>
-            </TabsList>
-            <TabsContent value="simple" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {SIMPLE_FIELDS.map(({ id, label, type }) => (
-                  <div key={id} className="space-y-2">
-                    <Label htmlFor={id}>{label}</Label>
-                    <Input
-                      id={id}
-                      type={type}
-                      value={formData[id]}
-                      onChange={e => setFormData({ ...formData, [id]: e.target.value })}
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleSubmitCreate}>Create Timesheet</Button>
-              </div>
-            </TabsContent>
-            <TabsContent value="detailed">
-              <DetailedTimesheetEntry
-                onSubmit={(data: { workerName: string; clientName: string; weekEnding: string; shifts: ShiftEntry[]; totalHours: number; totalAmount: number; baseRate: number }) => {
-                  onCreateDetailedTimesheet(data)
-                  setIsCreateDialogOpen(false)
-                }}
-              />
-              <div className="flex justify-end gap-2 mt-4">
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <TimesheetEntryTabs
+            formData={formData}
+            setFormData={setFormData}
+            onSubmitSimple={handleSubmitCreate}
+            onSubmitDetailed={data => { onCreateDetailedTimesheet(data); setIsCreateDialogOpen(false) }}
+            onClose={() => setIsCreateDialogOpen(false)}
+          />
         </DialogContent>
       </Dialog>
 
