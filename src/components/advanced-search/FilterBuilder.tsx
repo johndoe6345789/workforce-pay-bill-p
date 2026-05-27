@@ -5,30 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus } from '@phosphor-icons/react'
 import type { FilterField } from '@/components/AdvancedSearch'
-
-const TEXT_OPERATORS = [
-  { value: 'contains', label: 'Contains' },
-  { value: '=', label: 'Equals' },
-  { value: 'starts', label: 'Starts with' },
-  { value: 'ends', label: 'Ends with' },
-]
-const NUMBER_OPERATORS = [
-  { value: '=', label: 'Equals' },
-  { value: '>', label: 'Greater than' },
-  { value: '>=', label: 'Greater or equal' },
-  { value: '<', label: 'Less than' },
-  { value: '<=', label: 'Less or equal' },
-]
-const SELECT_OPERATORS = [
-  { value: '=', label: 'Equals' },
-  { value: 'in', label: 'In list' },
-]
-
-function getOperators(field?: FilterField) {
-  if (field?.type === 'number') return NUMBER_OPERATORS
-  if (field?.type === 'select') return SELECT_OPERATORS
-  return TEXT_OPERATORS
-}
+import { getOperators } from '@/data/filter-operators'
 
 interface Props {
   fields: FilterField[]

@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Buildings, Lock, User, Eye, EyeSlash } from '@phosphor-icons/react'
 import { useLoginScreen } from '@/hooks/useLoginScreen'
 import { LoginBrandingPanel } from '@/components/login/LoginBrandingPanel'
+import { LoginTestAccounts } from '@/components/login/LoginTestAccounts'
 
 export default function LoginScreen() {
   const vm = useLoginScreen()
@@ -63,27 +64,7 @@ export default function LoginScreen() {
             )}
           </form>
 
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
-            <details className="group">
-              <summary className="text-sm font-medium cursor-pointer text-muted-foreground hover:text-foreground transition-colors">{vm.t('login.testAccounts')}</summary>
-              <div className="mt-3 space-y-2 text-xs">
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { role: 'Admin', email: 'admin@workforce.com', pass: 'admin123' },
-                    { role: 'Finance', email: 'finance@workforce.com', pass: 'finance123' },
-                    { role: 'Payroll', email: 'payroll@workforce.com', pass: 'payroll123' },
-                    { role: 'Compliance', email: 'compliance@workforce.com', pass: 'compliance123' },
-                  ].map(({ role, email, pass }) => (
-                    <div key={role} className="font-mono">
-                      <div className="font-semibold mb-1">{role}:</div>
-                      <div>{email}</div>
-                      <div className="text-muted-foreground">{pass}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </details>
-          </div>
+          <LoginTestAccounts t={vm.t} />
 
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
