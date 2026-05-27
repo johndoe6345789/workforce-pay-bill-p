@@ -4,12 +4,19 @@ import { performanceMonitor } from '@/lib/performance-monitor'
 
 export type DatasetType = 'timesheets' | 'invoices' | 'payroll' | 'workers'
 
-interface PerformanceTestResult {
+export interface PerformanceTestResult {
   datasetType: DatasetType
   count: number
   generationTime: number
   renderTime?: number
   memoryUsed?: number
+}
+
+export interface PerformanceReport {
+  totalTests: number
+  averageGenerationTime: number
+  totalItemsGenerated: number
+  results: PerformanceTestResult[]
 }
 
 export function usePerformanceTest() {

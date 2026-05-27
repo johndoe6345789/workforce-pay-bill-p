@@ -5,6 +5,7 @@ import { useTimesheetsCrud } from '@/hooks/use-timesheets-crud'
 import { usePermissions } from '@/hooks/use-permissions'
 import { useTranslation } from '@/hooks/use-translation'
 import type { Timesheet, TimesheetStatus, ShiftEntry } from '@/lib/types'
+import type { FilterField } from '@/components/AdvancedSearch'
 
 export function useTimesheetsView() {
   const { t } = useTranslation()
@@ -22,6 +23,19 @@ export function useTimesheetsView() {
   const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>([])
   const [formData, setFormData] = useState({ workerName: '', clientName: '', hours: '', rate: '', weekEnding: '' })
   const [csvData, setCsvData] = useState('')
+
+  const timesheetFields: FilterField[] = useMemo(() => [
+    { name: 'workerName', label: t('timesheets.workerName'), type: 'text' },
+    { name: 'clientName', label: t('timesheets.clientName'), type: 'text' },
+    { name: 'status', label: t('timesheets.status.all'), type: 'select', options: [
+      { value: 'pending', label: t('timesheets.status.pending') },
+      { value: 'approved', label: t('timesheets.status.approved') },
+      { value: 'rejected', label: t('timesheets.status.rejected') },
+    ]},
+    { name: 'hours', label: t('timesheets.hours'), type: 'number' },
+    { name: 'amount', label: t('timesheets.amount'), type: 'number' },
+    { name: 'weekEnding', label: t('timesheets.weekEnding'), type: 'date' },
+  ], [t])
 
   const timesheetsToFilter = useMemo(() => {
     return timesheets.filter(ts => statusFilter === 'all' || ts.status === statusFilter)
@@ -145,6 +159,7 @@ export function useTimesheetsView() {
     formData, setFormData, csvData, setCsvData,
     timesheetsWithValidation, validationStats,
     pendingCount, approvedCount, totalHours, totalValue, approvalRate,
+    timesheetFields,
     handleResultsChange,
     handleCreateTimesheet, handleCreateDetailedTimesheet, handleBulkImport,
     handleApprove, handleReject, handleAdjust, handleTimeAndRateAdjustment, handleDelete,

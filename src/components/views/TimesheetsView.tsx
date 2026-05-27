@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Stack } from '@/components/ui/stack'
 import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
 import { TimeAndRateAdjustmentWizard } from '@/components/TimeAndRateAdjustmentWizard'
-import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
+import { AdvancedSearch } from '@/components/AdvancedSearch'
 import { TimesheetCreateDialogs } from '@/components/timesheets/TimesheetCreateDialogs'
 import { TimesheetTabs } from '@/components/timesheets/TimesheetTabs'
 import { TimesheetAnalytics } from '@/components/timesheets/TimesheetAnalytics'
@@ -22,19 +22,6 @@ interface TimesheetsViewProps {
 
 export function TimesheetsView({ onCreateInvoice }: TimesheetsViewProps) {
   const vm = useTimesheetsView()
-
-  const timesheetFields: FilterField[] = [
-    { name: 'workerName', label: vm.t('timesheets.workerName'), type: 'text' },
-    { name: 'clientName', label: vm.t('timesheets.clientName'), type: 'text' },
-    { name: 'status', label: vm.t('timesheets.status.all'), type: 'select', options: [
-      { value: 'pending', label: vm.t('timesheets.status.pending') },
-      { value: 'approved', label: vm.t('timesheets.status.approved') },
-      { value: 'rejected', label: vm.t('timesheets.status.rejected') }
-    ]},
-    { name: 'hours', label: vm.t('timesheets.hours'), type: 'number' },
-    { name: 'amount', label: vm.t('timesheets.amount'), type: 'number' },
-    { name: 'weekEnding', label: vm.t('timesheets.weekEnding'), type: 'date' }
-  ]
 
   return (
     <Stack spacing={6}>
@@ -95,7 +82,7 @@ export function TimesheetsView({ onCreateInvoice }: TimesheetsViewProps) {
         <CardContent>
           <AdvancedSearch
             items={vm.timesheetsToFilter}
-            fields={timesheetFields}
+            fields={vm.timesheetFields}
             onResultsChange={vm.handleResultsChange}
             placeholder={vm.t('timesheets.searchPlaceholder')}
           />

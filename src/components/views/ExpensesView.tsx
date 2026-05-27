@@ -9,7 +9,7 @@ import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
 import { MetricCard } from '@/components/ui/metric-card'
 import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
-import { AdvancedSearch, type FilterField } from '@/components/AdvancedSearch'
+import { AdvancedSearch } from '@/components/AdvancedSearch'
 import { ExpenseCard } from '@/components/expenses/ExpenseCard'
 import { ExpenseCreateDialog } from '@/components/expenses/ExpenseCreateDialog'
 import { useExpensesView } from '@/hooks/useExpensesView'
@@ -28,31 +28,6 @@ interface ExpensesViewProps {
 export function ExpensesView({ expenses, onCreateExpense, onApprove, onReject }: ExpensesViewProps) {
   const vm = useExpensesView(expenses, onCreateExpense)
   const { hasPermission } = usePermissions()
-
-  const expenseFields: FilterField[] = [
-    { name: 'workerName', label: vm.t('expenses.workerName'), type: 'text' },
-    { name: 'clientName', label: vm.t('expenses.clientName'), type: 'text' },
-    { name: 'status', label: vm.t('common.status'), type: 'select', options: [
-      { value: 'pending', label: vm.t('expenses.status.pending') },
-      { value: 'approved', label: vm.t('expenses.status.approved') },
-      { value: 'rejected', label: vm.t('expenses.status.rejected') },
-      { value: 'paid', label: vm.t('expenses.status.paid') }
-    ]},
-    { name: 'category', label: vm.t('expenses.category'), type: 'select', options: [
-      { value: 'Travel', label: vm.t('expenses.categories.travel') },
-      { value: 'Accommodation', label: vm.t('expenses.categories.accommodation') },
-      { value: 'Meals', label: vm.t('expenses.categories.meals') },
-      { value: 'Equipment', label: vm.t('expenses.categories.equipment') },
-      { value: 'Training', label: vm.t('expenses.categories.training') },
-      { value: 'Other', label: vm.t('expenses.categories.other') }
-    ]},
-    { name: 'amount', label: vm.t('expenses.amount'), type: 'number' },
-    { name: 'date', label: vm.t('expenses.date'), type: 'date' },
-    { name: 'billable', label: vm.t('expenses.billable'), type: 'select', options: [
-      { value: 'true', label: vm.t('common.yes') },
-      { value: 'false', label: vm.t('common.no') }
-    ]}
-  ]
 
   const tabStatuses = ['pending', 'approved', 'rejected', 'paid'] as const
 
@@ -77,7 +52,7 @@ export function ExpensesView({ expenses, onCreateExpense, onApprove, onReject }:
 
       <AdvancedSearch
         items={vm.expensesToFilter}
-        fields={expenseFields}
+        fields={vm.expenseFields}
         onResultsChange={vm.handleResultsChange}
         placeholder={vm.t('expenses.searchPlaceholder')}
       />
