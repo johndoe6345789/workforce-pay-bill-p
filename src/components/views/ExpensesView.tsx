@@ -1,17 +1,13 @@
-import { Download, Funnel, CheckCircle, XCircle, CurrencyDollar, CaretDown, ClockCounterClockwise } from '@phosphor-icons/react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { CheckCircle, XCircle, CurrencyDollar, ClockCounterClockwise } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/ui/page-header'
 import { Grid } from '@/components/ui/grid'
 import { Stack } from '@/components/ui/stack'
 import { MetricCard } from '@/components/ui/metric-card'
 import { ExpenseDetailDialog } from '@/components/ExpenseDetailDialog'
 import { AdvancedSearch } from '@/components/AdvancedSearch'
-import { ExpenseCard } from '@/components/expenses/ExpenseCard'
 import { ExpenseCreateDialog } from '@/components/expenses/ExpenseCreateDialog'
+import { ExpenseFilterBar } from '@/components/expenses/ExpenseFilterBar'
+import { ExpenseTabsSection } from '@/components/expenses/ExpenseTabsSection'
 import { useExpensesView } from '@/hooks/useExpensesView'
 import { usePermissions } from '@/hooks/use-permissions'
 import type { Expense } from '@/lib/types'
@@ -28,8 +24,6 @@ interface ExpensesViewProps {
 export function ExpensesView({ expenses, onCreateExpense, onApprove, onReject }: ExpensesViewProps) {
   const vm = useExpensesView(expenses, onCreateExpense)
   const { hasPermission } = usePermissions()
-
-  const tabStatuses = ['pending', 'approved', 'rejected', 'paid'] as const
 
   return (
     <Stack spacing={6}>
@@ -64,65 +58,21 @@ export function ExpensesView({ expenses, onCreateExpense, onApprove, onReject }:
         <MetricCard label={vm.t('expenses.paid')} value={expenses.filter(e => e.status === 'paid').length} icon={<CurrencyDollar size={24} />} />
       </Grid>
 
-      <Stack direction="horizontal" spacing={4} align="center">
-        <Select value={vm.statusFilter} onValueChange={v => vm.setStatusFilter(v as any)}>
-          <SelectTrigger className="w-40">
-            <div className="flex items-center gap-2"><Funnel size={16} /><SelectValue /></div>
-          </SelectTrigger>
-          <SelectContent>
-            {(['all', 'pending', 'approved', 'rejected', 'paid'] as const).map(s => (
-              <SelectItem key={s} value={s}>{vm.t(`expenses.status.${s}`)}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Download size={18} className="mr-2" />
-              {vm.t('common.export')}
-              <CaretDown size={16} className="ml-2" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {(['csv', 'xlsx', 'json'] as const).map(fmt => (
-              <DropdownMenuItem key={fmt} onClick={() => vm.handleExport(fmt)}>
-                {vm.t('common.exportAs', { format: fmt === 'xlsx' ? 'Excel' : fmt.toUpperCase() })}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </Stack>
+      <ExpenseFilterBar
+        statusFilter={vm.statusFilter}
+        setStatusFilter={v => vm.setStatusFilter(v as any)}
+        onExport={vm.handleExport}
+        t={vm.t}
+      />
 
-      <Tabs defaultValue="pending" className="space-y-4">
-        <TabsList>
-          {tabStatuses.map(s => (
-            <TabsTrigger key={s} value={s}>
-              {vm.t(`expenses.tabs.${s}`)} ({expenses.filter(e => e.status === s).length})
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {tabStatuses.map(s => (
-          <TabsContent key={s} value={s} className="space-y-4">
-            {vm.filteredExpenses.filter(e => e.status === s).map(expense => (
-              <ExpenseCard
-                key={expense.id}
-                expense={expense}
-                onApprove={s === 'pending' ? onApprove : undefined}
-                onReject={s === 'pending' ? onReject : undefined}
-                onViewDetails={vm.setViewingExpense}
-              />
-            ))}
-            {s === 'pending' && vm.filteredExpenses.filter(e => e.status === 'pending').length === 0 && (
-              <Card className="p-12 text-center">
-                <CheckCircle size={48} className="mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{vm.t('expenses.allCaughtUp')}</h3>
-                <p className="text-muted-foreground">{vm.t('expenses.noPendingExpenses')}</p>
-              </Card>
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
+      <ExpenseTabsSection
+        expenses={expenses}
+        filteredExpenses={vm.filteredExpenses}
+        onApprove={onApprove}
+        onReject={onReject}
+        onViewDetails={vm.setViewingExpense}
+        t={vm.t}
+      />
 
       <ExpenseDetailDialog
         expense={vm.viewingExpense}

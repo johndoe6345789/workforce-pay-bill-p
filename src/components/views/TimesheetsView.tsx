@@ -1,17 +1,10 @@
-import { Download, Funnel, ChartBar, Warning } from '@phosphor-icons/react'
-import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { PageHeader } from '@/components/ui/page-header'
 import { Stack } from '@/components/ui/stack'
-import { TimesheetDetailDialog } from '@/components/TimesheetDetailDialog'
-import { TimeAndRateAdjustmentWizard } from '@/components/TimeAndRateAdjustmentWizard'
-import { AdvancedSearch } from '@/components/AdvancedSearch'
-import { TimesheetCreateDialogs } from '@/components/timesheets/TimesheetCreateDialogs'
 import { TimesheetTabs } from '@/components/timesheets/TimesheetTabs'
 import { TimesheetAnalytics } from '@/components/timesheets/TimesheetAnalytics'
-import { LiveRefreshIndicator } from '@/components/LiveRefreshIndicator'
+import { TimesheetSearchPanel } from '@/components/timesheets/TimesheetSearchPanel'
+import { TimesheetFilterBar } from '@/components/timesheets/TimesheetFilterBar'
+import { TimesheetActionDialogs } from '@/components/timesheets/TimesheetActionDialogs'
+import { TimesheetPageHeader } from '@/components/timesheets/TimesheetPageHeader'
 import { useTimesheetsView } from '@/hooks/useTimesheetsView'
 
 interface TimesheetsViewProps {
@@ -25,34 +18,23 @@ export function TimesheetsView({ onCreateInvoice }: TimesheetsViewProps) {
 
   return (
     <Stack spacing={6}>
-      <div className="flex items-center justify-between">
-        <PageHeader
-          title={vm.t('timesheets.title')}
-          description={vm.t('timesheets.subtitle')}
-          actions={
-            <Stack direction="horizontal" spacing={2}>
-              <Button variant="outline" onClick={() => vm.setShowAnalytics(!vm.showAnalytics)}>
-                <ChartBar size={18} className="mr-2" />
-                {vm.showAnalytics ? vm.t('timesheets.hideAnalytics') : vm.t('timesheets.showAnalytics')}
-              </Button>
-              <TimesheetCreateDialogs
-                isCreateDialogOpen={vm.isCreateDialogOpen}
-                setIsCreateDialogOpen={vm.setIsCreateDialogOpen}
-                isBulkImportOpen={vm.isBulkImportOpen}
-                setIsBulkImportOpen={vm.setIsBulkImportOpen}
-                formData={vm.formData}
-                setFormData={vm.setFormData}
-                csvData={vm.csvData}
-                setCsvData={vm.setCsvData}
-                onCreateTimesheet={vm.handleCreateTimesheet}
-                onCreateDetailedTimesheet={vm.handleCreateDetailedTimesheet}
-                onBulkImport={vm.handleBulkImport}
-              />
-            </Stack>
-          }
-        />
-        <LiveRefreshIndicator lastUpdated={vm.lastUpdated} pollingInterval={1000} />
-      </div>
+      <TimesheetPageHeader
+        showAnalytics={vm.showAnalytics}
+        onToggleAnalytics={() => vm.setShowAnalytics(!vm.showAnalytics)}
+        lastUpdated={vm.lastUpdated}
+        t={vm.t}
+        isCreateDialogOpen={vm.isCreateDialogOpen}
+        setIsCreateDialogOpen={vm.setIsCreateDialogOpen}
+        isBulkImportOpen={vm.isBulkImportOpen}
+        setIsBulkImportOpen={vm.setIsBulkImportOpen}
+        formData={vm.formData}
+        setFormData={vm.setFormData}
+        csvData={vm.csvData}
+        setCsvData={vm.setCsvData}
+        onCreateTimesheet={vm.handleCreateTimesheet}
+        onCreateDetailedTimesheet={vm.handleCreateDetailedTimesheet}
+        onBulkImport={vm.handleBulkImport}
+      />
 
       {vm.showAnalytics && (
         <TimesheetAnalytics
@@ -67,53 +49,22 @@ export function TimesheetsView({ onCreateInvoice }: TimesheetsViewProps) {
         />
       )}
 
-      <Card>
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg">{vm.t('timesheets.searchAndFilter')}</CardTitle>
-              <CardDescription className="text-xs mt-1">{vm.t('timesheets.findTimesheetsAdvanced')}</CardDescription>
-            </div>
-            <Badge variant="secondary" className="font-mono">
-              {vm.t('timesheets.results', { count: vm.filteredTimesheets.length })}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <AdvancedSearch
-            items={vm.timesheetsToFilter}
-            fields={vm.timesheetFields}
-            onResultsChange={vm.handleResultsChange}
-            placeholder={vm.t('timesheets.searchPlaceholder')}
-          />
-        </CardContent>
-      </Card>
+      <TimesheetSearchPanel
+        items={vm.timesheetsToFilter}
+        fields={vm.timesheetFields}
+        onResultsChange={vm.handleResultsChange}
+        title={vm.t('timesheets.searchAndFilter')}
+        description={vm.t('timesheets.findTimesheetsAdvanced')}
+        resultsLabel={vm.t('timesheets.results', { count: vm.filteredTimesheets.length })}
+        placeholder={vm.t('timesheets.searchPlaceholder')}
+      />
 
-      <Stack direction="horizontal" spacing={3} align="center" justify="between">
-        <Stack direction="horizontal" spacing={3}>
-          <Select value={vm.statusFilter} onValueChange={v => vm.setStatusFilter(v as any)}>
-            <SelectTrigger className="w-48">
-              <div className="flex items-center gap-2"><Funnel size={16} /><SelectValue /></div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{vm.t('timesheets.status.all')}</SelectItem>
-              <SelectItem value="pending">{vm.t('timesheets.status.pending')}</SelectItem>
-              <SelectItem value="approved">{vm.t('timesheets.status.approved')}</SelectItem>
-              <SelectItem value="rejected">{vm.t('timesheets.status.rejected')}</SelectItem>
-            </SelectContent>
-          </Select>
-          {vm.validationStats.invalid > 0 && (
-            <Badge variant="destructive" className="px-3 py-1.5">
-              <Warning size={14} weight="bold" className="mr-1" />
-              {vm.t('timesheets.validationErrors', { count: vm.validationStats.invalid, errors: vm.validationStats.invalid === 1 ? vm.t('timesheets.error') : vm.t('timesheets.errors') })}
-            </Badge>
-          )}
-        </Stack>
-        <Button variant="outline">
-          <Download size={18} className="mr-2" />
-          {vm.t('timesheets.exportCsv')}
-        </Button>
-      </Stack>
+      <TimesheetFilterBar
+        statusFilter={vm.statusFilter}
+        setStatusFilter={v => vm.setStatusFilter(v as any)}
+        validationStats={vm.validationStats}
+        t={vm.t}
+      />
 
       <TimesheetTabs
         filteredTimesheets={vm.timesheetsWithValidation}
@@ -125,20 +76,13 @@ export function TimesheetsView({ onCreateInvoice }: TimesheetsViewProps) {
         onDelete={vm.handleDelete}
       />
 
-      <TimesheetDetailDialog
-        timesheet={vm.viewingTimesheet}
-        open={vm.viewingTimesheet !== null}
-        onOpenChange={open => { if (!open) vm.setViewingTimesheet(null) }}
+      <TimesheetActionDialogs
+        viewingTimesheet={vm.viewingTimesheet}
+        setViewingTimesheet={vm.setViewingTimesheet}
+        selectedTimesheet={vm.selectedTimesheet}
+        setSelectedTimesheet={vm.setSelectedTimesheet}
+        onAdjustSubmit={vm.handleTimeAndRateAdjustment}
       />
-
-      {vm.selectedTimesheet && (
-        <TimeAndRateAdjustmentWizard
-          timesheet={{ id: vm.selectedTimesheet.id, workerId: vm.selectedTimesheet.workerId, workerName: vm.selectedTimesheet.workerName, clientName: vm.selectedTimesheet.clientName, hoursWorked: vm.selectedTimesheet.hours, rate: vm.selectedTimesheet.rate || 0, status: vm.selectedTimesheet.status }}
-          open={vm.selectedTimesheet !== null}
-          onOpenChange={open => { if (!open) vm.setSelectedTimesheet(null) }}
-          onSubmit={vm.handleTimeAndRateAdjustment}
-        />
-      )}
     </Stack>
   )
 }
