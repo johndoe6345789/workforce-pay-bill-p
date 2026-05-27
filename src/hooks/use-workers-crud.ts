@@ -2,18 +2,15 @@ import { useCallback } from 'react'
 import { indexedDB, STORES } from '@/lib/indexed-db'
 import { useIndexedDBState } from './use-indexed-db-state'
 import { useWorkersWrite } from './use-workers-write'
+import { useWorkersBulk } from './use-workers-bulk'
 import type { Worker } from '@/lib/types'
 
 export function useWorkersCrud() {
   const [workers, setWorkers] = useIndexedDBState<Worker[]>(STORES.WORKERS, [])
 
-  const {
-    createWorker,
-    updateWorker,
-    deleteWorker,
-    bulkCreateWorkers,
-    bulkUpdateWorkers,
-  } = useWorkersWrite(setWorkers)
+  const { createWorker, updateWorker, deleteWorker } =
+    useWorkersWrite(setWorkers)
+  const { bulkCreateWorkers, bulkUpdateWorkers } = useWorkersBulk(setWorkers)
 
   const getWorkerById = useCallback(async (id: string) => {
     try {
@@ -36,9 +33,7 @@ export function useWorkersCrud() {
   const getWorkerByEmail = useCallback(async (email: string) => {
     try {
       const results = await indexedDB.readByIndex<Worker>(
-        STORES.WORKERS,
-        'email',
-        email
+        STORES.WORKERS, 'email', email
       )
       return results[0] ?? null
     } catch (error) {

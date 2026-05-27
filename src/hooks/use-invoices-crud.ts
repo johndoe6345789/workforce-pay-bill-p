@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from 'react'
 import { indexedDB, STORES } from '@/lib/indexed-db'
 import { useIndexedDBLive } from './use-indexed-db-live'
 import { useInvoicesWrite } from './use-invoices-write'
+import { useInvoicesBulk } from './use-invoices-bulk'
 import type { Invoice } from '@/lib/types'
 
 export function useInvoicesCrud(options?: {
@@ -18,17 +19,12 @@ export function useInvoicesCrud(options?: {
     { enabled: liveRefreshEnabled, pollingInterval }
   )
 
-  useEffect(() => {
-    setLastUpdated(new Date())
-  }, [invoices])
+  useEffect(() => { setLastUpdated(new Date()) }, [invoices])
 
-  const {
-    createInvoice,
-    updateInvoice,
-    deleteInvoice,
-    bulkCreateInvoices,
-    bulkUpdateInvoices,
-  } = useInvoicesWrite(setInvoices)
+  const { createInvoice, updateInvoice, deleteInvoice } =
+    useInvoicesWrite(setInvoices)
+  const { bulkCreateInvoices, bulkUpdateInvoices } =
+    useInvoicesBulk(setInvoices)
 
   const getInvoiceById = useCallback(async (id: string) => {
     try {
@@ -42,9 +38,7 @@ export function useInvoicesCrud(options?: {
   const getInvoicesByClient = useCallback(async (clientId: string) => {
     try {
       return await indexedDB.readByIndex<Invoice>(
-        STORES.INVOICES,
-        'clientId',
-        clientId
+        STORES.INVOICES, 'clientId', clientId
       )
     } catch (error) {
       console.error('Failed to get invoices by client:', error)
@@ -55,9 +49,7 @@ export function useInvoicesCrud(options?: {
   const getInvoicesByStatus = useCallback(async (status: string) => {
     try {
       return await indexedDB.readByIndex<Invoice>(
-        STORES.INVOICES,
-        'status',
-        status
+        STORES.INVOICES, 'status', status
       )
     } catch (error) {
       console.error('Failed to get invoices by status:', error)

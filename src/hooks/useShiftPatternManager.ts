@@ -4,21 +4,16 @@ import { useTranslation } from '@/hooks/use-translation'
 import { toast } from 'sonner'
 import { DAYS_OF_WEEK } from '@/data/shiftPatternConfig'
 import type { ShiftPatternTemplate, ShiftType, DayOfWeek } from '@/lib/types'
-
-const DEFAULT_FORM: Partial<ShiftPatternTemplate> = {
-  name: '', description: '', shiftType: 'night', isRecurring: true,
-  defaultStartTime: '22:00', defaultEndTime: '06:00', defaultBreakMinutes: 30,
-  daysOfWeek: [], rateMultiplier: 1.0,
-}
+import { DEFAULT_SHIFT_FORM } from './useShiftPatternManager.types'
 
 export function useShiftPatternManager() {
   const { t } = useTranslation()
   const [patterns = [], setPatterns] = useKV<ShiftPatternTemplate[]>('shift-patterns', [])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingPattern, setEditingPattern] = useState<ShiftPatternTemplate | null>(null)
-  const [formData, setFormData] = useState<Partial<ShiftPatternTemplate>>(DEFAULT_FORM)
+  const [formData, setFormData] = useState<Partial<ShiftPatternTemplate>>(DEFAULT_SHIFT_FORM)
 
-  const resetForm = () => setFormData(DEFAULT_FORM)
+  const resetForm = () => setFormData(DEFAULT_SHIFT_FORM)
 
   const closeDialog = () => {
     setIsCreateDialogOpen(false)
@@ -95,11 +90,14 @@ export function useShiftPatternManager() {
     })
   }
 
+  void DAYS_OF_WEEK
+
   return {
     t, patterns, isCreateDialogOpen, setIsCreateDialogOpen,
     editingPattern, setEditingPattern,
     formData, setFormData,
     resetForm, closeDialog,
-    handleCreatePattern, handleUpdatePattern, handleDeletePattern, handleDuplicatePattern, handleEditPattern, toggleDayOfWeek,
+    handleCreatePattern, handleUpdatePattern, handleDeletePattern,
+    handleDuplicatePattern, handleEditPattern, toggleDayOfWeek,
   }
 }

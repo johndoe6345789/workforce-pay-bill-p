@@ -6,15 +6,9 @@ export type { WebSocketOptions } from './use-websocket.types'
 
 export function useWebSocket(url: string | null, options: WebSocketOptions = {}) {
   const {
-    reconnect = true,
-    reconnectAttempts = 5,
-    reconnectInterval = 3000,
-    heartbeatInterval = 30000,
-    heartbeatMessage = 'ping',
-    onOpen = () => {},
-    onClose = () => {},
-    onError = () => {},
-    onMessage = () => {},
+    reconnect = true, reconnectAttempts = 5, reconnectInterval = 3000,
+    heartbeatInterval = 30000, heartbeatMessage = 'ping',
+    onOpen = () => {}, onClose = () => {}, onError = () => {}, onMessage = () => {},
   } = options
 
   const [readyState, setReadyState] = useState<number>(WebSocket.CONNECTING)
@@ -43,10 +37,7 @@ export function useWebSocket(url: string | null, options: WebSocketOptions = {})
 
   useEffect(() => {
     void connect()
-    return () => {
-      mountedRef.current = false
-      disconnect()
-    }
+    return () => { mountedRef.current = false; disconnect() }
   }, [connect, disconnect])
 
   return {

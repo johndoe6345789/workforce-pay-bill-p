@@ -2,38 +2,16 @@ import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { useTranslation } from '@/hooks/use-translation'
 import { toast } from 'sonner'
+import { DEFAULT_FORM } from './useOnboardingWorkflowManager.types'
+import type { OnboardingWorkflow, OnboardingStep, OnboardingStepStatus, OnboardingFormData } from './useOnboardingWorkflowManager.types'
 
-export type OnboardingStatus = 'not-started' | 'in-progress' | 'completed' | 'blocked'
-export type OnboardingStep = 'personal-info' | 'right-to-work' | 'tax-forms' | 'bank-details' | 'compliance-docs' | 'contract-signing'
-
-export interface OnboardingStepStatus {
-  step: OnboardingStep
-  label: string
-  status: 'pending' | 'in-progress' | 'completed' | 'blocked'
-  completedDate?: string
-  documents?: string[]
-}
-
-export interface OnboardingWorkflow {
-  id: string
-  workerId: string
-  workerName: string
-  email: string
-  startDate: string
-  status: OnboardingStatus
-  progress: number
-  steps: OnboardingStepStatus[]
-  currentStep: OnboardingStep
-  notes?: string
-}
-
-const DEFAULT_FORM = { workerName: '', email: '', startDate: '' }
+export type { OnboardingStatus, OnboardingStep, OnboardingStepStatus, OnboardingWorkflow } from './useOnboardingWorkflowManager.types'
 
 export function useOnboardingWorkflowManager() {
   const { t } = useTranslation()
   const [workflows = [], setWorkflows] = useKV<OnboardingWorkflow[]>('onboarding-workflows', [])
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [formData, setFormData] = useState(DEFAULT_FORM)
+  const [formData, setFormData] = useState<OnboardingFormData>(DEFAULT_FORM)
 
   const makeDefaultSteps = (): OnboardingStepStatus[] => [
     { step: 'personal-info', label: t('onboarding.steps.personalInfo'), status: 'pending' },
@@ -58,7 +36,7 @@ export function useOnboardingWorkflowManager() {
       status: 'not-started',
       progress: 0,
       steps: makeDefaultSteps(),
-      currentStep: 'personal-info'
+      currentStep: 'personal-info',
     }
     setWorkflows(current => [...(current || []), newWorkflow])
     toast.success(t('onboarding.messages.createSuccess', { workerName: formData.workerName }))
@@ -81,7 +59,7 @@ export function useOnboardingWorkflowManager() {
         return {
           ...workflow, steps: updatedSteps, progress,
           status: allCompleted ? 'completed' as const : 'in-progress' as const,
-          currentStep: nextIncompleteStep?.step || workflow.currentStep
+          currentStep: nextIncompleteStep?.step || workflow.currentStep,
         }
       })
     })

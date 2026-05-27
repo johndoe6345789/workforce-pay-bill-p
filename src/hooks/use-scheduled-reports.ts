@@ -8,14 +8,9 @@ import { useExpensesCrud } from './use-expenses-crud'
 import { useDataExport } from './use-data-export'
 import type { ScheduledReport, ReportExecution, ReportType } from './use-scheduled-reports.types'
 import {
-  generateMarginAnalysis,
-  generateRevenueSummary,
-  generatePayrollSummary,
-  generateTimesheetSummary,
-  generateExpenseSummary,
-  generateCashFlow,
-  generateWorkerUtilization,
-  generateComplianceStatus,
+  generateMarginAnalysis, generateRevenueSummary, generatePayrollSummary,
+  generateTimesheetSummary, generateExpenseSummary, generateCashFlow,
+  generateWorkerUtilization, generateComplianceStatus,
 } from './use-scheduled-reports.generators'
 import { calculateNextRunDate } from './use-scheduled-reports.utils'
 import { useReportExecute } from './use-report-execute'
@@ -23,7 +18,6 @@ import { useReportExecute } from './use-report-execute'
 export function useScheduledReports() {
   const [schedules, setSchedules] = useIndexedDBState<ScheduledReport[]>('scheduled-reports', [])
   const [executions, setExecutions] = useIndexedDBState<ReportExecution[]>('report-executions', [])
-
   const { invoices } = useInvoicesCrud()
   const { payrollRuns } = usePayrollCrud()
   const { timesheets } = useTimesheetsCrud()
@@ -46,30 +40,27 @@ export function useScheduledReports() {
 
   const { executeReport } = useReportExecute(generateReportData, exportToCSV, exportToExcel, setExecutions)
 
+  const updateSchedule = useCallback((id: string, updates: Partial<ScheduledReport>) => {
+    setSchedules(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s))
+  }, [setSchedules])
+
   const createSchedule = useCallback((data: Omit<ScheduledReport, 'id' | 'createdAt' | 'runCount' | 'nextRunDate'>) => {
     const newSchedule: ScheduledReport = {
       ...data,
       id: `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       createdAt: new Date().toISOString(),
       runCount: 0,
-      nextRunDate: calculateNextRunDate(data.frequency)
+      nextRunDate: calculateNextRunDate(data.frequency),
     }
     setSchedules(prev => [...prev, newSchedule])
     return newSchedule
   }, [setSchedules])
 
-  const updateSchedule = useCallback((id: string, updates: Partial<ScheduledReport>) => {
-    setSchedules(prev => prev.map(schedule => schedule.id === id ? { ...schedule, ...updates } : schedule))
-  }, [setSchedules])
   const deleteSchedule = useCallback((id: string) => {
-    setSchedules(prev => prev.filter(schedule => schedule.id !== id))
+    setSchedules(prev => prev.filter(s => s.id !== id))
   }, [setSchedules])
-  const pauseSchedule = useCallback((id: string) => {
-    updateSchedule(id, { status: 'paused' })
-  }, [updateSchedule])
-  const resumeSchedule = useCallback((id: string) => {
-    updateSchedule(id, { status: 'active' })
-  }, [updateSchedule])
+  const pauseSchedule = useCallback((id: string) => updateSchedule(id, { status: 'paused' }), [updateSchedule])
+  const resumeSchedule = useCallback((id: string) => updateSchedule(id, { status: 'active' }), [updateSchedule])
 
   const runScheduleNow = useCallback(async (id: string) => {
     const schedule = schedules.find(s => s.id === id)
@@ -80,7 +71,7 @@ export function useScheduledReports() {
       lastRunStatus: execution.status,
       lastRunError: execution.error,
       runCount: schedule.runCount + 1,
-      nextRunDate: calculateNextRunDate(schedule.frequency)
+      nextRunDate: calculateNextRunDate(schedule.frequency),
     })
     return execution
   }, [schedules, executeReport, updateSchedule])
@@ -88,10 +79,10 @@ export function useScheduledReports() {
   useEffect(() => {
     const checkSchedules = () => {
       const now = new Date()
-      schedules.forEach(schedule => {
-        if (schedule.status !== 'active') return
-        const nextRun = new Date(schedule.nextRunDate)
-        if (now >= nextRun) { runScheduleNow(schedule.id) }
+      schedules.forEach(s => {
+        if (s.status === 'active' && now >= new Date(s.nextRunDate)) {
+          runScheduleNow(s.id)
+        }
       })
     }
     const interval = setInterval(checkSchedules, 60000)
@@ -99,12 +90,8 @@ export function useScheduledReports() {
     return () => clearInterval(interval)
   }, [schedules, runScheduleNow])
 
-  const getSchedulesByType = useCallback((type: ReportType) => {
-    return schedules.filter(s => s.type === type)
-  }, [schedules])
-  const getExecutionHistory = useCallback((scheduleId: string) => {
-    return executions.filter(e => e.scheduleId === scheduleId)
-  }, [executions])
+  const getSchedulesByType = useCallback((type: ReportType) => schedules.filter(s => s.type === type), [schedules])
+  const getExecutionHistory = useCallback((scheduleId: string) => executions.filter(e => e.scheduleId === scheduleId), [executions])
 
   return { schedules, executions, createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSchedule, runScheduleNow, getSchedulesByType, getExecutionHistory }
 }

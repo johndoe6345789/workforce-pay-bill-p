@@ -1,97 +1,64 @@
 import { useCallback, useRef } from 'react'
-import type { WebSocketOptions } from './use-websocket.types'
+import type { MutableRefObject } from 'react'
 
-interface ConnectionParams
-  extends Required<
-    Pick<
-      WebSocketOptions,
-      | 'reconnect'
-      | 'reconnectAttempts'
-      | 'reconnectInterval'
-      | 'heartbeatInterval'
-      | 'heartbeatMessage'
-      | 'onOpen'
-      | 'onClose'
-      | 'onError'
-      | 'onMessage'
-    >
-  > {
+export interface WsConnectionParams {
   url: string | null
+  reconnect: boolean
+  reconnectAttempts: number
+  reconnectInterval: number
+  heartbeatInterval: number
+  heartbeatMessage: string
   reconnectCount: number
+  onOpen: (e: Event) => void
+  onClose: (e: CloseEvent) => void
+  onError: (e: Event) => void
+  onMessage: (e: MessageEvent) => void
   setReadyState: (state: number) => void
   setLastMessage: (event: MessageEvent) => void
   setReconnectCount: (updater: (prev: number) => number) => void
-  mountedRef: React.MutableRefObject<boolean>
+  mountedRef: MutableRefObject<boolean>
 }
 
-export function useWebSocketConnection({
-  url,
-  reconnect,
-  reconnectAttempts,
-  reconnectInterval,
-  heartbeatInterval,
-  heartbeatMessage,
-  onOpen,
-  onClose,
-  onError,
-  onMessage,
-  reconnectCount,
-  setReadyState,
-  setLastMessage,
-  setReconnectCount,
-  mountedRef,
-}: ConnectionParams) {
+export function useWebSocketConnection(p: WsConnectionParams) {
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
 
   const connect = useCallback(() => {
-    if (!url || !mountedRef.current) return
+    if (!p.url || !p.mountedRef.current) return
     try {
-      const ws = new WebSocket(url)
+      const ws = new WebSocket(p.url)
 
       ws.onopen = event => {
-        setReadyState(WebSocket.OPEN)
-        setReconnectCount(() => 0)
-        onOpen(event)
-        if (heartbeatInterval > 0) {
+        p.setReadyState(WebSocket.OPEN)
+        p.setReconnectCount(() => 0)
+        p.onOpen(event)
+        if (p.heartbeatInterval > 0) {
           heartbeatIntervalRef.current = setInterval(() => {
-            if (ws.readyState === WebSocket.OPEN) ws.send(heartbeatMessage)
-          }, heartbeatInterval)
+            if (ws.readyState === WebSocket.OPEN) ws.send(p.heartbeatMessage)
+          }, p.heartbeatInterval)
         }
       }
 
       ws.onclose = event => {
-        setReadyState(WebSocket.CLOSED)
-        onClose(event)
+        p.setReadyState(WebSocket.CLOSED)
+        p.onClose(event)
         if (heartbeatIntervalRef.current) clearInterval(heartbeatIntervalRef.current)
-        if (reconnect && reconnectCount < reconnectAttempts && mountedRef.current) {
+        if (p.reconnect && p.reconnectCount < p.reconnectAttempts && p.mountedRef.current) {
           reconnectTimeoutRef.current = setTimeout(() => {
-            setReconnectCount(prev => prev + 1)
+            p.setReconnectCount(prev => prev + 1)
             connect()
-          }, reconnectInterval)
+          }, p.reconnectInterval)
         }
       }
 
-      ws.onerror = event => {
-        setReadyState(WebSocket.CLOSED)
-        onError(event)
-      }
-
-      ws.onmessage = event => {
-        setLastMessage(event)
-        onMessage(event)
-      }
-
+      ws.onerror = event => { p.setReadyState(WebSocket.CLOSED); p.onError(event) }
+      ws.onmessage = event => { p.setLastMessage(event); p.onMessage(event) }
       wsRef.current = ws
     } catch (error) {
       console.error('WebSocket connection error:', error)
     }
-  }, [
-    url, reconnect, reconnectAttempts, reconnectInterval, reconnectCount,
-    heartbeatInterval, heartbeatMessage, onOpen, onClose, onError, onMessage,
-    setReadyState, setLastMessage, setReconnectCount, mountedRef,
-  ])
+  }, [p])
 
   const disconnect = useCallback(() => {
     wsRef.current?.close()

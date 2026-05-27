@@ -1,26 +1,14 @@
 import { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { toast } from 'sonner'
-import type { PayrollRun, Timesheet, Worker } from '@/lib/types'
+import { payrollSchema } from './useCreatePayrollDialog.types'
+import type { PayrollFormData, CreatePayrollDialogOptions } from './useCreatePayrollDialog.types'
 
-export const payrollSchema = z.object({
-  periodEnding: z.string().min(1, 'Period ending date is required'),
-  processingType: z.enum(['all-approved', 'selected-workers', 'one-click']),
-  selectedWorkerIds: z.array(z.string()).optional(),
-})
+export { payrollSchema } from './useCreatePayrollDialog.types'
+export type { PayrollFormData } from './useCreatePayrollDialog.types'
 
-export type PayrollFormData = z.infer<typeof payrollSchema>
-
-interface Options {
-  timesheets: Timesheet[]
-  workers: Worker[]
-  onCreatePayroll: (payroll: Omit<PayrollRun, 'id'>) => Promise<void>
-  onOpenChange: (open: boolean) => void
-}
-
-export function useCreatePayrollDialog({ timesheets, workers, onCreatePayroll, onOpenChange }: Options) {
+export function useCreatePayrollDialog({ timesheets, workers, onCreatePayroll, onOpenChange }: CreatePayrollDialogOptions) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedWorkers, setSelectedWorkers] = useState<Set<string>>(new Set())
 
@@ -90,17 +78,9 @@ export function useCreatePayrollDialog({ timesheets, workers, onCreatePayroll, o
   }
 
   return {
-    form,
-    processingType,
-    isSubmitting,
-    selectedWorkers,
-    approvedTimesheets,
-    eligibleWorkers,
-    payrollAmount,
-    workerCount,
-    toggleWorker,
-    selectAll,
-    deselectAll,
+    form, processingType, isSubmitting, selectedWorkers,
+    approvedTimesheets, eligibleWorkers, payrollAmount, workerCount,
+    toggleWorker, selectAll, deselectAll,
     onSubmit: form.handleSubmit(onSubmit),
     handleCancel,
   }

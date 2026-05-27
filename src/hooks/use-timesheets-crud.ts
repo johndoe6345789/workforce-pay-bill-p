@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from 'react'
 import { indexedDB, STORES } from '@/lib/indexed-db'
 import { useIndexedDBLive } from './use-indexed-db-live'
 import { useTimesheetsWrite } from './use-timesheets-write'
+import { useTimesheetsBulk } from './use-timesheets-bulk'
 import type { Timesheet } from '@/lib/types'
 
 export function useTimesheetsCrud(options?: {
@@ -18,17 +19,12 @@ export function useTimesheetsCrud(options?: {
     { enabled: liveRefreshEnabled, pollingInterval }
   )
 
-  useEffect(() => {
-    setLastUpdated(new Date())
-  }, [timesheets])
+  useEffect(() => { setLastUpdated(new Date()) }, [timesheets])
 
-  const {
-    createTimesheet,
-    updateTimesheet,
-    deleteTimesheet,
-    bulkCreateTimesheets,
-    bulkUpdateTimesheets,
-  } = useTimesheetsWrite(setTimesheets)
+  const { createTimesheet, updateTimesheet, deleteTimesheet } =
+    useTimesheetsWrite(setTimesheets)
+  const { bulkCreateTimesheets, bulkUpdateTimesheets } =
+    useTimesheetsBulk(setTimesheets)
 
   const getTimesheetById = useCallback(async (id: string) => {
     try {
@@ -42,9 +38,7 @@ export function useTimesheetsCrud(options?: {
   const getTimesheetsByWorker = useCallback(async (workerId: string) => {
     try {
       return await indexedDB.readByIndex<Timesheet>(
-        STORES.TIMESHEETS,
-        'workerId',
-        workerId
+        STORES.TIMESHEETS, 'workerId', workerId
       )
     } catch (error) {
       console.error('Failed to get timesheets by worker:', error)
@@ -55,9 +49,7 @@ export function useTimesheetsCrud(options?: {
   const getTimesheetsByStatus = useCallback(async (status: string) => {
     try {
       return await indexedDB.readByIndex<Timesheet>(
-        STORES.TIMESHEETS,
-        'status',
-        status
+        STORES.TIMESHEETS, 'status', status
       )
     } catch (error) {
       console.error('Failed to get timesheets by status:', error)

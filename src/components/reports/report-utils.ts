@@ -1,29 +1,11 @@
-import type { Invoice, PayrollRun, Timesheet, Expense } from '@/lib/types'
+import type { Invoice, PayrollRun } from '@/lib/types'
+import type { ReportConfig, MarginDataPoint, MetricAggregate } from './report-utils.types'
 
-type ReportType = 'timesheet' | 'invoice' | 'payroll' | 'expense' | 'margin'
-type GroupByField = 'worker' | 'client' | 'date' | 'status' | 'month' | 'week'
+export type { ReportType, GroupByField, ReportFilter, ReportConfig, MetricAggregate, MarginDataPoint } from './report-utils.types'
 
-interface ReportFilter {
-  field: string
-  operator: 'equals' | 'contains' | 'greater' | 'less'
-  value: string
-}
-
-interface ReportConfig {
-  name: string
-  type: ReportType
-  dateRange: {
-    from: string
-    to: string
-  }
-  groupBy?: GroupByField
-  metrics: string[]
-  filters: ReportFilter[]
-}
-
-export function calculateMarginData(invoices: Invoice[], payrollRuns: PayrollRun[]) {
+export function calculateMarginData(invoices: Invoice[], payrollRuns: PayrollRun[]): MarginDataPoint[] {
   const grouped = new Map<string, { revenue: number; costs: number }>()
-  
+
   invoices.forEach(inv => {
     const key = inv.issueDate.substring(0, 7)
     const existing = grouped.get(key) || { revenue: 0, costs: 0 }
@@ -41,16 +23,16 @@ export function calculateMarginData(invoices: Invoice[], payrollRuns: PayrollRun
     revenue: data.revenue,
     costs: data.costs,
     margin: data.revenue - data.costs,
-    marginPercentage: data.revenue > 0 ? ((data.revenue - data.costs) / data.revenue) * 100 : 0
+    marginPercentage: data.revenue > 0 ? ((data.revenue - data.costs) / data.revenue) * 100 : 0,
   }))
 }
 
-export function filterData(data: any[], reportConfig: ReportConfig) {
+export function filterData(data: Record<string, unknown>[], reportConfig: ReportConfig) {
   return data.filter(item => {
     for (const filter of reportConfig.filters) {
       const value = item[filter.field]
       const filterValue = filter.value.toLowerCase()
-      
+
       switch (filter.operator) {
         case 'equals':
           if (String(value).toLowerCase() !== filterValue) return false
@@ -66,21 +48,21 @@ export function filterData(data: any[], reportConfig: ReportConfig) {
           break
       }
     }
-    
-    const itemDate = item.weekEnding || item.issueDate || item.periodEnding || item.date
+
+    const itemDate = (item.weekEnding || item.issueDate || item.periodEnding || item.date) as string | undefined
     if (itemDate) {
       if (itemDate < reportConfig.dateRange.from || itemDate > reportConfig.dateRange.to) {
         return false
       }
     }
-    
+
     return true
   })
 }
 
-export function aggregateData(data: any[], reportConfig: ReportConfig) {
+export function aggregateData(data: Record<string, unknown>[], reportConfig: ReportConfig) {
   if (!reportConfig.groupBy) {
-    const aggregated: any = {}
+    const aggregated: Record<string, MetricAggregate> = {}
     reportConfig.metrics.forEach(metric => {
       const values = data.map(item => Number(item[metric]) || 0)
       aggregated[metric] = {
@@ -88,23 +70,21 @@ export function aggregateData(data: any[], reportConfig: ReportConfig) {
         average: values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0,
         count: values.length,
         min: values.length > 0 ? Math.min(...values) : 0,
-        max: values.length > 0 ? Math.max(...values) : 0
+        max: values.length > 0 ? Math.max(...values) : 0,
       }
     })
     return [aggregated]
   }
-  
-  const groups = new Map<string, any[]>()
+
+  const groups = new Map<string, Record<string, unknown>[]>()
   data.forEach(item => {
     const key = String(item[reportConfig.groupBy!] || 'Unknown')
-    if (!groups.has(key)) {
-      groups.set(key, [])
-    }
+    if (!groups.has(key)) groups.set(key, [])
     groups.get(key)!.push(item)
   })
 
   return Array.from(groups.entries()).map(([key, items]) => {
-    const row: any = { [reportConfig.groupBy!]: key }
+    const row: Record<string, unknown> = { [reportConfig.groupBy!]: key }
     reportConfig.metrics.forEach(metric => {
       const values = items.map(item => Number(item[metric]) || 0)
       row[metric] = {
@@ -112,7 +92,7 @@ export function aggregateData(data: any[], reportConfig: ReportConfig) {
         average: values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0,
         count: values.length,
         min: values.length > 0 ? Math.min(...values) : 0,
-        max: values.length > 0 ? Math.max(...values) : 0
+        max: values.length > 0 ? Math.max(...values) : 0,
       }
     })
     return row
