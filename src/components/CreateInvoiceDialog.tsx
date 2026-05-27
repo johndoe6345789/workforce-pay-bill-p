@@ -7,21 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Stack } from '@/components/ui/stack'
 import type { Invoice, InvoiceType } from '@/lib/types'
 import { useCreateInvoiceDialog } from '@/hooks/useCreateInvoiceDialog'
-
-const INVOICE_TYPES = [
-  { value: 'timesheet', label: 'Timesheet' },
-  { value: 'permanent-placement', label: 'Permanent Placement' },
-  { value: 'adhoc', label: 'Ad-hoc' },
-  { value: 'credit-note', label: 'Credit Note' },
-]
-
-const CURRENCIES = [
-  { value: 'GBP', label: 'GBP (£)' },
-  { value: 'USD', label: 'USD ($)' },
-  { value: 'EUR', label: 'EUR (€)' },
-  { value: 'AUD', label: 'AUD (A$)' },
-  { value: 'CAD', label: 'CAD (C$)' },
-]
+import { INVOICE_TYPES, CURRENCIES } from '@/data/invoice-config'
 
 interface Props { open: boolean; onOpenChange: (open: boolean) => void; onCreateInvoice: (invoice: Omit<Invoice, 'id'>) => Promise<void> }
 
