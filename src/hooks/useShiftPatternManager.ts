@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { useTranslation } from '@/hooks/use-translation'
 import { toast } from 'sonner'
-import { DAYS_OF_WEEK } from '@/data/shiftPatternConfig'
-import type { ShiftPatternTemplate, ShiftType, DayOfWeek } from '@/lib/types'
+import type { ShiftPatternTemplate, DayOfWeek } from '@/lib/types'
 import { DEFAULT_SHIFT_FORM } from './useShiftPatternManager.types'
+import { buildPatternFromForm, formDataFromPattern } from './useShiftPatternManager.helpers'
 
 export function useShiftPatternManager() {
   const { t } = useTranslation()
@@ -25,22 +25,7 @@ export function useShiftPatternManager() {
     if (!formData.name || !formData.shiftType || !formData.daysOfWeek?.length) {
       toast.error(t('shiftPatterns.fillAllFields')); return
     }
-    const newPattern: ShiftPatternTemplate = {
-      id: `SP-${Date.now()}`,
-      name: formData.name,
-      description: formData.description || '',
-      shiftType: formData.shiftType as ShiftType,
-      isRecurring: formData.isRecurring ?? true,
-      defaultStartTime: formData.defaultStartTime || '09:00',
-      defaultEndTime: formData.defaultEndTime || '17:00',
-      defaultBreakMinutes: formData.defaultBreakMinutes || 30,
-      daysOfWeek: formData.daysOfWeek as DayOfWeek[],
-      rateMultiplier: formData.rateMultiplier || 1.0,
-      createdDate: new Date().toISOString(),
-      usageCount: 0,
-      recurrencePattern: formData.isRecurring ? { frequency: 'weekly' } : undefined,
-    }
-    setPatterns(current => [...(current || []), newPattern])
+    setPatterns(current => [...(current || []), buildPatternFromForm(formData)])
     toast.success(t('shiftPatterns.patternCreated'))
     closeDialog()
   }
@@ -51,16 +36,10 @@ export function useShiftPatternManager() {
     }
     setPatterns(current => (current || []).map(p =>
       p.id !== editingPattern.id ? p : {
-        ...p,
-        name: formData.name!,
-        description: formData.description || '',
-        shiftType: formData.shiftType as ShiftType,
-        isRecurring: formData.isRecurring ?? true,
-        defaultStartTime: formData.defaultStartTime || '09:00',
-        defaultEndTime: formData.defaultEndTime || '17:00',
-        defaultBreakMinutes: formData.defaultBreakMinutes || 30,
-        daysOfWeek: formData.daysOfWeek as DayOfWeek[],
-        rateMultiplier: formData.rateMultiplier || 1.0,
+        ...buildPatternFromForm(formData),
+        id: p.id,
+        createdDate: p.createdDate,
+        usageCount: p.usageCount,
         recurrencePattern: formData.isRecurring ? (p.recurrencePattern || { frequency: 'weekly' }) : undefined,
       }
     ))
@@ -74,13 +53,14 @@ export function useShiftPatternManager() {
   }
 
   const handleDuplicatePattern = (pattern: ShiftPatternTemplate) => {
-    setPatterns(current => [...(current || []), { ...pattern, id: `SP-${Date.now()}`, name: `${pattern.name} (Copy)`, createdDate: new Date().toISOString(), usageCount: 0 }])
+    const copy = { ...pattern, id: `SP-${Date.now()}`, name: `${pattern.name} (Copy)`, createdDate: new Date().toISOString(), usageCount: 0 }
+    setPatterns(current => [...(current || []), copy])
     toast.success(t('shiftPatterns.patternDuplicated'))
   }
 
   const handleEditPattern = (pattern: ShiftPatternTemplate) => {
     setEditingPattern(pattern)
-    setFormData({ name: pattern.name, description: pattern.description, shiftType: pattern.shiftType, isRecurring: pattern.isRecurring, defaultStartTime: pattern.defaultStartTime, defaultEndTime: pattern.defaultEndTime, defaultBreakMinutes: pattern.defaultBreakMinutes, daysOfWeek: pattern.daysOfWeek, rateMultiplier: pattern.rateMultiplier })
+    setFormData(formDataFromPattern(pattern))
   }
 
   const toggleDayOfWeek = (day: DayOfWeek) => {
@@ -89,8 +69,6 @@ export function useShiftPatternManager() {
       return { ...prev, daysOfWeek: current.includes(day) ? current.filter(d => d !== day) : [...current, day] }
     })
   }
-
-  void DAYS_OF_WEEK
 
   return {
     t, patterns, isCreateDialogOpen, setIsCreateDialogOpen,
