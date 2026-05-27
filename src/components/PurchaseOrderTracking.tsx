@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, MagnifyingGlass, Download } from '@phosphor-icons/react'
+import { Plus, Download } from '@phosphor-icons/react'
 import { usePurchaseOrderTracking } from '@/hooks/usePurchaseOrderTracking'
 import { POCreateDialog } from '@/components/purchase-orders/POCreateDialog'
 import { PODetailDialog } from '@/components/purchase-orders/PODetailDialog'
 import { POMetricsGrid } from '@/components/purchase-orders/POMetricsGrid'
 import { POTabs } from '@/components/purchase-orders/POTabs'
+import { POSearchFilterBar } from '@/components/purchase-orders/POSearchFilterBar'
 
 export function PurchaseOrderTracking() {
   const vm = usePurchaseOrderTracking()
@@ -43,30 +42,12 @@ export function PurchaseOrderTracking() {
 
       <POMetricsGrid metrics={vm.metrics} totalPOs={vm.purchaseOrders.length} />
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search by PO number or client..."
-            value={vm.searchQuery}
-            onChange={e => vm.setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Select value={vm.filterStatus} onValueChange={vm.setFilterStatus}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="expiring-soon">Expiring Soon</SelectItem>
-            <SelectItem value="expired">Expired</SelectItem>
-            <SelectItem value="fulfilled">Fulfilled</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <POSearchFilterBar
+        searchQuery={vm.searchQuery}
+        setSearchQuery={vm.setSearchQuery}
+        filterStatus={vm.filterStatus}
+        setFilterStatus={vm.setFilterStatus}
+      />
 
       <POTabs
         filteredPOs={vm.filteredPOs}

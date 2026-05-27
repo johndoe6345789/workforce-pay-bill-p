@@ -6,8 +6,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus } from '@phosphor-icons/react'
-import type { NotificationRule, NotificationChannel, TriggerEvent } from '@/hooks/useNotificationRulesManager'
-import type { NotificationPriority } from '@/lib/types'
+import type { NotificationRule, NotificationChannel } from '@/hooks/useNotificationRulesManager'
+import { NotificationEventPriorityFields } from '@/components/notification-rules/NotificationEventPriorityFields'
 
 interface Props {
   open: boolean
@@ -42,30 +42,7 @@ export function NotificationRuleFormDialog({ open, isEditing, formData, setFormD
             <Label htmlFor="rule-desc">{t('notificationRules.descriptionLabel')}</Label>
             <Textarea id="rule-desc" value={formData.description} onChange={e => patch({ description: e.target.value })} placeholder={t('notificationRules.descriptionPlaceholder')} rows={2} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="trigger">{t('notificationRules.triggerEventLabel')}</Label>
-              <Select value={formData.triggerEvent} onValueChange={v => patch({ triggerEvent: v as TriggerEvent })}>
-                <SelectTrigger id="trigger"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {(['timesheet-submitted','timesheet-approved','timesheet-rejected','invoice-generated','invoice-overdue','compliance-expiring','compliance-expired','expense-submitted','payroll-completed'] as TriggerEvent[]).map(ev => (
-                    <SelectItem key={ev} value={ev}>{t(`notificationRules.events.${ev.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}`)}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="priority">{t('notificationRules.priorityLabel')}</Label>
-              <Select value={formData.priority} onValueChange={v => patch({ priority: v as NotificationPriority })}>
-                <SelectTrigger id="priority"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {(['low','medium','high','urgent'] as NotificationPriority[]).map(p => (
-                    <SelectItem key={p} value={p}>{t(`notificationRules.priorities.${p}`)}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <NotificationEventPriorityFields formData={formData} patch={patch} t={t} />
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="channel">{t('notificationRules.channelLabel')}</Label>
