@@ -1,14 +1,12 @@
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { FileText, Plus, MagnifyingGlass, Download } from '@phosphor-icons/react'
+import { Plus, MagnifyingGlass, Download } from '@phosphor-icons/react'
 import { usePurchaseOrderTracking } from '@/hooks/usePurchaseOrderTracking'
-import { PurchaseOrderCard } from '@/components/purchase-orders/PurchaseOrderCard'
 import { POCreateDialog } from '@/components/purchase-orders/POCreateDialog'
 import { PODetailDialog } from '@/components/purchase-orders/PODetailDialog'
 import { POMetricsGrid } from '@/components/purchase-orders/POMetricsGrid'
+import { POTabs } from '@/components/purchase-orders/POTabs'
 
 export function PurchaseOrderTracking() {
   const vm = usePurchaseOrderTracking()
@@ -70,40 +68,14 @@ export function PurchaseOrderTracking() {
         </Select>
       </div>
 
-      <Tabs defaultValue="active" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="active">Active ({vm.purchaseOrders.filter(p => p.status === 'active').length})</TabsTrigger>
-          <TabsTrigger value="expiring-soon">Expiring Soon ({vm.metrics.expiringSoonCount})</TabsTrigger>
-          <TabsTrigger value="expired">Expired ({vm.metrics.expiredCount})</TabsTrigger>
-          <TabsTrigger value="fulfilled">Fulfilled ({vm.purchaseOrders.filter(p => p.status === 'fulfilled').length})</TabsTrigger>
-          <TabsTrigger value="all">All ({vm.filteredPOs.length})</TabsTrigger>
-        </TabsList>
-        {(['active', 'expiring-soon', 'expired', 'fulfilled', 'all'] as const).map(tab => {
-          const tabItems = tab === 'all' ? vm.filteredPOs : vm.filteredPOs.filter(po => po.status === tab)
-          return (
-            <TabsContent key={tab} value={tab} className="space-y-3">
-              {tabItems.map(po => (
-                <PurchaseOrderCard
-                  key={po.id}
-                  purchaseOrder={po}
-                  onViewDetails={vm.handleViewDetails}
-                  onDelete={vm.handleDelete}
-                  getStatusColor={vm.getStatusColor}
-                />
-              ))}
-              {tabItems.length === 0 && (
-                <Card className="p-12 text-center">
-                  <FileText size={48} className="mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No purchase orders found</h3>
-                  <p className="text-muted-foreground">
-                    {tab === 'all' ? 'Create a new PO to get started' : `No ${tab} purchase orders`}
-                  </p>
-                </Card>
-              )}
-            </TabsContent>
-          )
-        })}
-      </Tabs>
+      <POTabs
+        filteredPOs={vm.filteredPOs}
+        purchaseOrders={vm.purchaseOrders}
+        metrics={vm.metrics}
+        onViewDetails={vm.handleViewDetails}
+        onDelete={vm.handleDelete}
+        getStatusColor={vm.getStatusColor}
+      />
 
       <POCreateDialog
         open={vm.isCreateOpen}
