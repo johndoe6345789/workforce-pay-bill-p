@@ -1,122 +1,16 @@
-import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { toast } from 'sonner'
 import { ReportConfigForm } from '@/components/reports/ReportConfigForm'
 import { ReportPreview } from '@/components/reports/ReportPreview'
 import { ReportResultTable } from '@/components/reports/ReportResultTable'
-import { calculateMarginData, filterData, aggregateData } from '@/components/reports/report-utils'
-import { useInvoicesCrud } from '@/hooks/use-invoices-crud'
-import { usePayrollCrud } from '@/hooks/use-payroll-crud'
-import { useExpensesCrud } from '@/hooks/use-expenses-crud'
+import { useCustomReportBuilder } from '@/hooks/useCustomReportBuilder'
 import type { Timesheet } from '@/lib/types'
 
 interface CustomReportBuilderProps {
   timesheets: Timesheet[]
 }
 
-type ReportType = 'timesheet' | 'invoice' | 'payroll' | 'expense' | 'margin'
-type AggregationType = 'sum' | 'average' | 'count' | 'min' | 'max'
-type GroupByField = 'worker' | 'client' | 'date' | 'status' | 'month' | 'week'
-
-interface ReportConfig {
-  name: string
-  type: ReportType
-  dateRange: {
-    from: string
-    to: string
-  }
-  groupBy?: GroupByField
-  metrics: string[]
-  filters: ReportFilter[]
-}
-
-interface ReportFilter {
-  field: string
-  operator: 'equals' | 'contains' | 'greater' | 'less'
-  value: string
-}
-
 export function CustomReportBuilder({ timesheets }: CustomReportBuilderProps) {
-  const { invoices } = useInvoicesCrud()
-  const { payrollRuns } = usePayrollCrud()
-  const { expenses } = useExpensesCrud()
-  
-  const [reportConfig, setReportConfig] = useState<ReportConfig>({
-    name: '',
-    type: 'timesheet',
-    dateRange: {
-      from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      to: new Date().toISOString().split('T')[0]
-    },
-    groupBy: undefined,
-    metrics: [],
-    filters: []
-  })
-  
-  const [reportResult, setReportResult] = useState<any>(null)
-
-  const availableMetrics: Record<ReportType, string[]> = {
-    timesheet: ['hours', 'amount', 'count'],
-    invoice: ['amount', 'count'],
-    payroll: ['totalAmount', 'workersCount'],
-    expense: ['amount', 'count'],
-    margin: ['revenue', 'costs', 'margin', 'marginPercentage']
-  }
-
-  const availableFilters: Record<ReportType, string[]> = {
-    timesheet: ['status', 'workerName', 'clientName'],
-    invoice: ['status', 'clientName', 'currency'],
-    payroll: ['status'],
-    expense: ['status', 'category', 'billable'],
-    margin: ['period']
-  }
-
-  const generateReport = () => {
-    if (!reportConfig.name) {
-      toast.error('Please enter a report name')
-      return
-    }
-
-    if (reportConfig.metrics.length === 0) {
-      toast.error('Please select at least one metric')
-      return
-    }
-
-    let data: any[] = []
-    
-    switch (reportConfig.type) {
-      case 'timesheet':
-        data = timesheets
-        break
-      case 'invoice':
-        data = invoices
-        break
-      case 'payroll':
-        data = payrollRuns
-        break
-      case 'expense':
-        data = expenses
-        break
-      case 'margin':
-        data = calculateMarginData(invoices, payrollRuns)
-        break
-    }
-
-    data = filterData(data, reportConfig)
-    const aggregated = aggregateData(data, reportConfig)
-
-    const result = {
-      name: reportConfig.name,
-      generatedAt: new Date().toISOString(),
-      totalRecords: data.length,
-      data: aggregated
-    }
-
-    setReportResult(result)
-    toast.success('Report generated successfully')
-  }
-
-
+  const vm = useCustomReportBuilder(timesheets)
 
   return (
     <div className="space-y-6">
@@ -135,11 +29,11 @@ export function CustomReportBuilder({ timesheets }: CustomReportBuilderProps) {
           </CardHeader>
           <CardContent>
             <ReportConfigForm
-              reportConfig={reportConfig}
-              setReportConfig={setReportConfig}
-              availableMetrics={availableMetrics}
-              availableFilters={availableFilters}
-              onGenerate={generateReport}
+              reportConfig={vm.reportConfig}
+              setReportConfig={vm.setReportConfig}
+              availableMetrics={vm.availableMetrics}
+              availableFilters={vm.availableFilters}
+              onGenerate={vm.generateReport}
             />
           </CardContent>
         </Card>
@@ -150,20 +44,18 @@ export function CustomReportBuilder({ timesheets }: CustomReportBuilderProps) {
             <CardDescription>Summary of configured report</CardDescription>
           </CardHeader>
           <CardContent>
-            <ReportPreview reportConfig={reportConfig} />
+            <ReportPreview reportConfig={vm.reportConfig} />
           </CardContent>
         </Card>
       </div>
 
-      {reportResult && (
+      {vm.reportResult && (
         <Card>
-          <CardHeader>
-            <CardTitle>Report Results</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Report Results</CardTitle></CardHeader>
           <CardContent>
-            <ReportResultTable 
-              reportResult={reportResult} 
-              reportConfig={reportConfig} 
+            <ReportResultTable
+              reportResult={vm.reportResult}
+              reportConfig={vm.reportConfig}
             />
           </CardContent>
         </Card>
