@@ -3,6 +3,16 @@ import { WorkflowTemplate } from './use-approval-workflow-templates.types'
 
 type SetTemplates = (updater: (current: WorkflowTemplate[] | undefined) => WorkflowTemplate[]) => void
 
+const makeDefaultStep = () => ({
+  id: `STEP-${Date.now()}-1`,
+  order: 0,
+  name: 'Initial Review',
+  description: 'First level approval',
+  approverRole: 'Manager',
+  requiresComments: false,
+  canSkip: false
+})
+
 export function useWorkflowTemplateCrud(setTemplates: SetTemplates) {
   const createTemplate = useCallback(
     (name: string, batchType: WorkflowTemplate['batchType'], description = ''): WorkflowTemplate => {
@@ -13,21 +23,10 @@ export function useWorkflowTemplateCrud(setTemplates: SetTemplates) {
         batchType,
         isActive: true,
         isDefault: false,
-        steps: [
-          {
-            id: `STEP-${Date.now()}-1`,
-            order: 0,
-            name: 'Initial Review',
-            description: 'First level approval',
-            approverRole: 'Manager',
-            requiresComments: false,
-            canSkip: false
-          }
-        ],
+        steps: [makeDefaultStep()],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
-
       setTemplates((current) => [...(current || []), newTemplate])
       return newTemplate
     },
@@ -48,10 +47,7 @@ export function useWorkflowTemplateCrud(setTemplates: SetTemplates) {
 
   const deleteTemplate = useCallback(
     (templateId: string) => {
-      setTemplates((current) => {
-        if (!current) return []
-        return current.filter((template) => template.id !== templateId)
-      })
+      setTemplates((current) => (current || []).filter((t) => t.id !== templateId))
     },
     [setTemplates]
   )
