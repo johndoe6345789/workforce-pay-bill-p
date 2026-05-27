@@ -1,165 +1,55 @@
-import { useState } from 'react'
 import { PageHeader } from '@/components/ui/page-header'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { usePermissions, Role, Permission } from '@/hooks/use-permissions'
-import { useTranslation } from '@/hooks/use-translation'
-import { Plus, Shield, Users, Key, MagnifyingGlass, Pencil, Copy } from '@phosphor-icons/react'
-import { Grid } from '@/components/ui/grid'
-import { useAppSelector } from '@/store/hooks'
-
-interface RoleWithUsers extends Role {
-  userCount?: number
-}
+import { Badge } from '@/components/ui/badge'
+import { Plus, Users, Key, MagnifyingGlass } from '@phosphor-icons/react'
+import { RoleCard } from '@/components/roles/RoleCard'
+import { RoleDetailDialog } from '@/components/roles/RoleDetailDialog'
+import { RoleFormDialog } from '@/components/roles/RoleFormDialog'
+import { useRolesPermissionsView } from '@/hooks/useRolesPermissionsView'
 
 export function RolesPermissionsView() {
-  const { t } = useTranslation()
-  const { roles, permissions, hasPermission } = usePermissions()
-  const currentUser = useAppSelector(state => state.auth.user)
-  
-  const [selectedRole, setSelectedRole] = useState<RoleWithUsers | null>(null)
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterModule, setFilterModule] = useState<string>('all')
-
-  const canManageRoles = hasPermission('settings.edit') || hasPermission('users.edit')
-  
-  const rolesWithUsers: RoleWithUsers[] = roles.map(role => ({
-    ...role,
-    userCount: Math.floor(Math.random() * 50)
-  }))
-
-  const filteredRoles = rolesWithUsers.filter(role =>
-    role.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    role.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  const modules = Array.from(new Set(permissions.map(p => p.module)))
-
-  const filteredPermissions = filterModule === 'all' 
-    ? permissions 
-    : permissions.filter(p => p.module === filterModule)
-
-  const getColorClass = (color: string) => {
-    const colorMap: Record<string, string> = {
-      primary: 'bg-primary text-primary-foreground',
-      secondary: 'bg-secondary text-secondary-foreground',
-      accent: 'bg-accent text-accent-foreground',
-      success: 'bg-success text-success-foreground',
-      warning: 'bg-warning text-warning-foreground',
-      destructive: 'bg-destructive text-destructive-foreground',
-      info: 'bg-info text-info-foreground',
-      muted: 'bg-muted text-muted-foreground',
-    }
-    return colorMap[color] || colorMap.muted
-  }
+  const vm = useRolesPermissionsView()
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('roles.title')}
-        description={t('roles.subtitle')}
-        actions={
-          canManageRoles ? (
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2" />
-              {t('roles.createRole')}
-            </Button>
-          ) : undefined
-        }
+        title={vm.t('roles.title')}
+        description={vm.t('roles.subtitle')}
+        actions={vm.canManageRoles ? (
+          <Button onClick={() => vm.setIsCreateDialogOpen(true)}>
+            <Plus className="mr-2" />{vm.t('roles.createRole')}
+          </Button>
+        ) : undefined}
       />
 
       <Tabs defaultValue="roles" className="w-full">
         <TabsList>
-          <TabsTrigger value="roles">
-            <Users className="mr-2" />
-            {t('roles.rolesTab')}
-          </TabsTrigger>
-          <TabsTrigger value="permissions">
-            <Key className="mr-2" />
-            {t('roles.permissionsTab')}
-          </TabsTrigger>
+          <TabsTrigger value="roles"><Users className="mr-2" />{vm.t('roles.rolesTab')}</TabsTrigger>
+          <TabsTrigger value="permissions"><Key className="mr-2" />{vm.t('roles.permissionsTab')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="roles" className="space-y-4 mt-6">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-md">
               <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-              <Input
-                placeholder={t('roles.searchRoles')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+              <Input placeholder={vm.t('roles.searchRoles')} value={vm.searchQuery} onChange={e => vm.setSearchQuery(e.target.value)} className="pl-10" />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredRoles.map((role) => (
-              <Card key={role.id} className="p-6 space-y-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1 flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-lg">{role.name}</h3>
-                      <Badge className={getColorClass(role.color)}>
-                        {role.id}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{role.description}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users size={16} />
-                  <span>{role.userCount} {t('roles.users')}</span>
-                  <span className="mx-2">•</span>
-                  <Key size={16} />
-                  <span>{role.permissions.length} {t('roles.permissions')}</span>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => setSelectedRole(role)}
-                  >
-                    {t('roles.viewDetails')}
-                  </Button>
-                  {canManageRoles && (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedRole(role)
-                          setIsEditDialogOpen(true)
-                        }}
-                      >
-                        <Pencil size={16} />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedRole(role)
-                          setIsCreateDialogOpen(true)
-                        }}
-                      >
-                        <Copy size={16} />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </Card>
+            {vm.filteredRoles.map(role => (
+              <RoleCard
+                key={role.id}
+                role={role}
+                canManageRoles={vm.canManageRoles}
+                onView={vm.setSelectedRole}
+                onEdit={r => { vm.setSelectedRole(r); vm.setIsEditDialogOpen(true) }}
+                onDuplicate={r => { vm.setSelectedRole(r); vm.setIsCreateDialogOpen(true) }}
+                t={vm.t}
+              />
             ))}
           </div>
         </TabsContent>
@@ -168,55 +58,31 @@ export function RolesPermissionsView() {
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-md">
               <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-              <Input
-                placeholder={t('roles.searchPermissions')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+              <Input placeholder={vm.t('roles.searchPermissions')} value={vm.searchQuery} onChange={e => vm.setSearchQuery(e.target.value)} className="pl-10" />
             </div>
-            <select
-              value={filterModule}
-              onChange={(e) => setFilterModule(e.target.value)}
-              className="px-4 py-2 border border-input rounded-md bg-background"
-            >
-              <option value="all">{t('roles.allModules')}</option>
-              {modules.map(module => (
-                <option key={module} value={module}>
-                  {module.charAt(0).toUpperCase() + module.slice(1)}
-                </option>
-              ))}
+            <select value={vm.filterModule} onChange={e => vm.setFilterModule(e.target.value)} className="px-4 py-2 border border-input rounded-md bg-background">
+              <option value="all">{vm.t('roles.allModules')}</option>
+              {vm.modules.map(module => <option key={module} value={module}>{module.charAt(0).toUpperCase() + module.slice(1)}</option>)}
             </select>
           </div>
-
           <Card className="p-6">
             <ScrollArea className="h-[600px]">
               <div className="space-y-6">
-                {modules.map(module => {
-                  const modulePermissions = filteredPermissions.filter(p => p.module === module)
-                  if (modulePermissions.length === 0) return null
-
+                {vm.modules.map(module => {
+                  const modulePermissions = vm.filteredPermissions.filter(p => p.module === module)
+                  if (!modulePermissions.length) return null
                   return (
                     <div key={module} className="space-y-3">
-                      <h3 className="font-semibold text-lg capitalize border-b pb-2">
-                        {module}
-                      </h3>
+                      <h3 className="font-semibold text-lg capitalize border-b pb-2">{module}</h3>
                       <div className="grid gap-3">
                         {modulePermissions.map(permission => (
-                          <div
-                            key={permission.id}
-                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-                          >
+                          <div key={permission.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
                             <div className="flex-1 space-y-1">
                               <div className="flex items-center gap-2">
-                                <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-                                  {permission.id}
-                                </code>
+                                <code className="text-sm font-mono bg-muted px-2 py-1 rounded">{permission.id}</code>
                                 <span className="font-medium">{permission.name}</span>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {permission.description}
-                              </p>
+                              <p className="text-sm text-muted-foreground">{permission.description}</p>
                             </div>
                           </div>
                         ))}
@@ -230,270 +96,20 @@ export function RolesPermissionsView() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={!!selectedRole && !isEditDialogOpen} onOpenChange={(open) => !open && setSelectedRole(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Badge className={getColorClass(selectedRole?.color || 'muted')}>
-                {selectedRole?.name}
-              </Badge>
-            </DialogTitle>
-            <DialogDescription>{selectedRole?.description}</DialogDescription>
-          </DialogHeader>
-
-          <ScrollArea className="h-[400px] pr-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Users size={16} />
-                  <span>{selectedRole?.userCount} {t('roles.usersAssigned')}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Key size={16} />
-                  <span>{selectedRole?.permissions.length} {t('roles.permissions')}</span>
-                </div>
-              </div>
-
-              {currentUser?.roleId === selectedRole?.id && (
-                <Alert>
-                  <AlertDescription>
-                    {t('roles.thisIsYourCurrentRole')}
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <div className="space-y-3">
-                <h4 className="font-semibold">{t('roles.assignedPermissions')}</h4>
-                {selectedRole?.permissions.includes('*') ? (
-                  <Alert>
-                    <AlertDescription className="font-semibold">
-                      ✓ {t('roles.fullSystemAccess')}
-                    </AlertDescription>
-                  </Alert>
-                ) : (
-                  <div className="space-y-2">
-                    {modules.map(module => {
-                      const modulePerms = selectedRole?.permissions.filter(p => 
-                        p.startsWith(module + '.')
-                      ) || []
-                      if (modulePerms.length === 0) return null
-
-                      return (
-                        <div key={module} className="space-y-2">
-                          <h5 className="font-medium text-sm capitalize text-muted-foreground">
-                            {module}
-                          </h5>
-                          <div className="grid gap-2 pl-4">
-                            {modulePerms.map(perm => {
-                              const permData = permissions.find(p => p.id === perm)
-                              return (
-                                <div key={perm} className="flex items-start gap-2 text-sm">
-                                  <Badge variant="outline" className="font-mono text-xs">
-                                    {perm}
-                                  </Badge>
-                                  <span className="text-muted-foreground">
-                                    {permData?.name}
-                                  </span>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          </ScrollArea>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedRole(null)}>
-              {t('common.close')}
-            </Button>
-            {canManageRoles && (
-              <Button onClick={() => setIsEditDialogOpen(true)}>
-                <Pencil className="mr-2" />
-                {t('roles.editRole')}
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <RoleFormDialog
-        role={selectedRole}
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        onSave={() => {
-          setIsCreateDialogOpen(false)
-          setSelectedRole(null)
-        }}
+      <RoleDetailDialog
+        role={vm.selectedRole}
+        open={!!vm.selectedRole && !vm.isEditDialogOpen}
+        onOpenChange={open => { if (!open) vm.setSelectedRole(null) }}
+        canManageRoles={vm.canManageRoles}
+        modules={vm.modules}
+        permissions={vm.permissions}
+        currentUserRoleId={vm.currentUser?.roleId}
+        onEdit={() => vm.setIsEditDialogOpen(true)}
+        t={vm.t}
       />
 
-      <RoleFormDialog
-        role={selectedRole}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onSave={() => {
-          setIsEditDialogOpen(false)
-          setSelectedRole(null)
-        }}
-      />
+      <RoleFormDialog role={vm.selectedRole} open={vm.isCreateDialogOpen} onOpenChange={vm.setIsCreateDialogOpen} onSave={() => { vm.setIsCreateDialogOpen(false); vm.setSelectedRole(null) }} />
+      <RoleFormDialog role={vm.selectedRole} open={vm.isEditDialogOpen} onOpenChange={vm.setIsEditDialogOpen} onSave={() => { vm.setIsEditDialogOpen(false); vm.setSelectedRole(null) }} />
     </div>
-  )
-}
-
-interface RoleFormDialogProps {
-  role: RoleWithUsers | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSave: () => void
-}
-
-function RoleFormDialog({ role, open, onOpenChange, onSave }: RoleFormDialogProps) {
-  const { t } = useTranslation()
-  const { permissions: allPermissions } = usePermissions()
-  const modules = Array.from(new Set(allPermissions.map(p => p.module)))
-  
-  const [formData, setFormData] = useState({
-    name: role?.name || '',
-    description: role?.description || '',
-    color: role?.color || 'muted',
-    permissions: role?.permissions || []
-  })
-
-  const togglePermission = (permissionId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      permissions: prev.permissions.includes(permissionId)
-        ? prev.permissions.filter(p => p !== permissionId)
-        : [...prev.permissions, permissionId]
-    }))
-  }
-
-  const toggleModule = (module: string) => {
-    const modulePerms = allPermissions
-      .filter(p => p.module === module)
-      .map(p => p.id)
-    
-    const allSelected = modulePerms.every(p => formData.permissions.includes(p))
-    
-    setFormData(prev => ({
-      ...prev,
-      permissions: allSelected
-        ? prev.permissions.filter(p => !modulePerms.includes(p))
-        : [...new Set([...prev.permissions, ...modulePerms])]
-    }))
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>{role ? t('roles.editRole') : t('roles.createNewRole')}</DialogTitle>
-          <DialogDescription>
-            {t('roles.defineRoleDetails')}
-          </DialogDescription>
-        </DialogHeader>
-
-        <ScrollArea className="h-[500px] pr-4">
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('roles.roleName')}</label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder={t('roles.roleNamePlaceholder')}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('roles.description')}</label>
-                <Input
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder={t('roles.descriptionPlaceholder')}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('roles.color')}</label>
-                <select
-                  value={formData.color}
-                  onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
-                  className="w-full px-4 py-2 border border-input rounded-md bg-background"
-                >
-                  <option value="primary">{t('roles.primary')}</option>
-                  <option value="secondary">{t('roles.secondary')}</option>
-                  <option value="accent">{t('roles.accent')}</option>
-                  <option value="success">{t('roles.success')}</option>
-                  <option value="warning">{t('roles.warning')}</option>
-                  <option value="info">{t('roles.info')}</option>
-                  <option value="muted">{t('roles.muted')}</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="font-semibold">{t('roles.permissionsTab')}</h4>
-              {modules.map(module => {
-                const modulePerms = allPermissions.filter(p => p.module === module)
-                const selectedCount = modulePerms.filter(p => 
-                  formData.permissions.includes(p.id)
-                ).length
-
-                return (
-                  <div key={module} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          checked={selectedCount === modulePerms.length}
-                          onCheckedChange={() => toggleModule(module)}
-                        />
-                        <label className="font-medium capitalize cursor-pointer">
-                          {module}
-                        </label>
-                      </div>
-                      <Badge variant="outline">
-                        {selectedCount} / {modulePerms.length}
-                      </Badge>
-                    </div>
-                    <div className="grid gap-2 pl-6">
-                      {modulePerms.map(permission => (
-                        <div key={permission.id} className="flex items-start gap-2">
-                          <Checkbox
-                            checked={formData.permissions.includes(permission.id)}
-                            onCheckedChange={() => togglePermission(permission.id)}
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <code className="text-xs font-mono">{permission.id}</code>
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {permission.description}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </ScrollArea>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common.cancel')}
-          </Button>
-          <Button onClick={onSave}>
-            {role ? t('roles.saveChanges') : t('roles.createRole')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   )
 }
