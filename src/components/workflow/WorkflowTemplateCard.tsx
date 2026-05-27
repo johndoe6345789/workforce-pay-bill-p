@@ -2,6 +2,7 @@ import { Trash, Copy, PencilSimple, FlowArrow, CheckCircle, Users } from '@phosp
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { BATCH_TYPES } from '@/hooks/useWorkflowTemplateEditor'
 import type { WorkflowTemplate } from '@/hooks/use-approval-workflow-templates'
 
 interface WorkflowTemplateCardProps {
@@ -11,21 +12,12 @@ interface WorkflowTemplateCardProps {
   onDuplicate: () => void
 }
 
-export function WorkflowTemplateCard({ 
-  template, 
-  onEdit, 
-  onDelete, 
-  onDuplicate 
+export function WorkflowTemplateCard({
+  template,
+  onEdit,
+  onDelete,
+  onDuplicate
 }: WorkflowTemplateCardProps) {
-  const batchTypeLabels: Record<WorkflowTemplate['batchType'], string> = {
-    'payroll': 'Payroll',
-    'invoice': 'Invoice',
-    'timesheet': 'Timesheet',
-    'expense': 'Expense',
-    'compliance': 'Compliance',
-    'purchase-order': 'Purchase Order'
-  }
-
   const parallelStepsCount = template.steps.filter(s => s.isParallel).length
   const totalApprovers = template.steps.reduce((sum, step) => {
     if (step.isParallel && step.parallelApprovers) {
@@ -52,7 +44,7 @@ export function WorkflowTemplateCard({
               {template.description}
             </p>
           </div>
-          <Badge variant="secondary">{batchTypeLabels[template.batchType]}</Badge>
+          <Badge variant="secondary">{BATCH_TYPES.find(t => t.value === template.batchType)?.label ?? template.batchType}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

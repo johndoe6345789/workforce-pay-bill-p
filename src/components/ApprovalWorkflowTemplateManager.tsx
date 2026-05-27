@@ -6,16 +6,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { WorkflowTemplateEditor } from './workflow/WorkflowTemplateEditor'
 import { WorkflowTemplateCard } from './workflow/WorkflowTemplateCard'
+import { BATCH_TYPES } from '@/hooks/useWorkflowTemplateEditor'
 import { useApprovalWorkflowTemplateManager } from '@/hooks/useApprovalWorkflowTemplateManager'
-
-const BATCH_TYPES: { value: string; label: string }[] = [
-  { value: 'payroll',         label: 'Payroll' },
-  { value: 'invoice',         label: 'Invoice' },
-  { value: 'timesheet',       label: 'Timesheet' },
-  { value: 'expense',         label: 'Expense' },
-  { value: 'compliance',      label: 'Compliance' },
-  { value: 'purchase-order',  label: 'Purchase Order' },
-]
 
 export function ApprovalWorkflowTemplateManager() {
   const vm = useApprovalWorkflowTemplateManager()

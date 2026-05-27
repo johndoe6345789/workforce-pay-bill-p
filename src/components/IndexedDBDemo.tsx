@@ -6,15 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Database, Trash, FloppyDisk, ArrowClockwise } from '@phosphor-icons/react'
 import { useIndexedDBDemo } from '@/hooks/useIndexedDBDemo'
-
-const FEATURES = [
-  'Persistent storage across page reloads',
-  'Automatic session management and tracking',
-  'Activity timestamp updates',
-  'Automatic expiry after 24 hours',
-  'React hooks for easy integration',
-  'Type-safe with TypeScript',
-]
+import { INDEXED_DB_FEATURES } from '@/data/indexed-db-demo-data'
 
 export function IndexedDBDemo() {
   const vm = useIndexedDBDemo()
@@ -90,7 +82,7 @@ export function IndexedDBDemo() {
         <div className="space-y-2">
           <h4 className="text-sm font-semibold">Features</h4>
           <ul className="text-sm text-muted-foreground space-y-1">
-            {FEATURES.map(f => <li key={f}>✓ {f}</li>)}
+            {INDEXED_DB_FEATURES.map(f => <li key={f}>✓ {f}</li>)}
           </ul>
         </div>
         <div className="p-4 bg-info/10 border border-info/20 rounded-lg">
