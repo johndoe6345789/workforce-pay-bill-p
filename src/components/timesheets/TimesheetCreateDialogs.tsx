@@ -2,11 +2,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, FileCsv } from '@phosphor-icons/react'
+import { Plus } from '@phosphor-icons/react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DetailedTimesheetEntry } from '@/components/DetailedTimesheetEntry'
-import { Textarea } from '@/components/ui/textarea'
 import { usePermissions } from '@/hooks/use-permissions'
+import { TimesheetBulkImportDialog } from '@/components/timesheets/TimesheetBulkImportDialog'
 import type { ShiftEntry } from '@/lib/types'
 
 interface FormData {
@@ -121,29 +121,13 @@ export function TimesheetCreateDialogs({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isBulkImportOpen} onOpenChange={setIsBulkImportOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline"><FileCsv size={18} className="mr-2" />Bulk Import</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Bulk Import Timesheets</DialogTitle>
-            <DialogDescription>
-              Import multiple timesheets from CSV. Format: workerName, clientName, hours, rate, weekEnding
-            </DialogDescription>
-          </DialogHeader>
-          <Textarea
-            placeholder="workerName,clientName,hours,rate,weekEnding&#10;John Doe,Acme Corp,40,25,2024-01-12"
-            rows={10}
-            value={csvData}
-            onChange={e => setCsvData(e.target.value)}
-          />
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsBulkImportOpen(false)}>Cancel</Button>
-            <Button onClick={handleBulkImport}>Import</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TimesheetBulkImportDialog
+        open={isBulkImportOpen}
+        onOpenChange={setIsBulkImportOpen}
+        csvData={csvData}
+        setCsvData={setCsvData}
+        onImport={handleBulkImport}
+      />
     </>
   )
 }

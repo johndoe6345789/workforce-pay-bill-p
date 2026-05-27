@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Receipt, LinkSimple, X } from '@phosphor-icons/react'
 import type { PurchaseOrder, LinkedInvoice } from '@/lib/types'
 import type { Invoice } from '@/lib/types'
+import { LinkInvoiceDialog } from '@/components/purchase-orders/LinkInvoiceDialog'
 
 interface Props {
   open: boolean
@@ -109,36 +110,13 @@ export function PODetailDialog({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isLinkInvoiceOpen} onOpenChange={setIsLinkInvoiceOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Link Invoice to PO</DialogTitle>
-            <DialogDescription>Select an invoice to link to {selectedPO.poNumber}</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-4 max-h-96 overflow-y-auto">
-            {availableInvoices.length > 0 ? (
-              availableInvoices.map(invoice => (
-                <Card key={invoice.id} className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => handleLinkInvoice(invoice.id)}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div><p className="font-semibold font-mono">{invoice.invoiceNumber}</p><p className="text-sm text-muted-foreground">{invoice.clientName}</p></div>
-                      <div className="text-right">
-                        <p className="font-semibold font-mono">{invoice.currency} {invoice.amount.toLocaleString()}</p>
-                        <Badge variant="outline" className="text-xs">{invoice.status}</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card className="p-8 text-center">
-                <Receipt size={32} className="mx-auto text-muted-foreground mb-2" />
-                <p className="text-muted-foreground">No available invoices for this client</p>
-              </Card>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <LinkInvoiceDialog
+        open={isLinkInvoiceOpen}
+        onOpenChange={setIsLinkInvoiceOpen}
+        poNumber={selectedPO.poNumber}
+        availableInvoices={availableInvoices}
+        onLink={handleLinkInvoice}
+      />
     </>
   )
 }

@@ -3,7 +3,8 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
-import { ShieldCheck, User, FileText, CalendarBlank, Warning, CheckCircle, XCircle, UploadSimple } from '@phosphor-icons/react'
+import { ShieldCheck, FileText, Warning, CheckCircle, XCircle, UploadSimple } from '@phosphor-icons/react'
+import { ComplianceInfoGrid } from '@/components/compliance/ComplianceInfoGrid'
 import type { ComplianceDocument } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import type React from 'react'
@@ -26,12 +27,6 @@ const BADGE_VARIANT: Record<string, 'success' | 'warning' | 'destructive'> = {
   expired:  'destructive',
 }
 
-const DATE_FORMAT: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
-
-function expiryColor(days: number) {
-  return days < 0 ? 'text-destructive' : days < 30 ? 'text-warning' : 'text-success'
-}
-
 export function ComplianceDetailDialog({ document, open, onOpenChange }: Props) {
   if (!document) return null
 
@@ -39,20 +34,6 @@ export function ComplianceDetailDialog({ document, open, onOpenChange }: Props) 
   const { Icon, color, bgColor, message, messageColor } = cfg
   const badgeVariant = BADGE_VARIANT[document.status] ?? 'destructive'
   const days = document.daysUntilExpiry
-
-  const DETAIL_ROWS: { label: string; value: React.ReactNode }[] = [
-    { label: 'Document ID',  value: <p className="font-mono">{document.id}</p> },
-    { label: 'Worker ID',    value: <p className="font-mono">{document.workerId}</p> },
-    { label: 'Worker Name',  value: <p className="font-medium">{document.workerName}</p> },
-    { label: 'Type',         value: <p className="font-medium">{document.documentType}</p> },
-    { label: 'Expiry Date',  value: <p className="font-medium">{new Date(document.expiryDate).toLocaleDateString()}</p> },
-    { label: 'Status',       value: <Badge variant={badgeVariant}>{document.status}</Badge> },
-    { label: 'Days Remaining', value: (
-      <p className={cn('font-mono font-semibold', expiryColor(days))}>
-        {days < 0 ? `${Math.abs(days)} days overdue` : `${days} days`}
-      </p>
-    )},
-  ]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,27 +55,7 @@ export function ComplianceDetailDialog({ document, open, onOpenChange }: Props) 
 
         <ScrollArea className="max-h-[calc(90vh-120px)]">
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><User size={16} /><span>Worker</span></div>
-                <p className="font-medium">{document.workerName}</p>
-                <p className="text-xs text-muted-foreground">ID: {document.workerId}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><FileText size={16} /><span>Document Type</span></div>
-                <Badge variant="outline" className="text-sm">{document.documentType}</Badge>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><CalendarBlank size={16} /><span>Expiry Date</span></div>
-                <p className="font-medium">{new Date(document.expiryDate).toLocaleDateString('en-GB', DATE_FORMAT)}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm"><Warning size={16} /><span>Days Until Expiry</span></div>
-                <p className={cn('font-semibold font-mono text-2xl', expiryColor(days))}>
-                  {days < 0 ? 'Expired' : `${days} days`}
-                </p>
-              </div>
-            </div>
+            <ComplianceInfoGrid document={document} badgeVariant={badgeVariant} />
 
             <Separator />
 
@@ -115,14 +76,19 @@ export function ComplianceDetailDialog({ document, open, onOpenChange }: Props) 
 
             <div className="space-y-2">
               <h4 className="font-semibold text-sm">Document Details</h4>
-              <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+              <div className="bg-muted/30 rounded-lg p-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  {DETAIL_ROWS.map(({ label, value }) => (
-                    <div key={label}>
-                      <p className="text-muted-foreground">{label}</p>
-                      {value}
-                    </div>
-                  ))}
+                  <div><p className="text-muted-foreground">Document ID</p><p className="font-mono">{document.id}</p></div>
+                  <div><p className="text-muted-foreground">Worker ID</p><p className="font-mono">{document.workerId}</p></div>
+                  <div><p className="text-muted-foreground">Worker Name</p><p className="font-medium">{document.workerName}</p></div>
+                  <div><p className="text-muted-foreground">Type</p><p className="font-medium">{document.documentType}</p></div>
+                  <div><p className="text-muted-foreground">Expiry Date</p><p className="font-medium">{new Date(document.expiryDate).toLocaleDateString()}</p></div>
+                  <div><p className="text-muted-foreground">Status</p><Badge variant={badgeVariant}>{document.status}</Badge></div>
+                  <div><p className="text-muted-foreground">Days Remaining</p>
+                    <p className={cn('font-mono font-semibold', days < 0 ? 'text-destructive' : days < 30 ? 'text-warning' : 'text-success')}>
+                      {days < 0 ? `${Math.abs(days)} days overdue` : `${days} days`}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
