@@ -1,0 +1,13 @@
+{
+  "defaults": {
+    "runwayWarnMonths": 6,
+    "ltvCacGoodRatio": 3.0,
+    "paybackGoodMonths": 12,
+    "healthScoreWeights": {
+      "runway": 30,
+      "ltvCac": 25,
+      "churn": 25,
+      "mrr": 20
+    }
+  }
+}
